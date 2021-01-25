@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: ./lib_view/libs/ismartvisionsdk.jar">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib_view/libs/ismartvisionsdk.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
