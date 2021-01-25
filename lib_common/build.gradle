@@ -40,4 +40,5 @@ dependencies {
     api project(path: ':lib_third')
     api project(path: ':lib_utils')
     api project(path: ':lib_network')
+    api project(path: ':lib_log')
 }
