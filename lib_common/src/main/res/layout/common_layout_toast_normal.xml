@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/common_rectangle_corners_14_color_dark"
+    android:paddingStart="40dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="40dp"
+    android:paddingBottom="20dp">
+
+
+    <TextView
+        android:id="@+id/view_toast_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/common_white"
+        android:textSize="@dimen/common_title_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="a就开始了法国进口螺丝刀发几个" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

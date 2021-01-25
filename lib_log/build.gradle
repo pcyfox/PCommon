@@ -1,0 +1,41 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+def rootDependencies = rootProject.ext.dependencies
+android {
+    compileSdkVersion project.compileSdkVersion
+    defaultConfig {
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.androidTargetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        //在这个模块的资源命名必需以这个字符开头，否则编译器会给出警告
+        resourcePrefix 'log_'
+        resConfigs('zh-rCN')
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+        }
+    }
+
+}
+
+dependencies {
+    api 'com.elvishew:xlog:1.6.1'
+    implementation rootProject.ext.dependencies.gson
+    implementation project(path: ':lib_network')
+    implementation rootDependencies.ktx
+    implementation 'com.blankj:utilcode:1.24.7'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
+}

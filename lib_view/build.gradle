@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+def rootDependencies = rootProject.ext.dependencies
+android {
+    compileSdkVersion project.compileSdkVersion
+    defaultConfig {
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.androidTargetSdk
+        versionCode 1
+        versionName "1.0"
+        resourcePrefix 'view_'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'view-proguard-rules.pro'
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        dataBinding = true
+        // for view binding :
+        // viewBinding = true
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation rootDependencies.appcompat
+    implementation project(path: ':lib_utils')
+    implementation(rootDependencies.glide) {
+        exclude group: 'com.android.support'
+    }
+
+}

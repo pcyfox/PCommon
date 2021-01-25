@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="testRunner" value="PLATFORM" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="/usr/local/Cellar/gradle/6.0.1/libexec" />
+        <option name="gradleJvm" value="1.8" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/lib_cache" />
+            <option value="$PROJECT_DIR$/lib_common" />
+            <option value="$PROJECT_DIR$/lib_glide" />
+            <option value="$PROJECT_DIR$/lib_log" />
+            <option value="$PROJECT_DIR$/lib_network" />
+            <option value="$PROJECT_DIR$/lib_third" />
+            <option value="$PROJECT_DIR$/lib_utils" />
+            <option value="$PROJECT_DIR$/lib_view" />
+            <option value="$PROJECT_DIR$/module_test" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+        <option name="useQualifiedModuleNames" value="true" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

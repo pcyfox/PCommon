@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingTop="30dp"
+    android:paddingEnd="20dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.7"
+        android:background="@drawable/shape_solid_corners20_black"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="6dp">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_no_avaliable_network" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="网络连接异常"
+            android:textColor="@color/common_activityBgColor"
+            android:textSize="18dp" />
+    </LinearLayout>
+
+</RelativeLayout>

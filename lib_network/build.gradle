@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+def rootDependencies = rootProject.ext.dependencies
+
+android {
+    compileSdkVersion project.compileSdkVersion
+    defaultConfig {
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.androidTargetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        //在这个模块的资源命名必需以这个字符开头，否则编译器会给出警告
+        resourcePrefix 'net_'
+        resConfigs('zh-rCN')
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            consumerProguardFiles 'nework-proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            consumerProguardFiles 'nework-proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation('androidx.annotation:annotation:1.1.0')
+    implementation 'com.elvishew:xlog:1.6.1'
+    //ok http
+    implementation rootProject.ext.dependencies.okhttp3
+    //retrofit
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    api files('libs/netty-all-4.1.23.Final.jar')
+    implementation  rootProject.ext.dependencies.rxjava2
+    implementation  rootProject.ext.dependencies.rxandroid
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation rootDependencies.ktx
+    implementation project(path: ':lib_cache')
+}
+
+repositories {
+    mavenCentral()
+}

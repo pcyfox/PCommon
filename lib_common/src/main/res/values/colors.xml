@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="common_transparent">#00000000</color>
+    <color name="common_colorPrimary">#3A8DFF</color>
+    <color name="common_colorPrimaryDark">#0669EF</color>
+    <color name="common_colorAccent">#0669EF</color>
+    <color name="common_textColorPrimary">#444444</color>
+    <color name="common_activityBgColor">#F2F3FB</color>
+    <color name="common_textColorSub">#999999</color>
+    <color name="common_textColorHint">#999999</color>
+    <color name="common_textColorTip">#34404c</color>
+    <color name="common_textColorBlue">#3A8DFF</color>
+    <color name="common_divider_color">#41999999</color>
+    <color name="common_shadow_color">#12999999</color>
+    <color name="common_red_text_color">#ED3131</color>
+    <color name="common_white">#FFFFFF</color>
+    <color name="common_golden">#FFD700</color>
+    <color name="common_seek_bar_color">#3A8DFF</color>
+    <color name="common_seek_bar_bg_color">#99999999</color>
+</resources>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/common_rectangle_corners_14_color_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/teach_close_progress"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/common_ic_pop_close" />
+
+
+            <com.wang.avi.AVLoadingIndicatorView
+                android:id="@+id/avi_loading"
+                style="@style/AVLoadingIndicatorView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:button="@null"
+                app:indicatorColor="@color/common_colorPrimaryDark"
+                app:indicatorName="BallSpinFadeLoaderIndicator"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.4" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

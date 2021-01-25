@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AlertButton">
+        <attr name="title" format="string" />
+        <attr name="tips" format="string" />
+    </declare-styleable>
+
+
+    <declare-styleable name="MyCheckBox">
+        <attr name="android:button" />
+        <attr name="attr_drawableWidth" format="dimension" />
+        <attr name="attr_drawableHight" format="dimension" />
+    </declare-styleable>
+</resources>
