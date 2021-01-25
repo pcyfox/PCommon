@@ -53,7 +53,7 @@ dependencies {
 
     implementation project(path: ':lib_cache')
     implementation project(path: ':lib_common')
-    implementation project(path: ':lib_view')
+    implementation project(path: ':lib_widget')
     implementation project(path: ':lib_utils')
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 

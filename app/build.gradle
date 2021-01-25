@@ -141,6 +141,6 @@ dependencies {
     implementation project(path: ':lib_cache')
     implementation project(path: ':module_test')
     implementation project(path: ':lib_glide')
-    implementation project(path: ':lib_view')
+    implementation project(path: ':lib_widget')
 
 }

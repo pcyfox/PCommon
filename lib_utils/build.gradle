@@ -29,8 +29,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api rootDependencies.xlog
-    api rootDependencies.appcompat
+    implementation rootDependencies.xlog
+    implementation rootDependencies.appcompat
     //@see :https://github.com/Blankj/AndroidUtilCode
     api rootDependencies.utilcode
     implementation rootDependencies.ktx

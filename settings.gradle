@@ -7,5 +7,5 @@ include ':app',
         ':lib_utils',
         ':lib_network',
         ':lib_log',
-        ':lib_view'
+        ':lib_widget'
 
