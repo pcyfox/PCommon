@@ -53,7 +53,6 @@ dependencies {
     // api rootDependencies.bugly
     //api rootDependencies.arouter
 
-    //  api 'androidx.cardview:cardview:1.0.0'
     //带丰富动画的进度条
     api 'com.wang.avi:library:2.1.3'
 
