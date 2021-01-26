@@ -19,5 +19,8 @@ module_xxx:(业务型模块，与具体业务息息相关，不同的APP有不�
 author ：LP
 
 
+[![](https://jitpack.io/v/pcyfox/PCommon.svg)](https://jitpack.io/#pcyfox/PCommon)
+
+
 
 
