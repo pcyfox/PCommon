@@ -28,20 +28,17 @@ dependencies {
     implementation rootDependencies.kotlin
     implementation rootDependencies.ktx
 
-    implementation(rootDependencies.glideIntegration) {
+    api(rootDependencies.glideIntegration) {
         exclude group: 'com.android.support'
     }
-    implementation(rootDependencies.glide){
+    api(rootDependencies.glide) {
         exclude group: 'com.android.support'
     }
-    annotationProcessor (rootDependencies.glidwAnnotationProcessor)
-
+    api(rootDependencies.glidwAnnotationProcessor)
     implementation project(path: ':lib_network')//网络请求实现库
     implementation rootDependencies.gson
     implementation rootDependencies.annotation
     implementation rootDependencies.appcompat
-
-
 
 
 }
