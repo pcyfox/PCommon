@@ -29,7 +29,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation rootDependencies.xlog
+    api rootDependencies.xlog
     implementation rootDependencies.appcompat
     //@see :https://github.com/Blankj/AndroidUtilCode
     api rootDependencies.utilcode
