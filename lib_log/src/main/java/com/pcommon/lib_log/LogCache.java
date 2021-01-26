@@ -1,7 +1,9 @@
 package com.pcommon.lib_log;
 
-import java.util.Map;
+import androidx.annotation.Keep;
 
+import java.util.Map;
+@Keep
 public class LogCache {
     private static final String TAG = "LogCache";
     private Map<String, String> header;
