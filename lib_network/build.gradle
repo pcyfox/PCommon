@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             consumerProguardFiles 'nework-proguard-rules.pro'
         }
 
