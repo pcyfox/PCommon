@@ -7,9 +7,8 @@ import android.util.Log;
 
 import com.blankj.utilcode.util.AppUtils;
 import com.jeremyliao.liveeventbus.LiveEventBus;
-import com.pcommon.application.AppApplication;
+import com.pcommon.AppConfig;
 import com.pcommon.lib_common.BuildConfig;
-import com.pcommon.lib_common.config.AppConfig;
 import com.pcommon.lib_common.config.DeskConfig;
 import com.pcommon.lib_log.XLogHelper;
 import com.pcommon.lib_log.printer.CloudLogPrinter;

@@ -71,7 +71,7 @@ android {
     buildTypes {
         release {
             manifestPlaceholders = [icon: "@drawable/ic_launcher", app_name: "PCommon"]
-            minifyEnabled false
+            minifyEnabled  true
             isMinifyEnabled = minifyEnabled
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release

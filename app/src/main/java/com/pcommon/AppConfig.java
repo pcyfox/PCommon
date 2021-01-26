@@ -1,4 +1,4 @@
-package com.pcommon.lib_common.config;
+package com.pcommon;
 
 import android.text.TextUtils;
 

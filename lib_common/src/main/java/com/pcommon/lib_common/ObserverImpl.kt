@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.blankj.utilcode.util.GsonUtils
 import com.elvishew.xlog.XLog
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.pcommon.lib_common.base.BaseRespEntity
+import com.pcommon.lib_network.entity.BaseRespEntity
 import com.pcommon.lib_utils.Util
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable

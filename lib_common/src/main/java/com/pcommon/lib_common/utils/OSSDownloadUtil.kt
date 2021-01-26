@@ -3,11 +3,11 @@ package com.pcommon.lib_common.utils
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.pcommon.lib_common.base.BaseRespEntity
 import com.pcommon.lib_network.OKHttpUtils
 import com.pcommon.lib_network.download.DownLoadCallback
 import com.pcommon.lib_network.download.DownloadInfo
 import com.pcommon.lib_network.download.DownloadManager
+import com.pcommon.lib_network.entity.BaseRespEntity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
