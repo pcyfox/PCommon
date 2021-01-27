@@ -1,7 +1,12 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
+if ("true" == getProperty("isTestMode").toString()) {
+    aaply plugin: 'com.android.application'
+} else {
+    apply plugin: 'com.android.library'
 }
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 30
