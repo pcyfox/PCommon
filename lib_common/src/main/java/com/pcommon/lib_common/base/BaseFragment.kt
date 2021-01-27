@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.Keep
 import androidx.fragment.app.Fragment
 
 
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment
  * @describe fragment 基类
  */
 
+@Keep
 abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragment(), OnKeyDownListener {
     protected var viewModel: VM? = null
     private var viewDataBinding: VDB? = null

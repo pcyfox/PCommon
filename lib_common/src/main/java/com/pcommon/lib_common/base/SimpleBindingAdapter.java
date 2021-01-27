@@ -2,10 +2,12 @@ package com.pcommon.lib_common.base;
 
 import android.content.Context;
 
+import androidx.annotation.Keep;
 import androidx.annotation.LayoutRes;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
+@Keep
 public abstract class SimpleBindingAdapter<M, B extends ViewDataBinding> extends BaseBindingAdapter<M, B> {
 
     private int layout;

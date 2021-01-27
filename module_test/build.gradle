@@ -33,10 +33,7 @@ android {
     }
 
     buildFeatures {
-        //noinspection DataBindingWithoutKapt
         dataBinding = true
-        // for view binding :
-        // viewBinding = true
     }
 
     buildTypes {
@@ -58,10 +55,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
 
-    implementation project(path: ':lib_cache')
-    implementation project(path: ':lib_common')
-    implementation project(path: ':lib_widget')
-    implementation project(path: ':lib_utils')
+    api project(path: ':lib_cache')
+    api project(path: ':lib_common')
+    api project(path: ':lib_widget')
+    api project(path: ':lib_utils')
+
+    //implementation fileTree(include: ['*.jar'], ['netty-all-4.1.23.Final.jar'])
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
 

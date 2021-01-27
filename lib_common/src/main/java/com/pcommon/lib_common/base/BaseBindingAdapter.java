@@ -20,6 +20,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.annotation.Keep;
 import androidx.annotation.LayoutRes;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
@@ -33,6 +34,7 @@ import java.util.List;
  * Create at 2018/6/30
  */
 
+@Keep
 public abstract class BaseBindingAdapter<M, B extends ViewDataBinding> extends RecyclerView.Adapter {
 
     protected Context mContext;

@@ -7,12 +7,14 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.Keep
 import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDialog
 import com.blankj.utilcode.util.ScreenUtils
 
 
+@Keep
 open class BaseFragmentDialog(@LayoutRes val layoutId: Int, var widthPercent: Float = 1.0f, var heightPercent: Float = 1.0f, private val cancelable: Boolean = false, val ct: Context?) : AppCompatDialog(ct) {
     protected var activity: Activity? = null
 

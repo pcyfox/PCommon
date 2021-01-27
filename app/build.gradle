@@ -71,7 +71,7 @@ android {
     buildTypes {
         release {
             manifestPlaceholders = [icon: "@drawable/ic_launcher", app_name: "PCommon"]
-            minifyEnabled  true
+            minifyEnabled false
             isMinifyEnabled = minifyEnabled
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
@@ -79,7 +79,7 @@ android {
         }
         debug {
             manifestPlaceholders = [icon: "@drawable/ic_launcher", app_name: "PCommon"]
-            minifyEnabled true
+            minifyEnabled false
             isMinifyEnabled = minifyEnabled
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -135,12 +135,7 @@ dependencies {
         debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
     }
     implementation 'com.android.support:multidex:1.0.3'
-    implementation project(path: ':lib_common')
-    implementation project(path: ':lib_log')
     implementation 'me.jessyan:autosize:1.2.0'
-    implementation project(path: ':lib_cache')
     implementation project(path: ':module_test')
-    implementation project(path: ':lib_glide')
-    implementation project(path: ':lib_widget')
 
 }

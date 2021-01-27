@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
 import androidx.core.view.isInvisible
 import androidx.databinding.DataBindingUtil
@@ -33,7 +34,7 @@ import com.pcommon.lib_utils.MaskUtils
  * @package
  * @describe Activity 基类
  */
-
+@Keep
 abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : FragmentActivity() {
     private val TAG = "BaseActivity"
     protected var viewModel: VM? = null

@@ -8,8 +8,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+
+import androidx.annotation.Keep;
+
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+@Keep
 public class NetWorkChangReceiver extends BroadcastReceiver {
     private static final String TAG = "NetWorkChangReceiver";
     private NetWorkChangEvent event;

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 
+import androidx.annotation.Keep;
 import androidx.annotation.RequiresApi;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -15,6 +16,7 @@ import java.util.List;
 import static com.pcommon.lib_utils.USBDeviceUtils.getDeviceList;
 
 
+@Keep
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class UsbChangeReceiver extends BroadcastReceiver {
     private static final String TAG = "UsbChangeReceiver";

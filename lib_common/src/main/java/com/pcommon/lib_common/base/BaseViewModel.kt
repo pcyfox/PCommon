@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.Keep
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.AndroidViewModel
@@ -19,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
  * @author LN
  */
 
+@Keep
 open class BaseViewModel(application: Application) : AndroidViewModel(application), BaseLifecycleObserver, Observable {
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
     override fun onAny(owner: LifecycleOwner, event: Lifecycle.Event) {

@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.ActivityUtils
 import com.elvishew.xlog.XLog
@@ -18,6 +19,7 @@ import com.pcommon.lib_common.application.BaseAbstractApplication
  * @describe todo
  */
 
+@Keep
 @RequiresApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 abstract class BaseApplication : BaseAbstractApplication(), Application.ActivityLifecycleCallbacks {
     private val TAG = "BaseApplication"
