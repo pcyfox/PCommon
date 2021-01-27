@@ -19,7 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-#-keep class com.tk_edu.lib_view.** {*; }
--keep class com.tk_edu.lib_vidget.**
--keep class com.tk_edu.lib_vidget.exam.**{*;}
-

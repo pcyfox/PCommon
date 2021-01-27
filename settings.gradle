@@ -1,3 +1,4 @@
+include ':testApp'
 include ':module_test'
 include ':app',
         ':lib_cache',

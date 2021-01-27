@@ -4,9 +4,10 @@ package com.pcommon.lib_common.application
 import android.app.Application
 import android.content.Context
 import androidx.annotation.CallSuper
+import androidx.annotation.Keep
 import java.util.*
 
-
+@Keep
 abstract class BaseAbstractApplication : Application() {
     private var logicClasses: MutableList<Class<out AbstractApplication>>? = null
     private var logics: MutableList<AbstractApplication>? = null

@@ -20,10 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-
-
-
-#-keep class com.qicloud.lib_common.BuildConfig { *; }
+-keep class androidx.databinding.DataBindingComponent {*;}
 
 
 

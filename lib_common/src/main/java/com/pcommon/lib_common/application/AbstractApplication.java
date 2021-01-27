@@ -5,10 +5,12 @@ import android.content.ComponentCallbacks;
 import android.content.Context;
 import android.content.res.Configuration;
 
+import androidx.annotation.Keep;
+
 /**
  * 抽象意义上的Application,非Context子类
  */
-
+@Keep
 public class AbstractApplication {
     public AbstractApplication() {
     }

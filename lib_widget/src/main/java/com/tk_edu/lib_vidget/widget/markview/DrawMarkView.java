@@ -30,9 +30,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DrawMarkView extends View {
 
-    private List<MarkInfo> list = new CopyOnWriteArrayList<>();
-    private Paint mLinePaint, textPaint, bitMapPaint;
-    private Path mPath;
+    private final List<MarkInfo> list = new CopyOnWriteArrayList<>();
+    private final Paint mLinePaint;
+    private final Paint textPaint;
+    private final Paint bitMapPaint;
+    private final Path mPath;
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
     private float startX, startY, endX, endY;
@@ -40,7 +42,7 @@ public class DrawMarkView extends View {
     private MarkInfo selectMarkInfo;
     private OnMarkInfoCallback callback;
 
-    private Runnable runnable;
+    private final Runnable runnable;
     private Bitmap mBitmap;
     private int parentHight = 0;
     private int parentWidth = 0;

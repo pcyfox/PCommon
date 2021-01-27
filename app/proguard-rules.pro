@@ -297,6 +297,7 @@ public static *** w(...);
 
 -keep  class * extends  com.pcommon.lib_common.application.AbstractApplication
 -keepattributes SourceFile,LineNumberTable
+-keep class androidx.databinding.DataBindingComponent {*;}
 
 
 
