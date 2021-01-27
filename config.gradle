@@ -1,18 +1,10 @@
 ext {
-    // Retrofit的正式环境BaseUrl
-    releaseBaseUrl = "http://www.taike-cloud.com:8080/"
-    // debugBaseUrl = "http://www.taike-cloud.com:8080/"
-    debugBaseUrl = "http://192.168.8.95/"
-    ELKBaseUrl = "http://39.103.152.117"
-
-    TeachAppVersionCode = 53
-    TeachAppVersionName = "V1.0.53"
-
-    StuAppVersionCode = 53
-    StuAppVersionName = "V1.0.53"
+    versionCode=1
+    versionName="1"
 
     compileSdkVersion = 28
     androidBuildTools = '29.0.2'
+
     androidTargetSdk = 26 //必须大于等于26  canRequestPackageInstalls才能返回正确的值
     minSdkVersion = 21
 

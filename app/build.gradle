@@ -18,8 +18,8 @@ android {
         applicationId "com.pcyfox.common"
 
         projectName = "PCommon"
-        versionCode project.TeachAppVersionCode
-        versionName project.TeachAppVersionName
+        versionCode project.versionCode
+        versionName project.versionName
 
 
         minSdkVersion project.minSdkVersion

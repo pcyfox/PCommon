@@ -21,6 +21,7 @@ import com.pcommon.manager.TrdServiceManager
  * @author LP
  */
 class AppApplication : BaseApplication() {
+    private  val ELK_URL=""
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(this)
@@ -53,7 +54,7 @@ class AppApplication : BaseApplication() {
 
     private fun initLog() {
         val ELKPort = 0
-        TrdServiceManager.initLog("TK-EDU-STU", BuildConfig.ELK_URL + ":" + ELKPort)
+        TrdServiceManager.initLog("TK-EDU-STU", "$ELK_URL:$ELKPort")
         if (PermissionUtils.isGranted(PermissionConstants.STORAGE)) {
             Thread {
                 Thread.sleep(30 * 1000)//延迟处理，避免影响APP启动流畅度,以及重启后未连上网
@@ -73,7 +74,7 @@ class AppApplication : BaseApplication() {
             //oss下载请求不能添加请求头
             it.toString().contains(".oss-cn")
         }
-        RequestManager.get().addUpdateLogRequests(BuildConfig.ELK_URL, false)
+        RequestManager.get().addUpdateLogRequests(ELK_URL, false)
         //DownloadManager与RequestManager共享同一个okHttpClient，以优化APP性能
         val downloadManager = DownloadManager.getInstance()
         downloadManager.okHttpClient = RequestManager.get().httpClient

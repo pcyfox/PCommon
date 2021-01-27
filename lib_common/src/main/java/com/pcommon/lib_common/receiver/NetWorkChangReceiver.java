@@ -8,9 +8,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-
-import androidx.annotation.Keep;
-
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 public class NetWorkChangReceiver extends BroadcastReceiver {
@@ -20,8 +17,8 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-            System.out.println("网络状态已经改变");
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            System.out.println("-----------网络状态发生变化----------");
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info != null) {
                 Log.d(TAG, "onReceive() called with: info =" + info.toString());
@@ -29,13 +26,13 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
             if (info != null && info.isAvailable()) {
                 event = new NetWorkChangEvent(true, info.getType());
                 sendEvent(event);
-                Log.e(TAG, "onReceive  NetworkInfo.State: " + "网络连接");
                 Helper.getInstance().setConnectionType(info.getType());
+                System.out.println(TAG + "NetworkInfo State: 网络已连接,type:" + Helper.getConnectionType(info.getType()));
             } else {
                 event = new NetWorkChangEvent(false, -1);
                 sendEvent(event);
-                Log.e(TAG, "onReceive  NetworkInfo.State: " + "网络断开");
                 Helper.getInstance().setConnectionType(-1);
+                System.out.println(TAG + "NetworkInfo State: 网络已断开" );
             }
 
         }
@@ -77,11 +74,17 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
          * @return
          */
         public static String getConnectionType(int type) {
-            String connType = "";
-            if (type == ConnectivityManager.TYPE_MOBILE) {
-                connType = "移动数据网络";
-            } else if (type == ConnectivityManager.TYPE_WIFI) {
-                connType = "WIFI网络";
+
+            Log.d(TAG, "getConnectionType() called with: type = [" + type + "]");
+            String connType = "其它";
+            switch (type) {
+                case ConnectivityManager.TYPE_MOBILE:
+                    connType = "移动数据网络";
+                    break;
+                case ConnectivityManager.TYPE_WIFI:
+                    connType = "WIFI网络";
+                case ConnectivityManager.TYPE_ETHERNET:
+                    break;
             }
             return connType;
         }
@@ -126,8 +129,7 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
     }
 
 
-    @Keep
-    public static class NetWorkChangEvent {
+    public class NetWorkChangEvent {
         private boolean isAvailable;
         private int type;
 
@@ -153,6 +155,14 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
 
         public void setType(int type) {
             this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return "NetWorkChangEvent{" +
+                    "isAvailable=" + isAvailable +
+                    ", type=" + type +
+                    '}';
         }
     }
 }

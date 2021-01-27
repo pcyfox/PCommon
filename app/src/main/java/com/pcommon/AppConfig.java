@@ -26,8 +26,7 @@ public final class AppConfig {
         if (!TextUtils.isEmpty(cacheUrl)) {
             return cacheUrl;
         }
-        if (BuildConfig.DEBUG) return BuildConfig.DEBUG_URL;
-        return BuildConfig.BASE_URL;
+        return "";
     }
 
     public static void setBaseUrl(String baseUrl) {
