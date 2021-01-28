@@ -12,6 +12,7 @@ import com.elvishew.xlog.XLog;
 import com.elvishew.xlog.printer.Printer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.pcommon.lib_log.BuildConfig;
 import com.pcommon.lib_log.LogCache;
 import com.pcommon.lib_log.LogCacheManager;
 import com.pcommon.lib_network.RequestManager;
@@ -36,7 +37,7 @@ public class CloudLogPrinter implements Printer {
     private BasePrintLogReq printLogReq;//必需是个JavaBean
     private String index;
     private int quantityInterval = 30;//上传数量间隔,默认是没满30条就上传
-    private static String url = "";
+    private static String url = "";//日志上传url
     private final Map<String, String> header = new HashMap<>();
     private static final String KEY_LOG_LEVEL = "log_level";
     private final Handler logUpDateHandler;
@@ -117,12 +118,18 @@ public class CloudLogPrinter implements Printer {
 
     @Override
     public void println(final int logLevel, final String tag, final String msg) {
-        // Log.d(TAG, "println() called with: logLevel = [" + logLevel + "], tag = [" + tag + "], msg = [" + msg + "]");
-        //  Log.println(logLevel, tag, msg);
-        if (logLevel <= LogLevel.DEBUG || TextUtils.isEmpty(msg) || TextUtils.isEmpty(url)) {
+        if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(url)) {
+            return;
+        }
+       //只有在debug模式下才会打印日志级别低于或等于debug的
+        if (logLevel <= LogLevel.DEBUG) {
+            if (BuildConfig.DEBUG) {
+                Log.d(tag, msg);
+            }
             return;
         }
 
+        Log.println(logLevel, tag, msg);
         Runnable worker = new Runnable() {
             @Override
             public void run() {
@@ -160,7 +167,7 @@ public class CloudLogPrinter implements Printer {
     private void upload(String tag, final String msg, String cacheKey, boolean isUpdateNow) {
         synchronized (mLogs) {
             if (isUpdateNow) {
-                handleUpdate(createLog(tag, msg), cacheKey);
+                handleUpdate(createLog(msg), cacheKey);
                 return;
             }
             if (mLogs.size() < quantityInterval || isUpdating) {
@@ -191,7 +198,7 @@ public class CloudLogPrinter implements Printer {
                 temp.add(mLogs.get(i));
             }
             mLogs.removeAll(temp);
-            Log.d(TAG, "upload log:-----------------> 日志已处理" + size + "条,还剩:" + mLogs.size()+"条");
+            Log.d(TAG, "upload log:-----------------> 日志已处理" + size + "条,还剩:" + mLogs.size() + "条");
             String log = new String(reqContent.toString().getBytes(), StandardCharsets.UTF_8);
             handleUpdate(log, cacheKey);
         } catch (Exception e) {
@@ -246,7 +253,7 @@ public class CloudLogPrinter implements Printer {
                     Log.e(TAG, "addLog() 添加日志达到上线，丢掉最早的一条日志");
                     mLogs.remove(0);
                 }
-                mLogs.add(createLog(tag, msg));
+                mLogs.add(createLog(msg));
             }
 
             if (addLogCount == 0) {
@@ -256,12 +263,10 @@ public class CloudLogPrinter implements Printer {
         }
     }
 
-    private String createLog(String tag, String msg) {
-        // format1.setTimeZone(timeZone);
+    private String createLog(String msg) {
         StringBuilder reqLogItem = new StringBuilder();
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         printLogReq.msg = msg;
-        // printLogReq.tag = tag;
         printLogReq.ts = TimeUtils.millis2String(System.currentTimeMillis());
         reqLogItem.append(gson.toJson(printLogReq));
         return reqLogItem.toString();

@@ -1,5 +1,7 @@
 package com.pcommon.lib_network.log;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ public class HeaderInterceptor implements Interceptor {
         mHeadMap.put("Content-Type", "application/json;charset=UTF-8");
     }
 
+    @NotNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request.Builder builder = chain.request().newBuilder();

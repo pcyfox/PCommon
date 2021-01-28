@@ -34,7 +34,7 @@ import okio.GzipSource;
  * a stable logging format, use your own interceptor.
  */
 public final class MyHttpLoggingInterceptor implements Interceptor {
-    private static final String TAG = "MyHttpLoggingIntercepto";
+    private static final String TAG = "MyHttpLoggingInterceptor";
     private static final Charset UTF8 = StandardCharsets.UTF_8;
     private static final String REQUEST_MESSAGE_START = "----------->Request:";
     private static final String RESPONSE_MESSAGE_START = "<-----------Response:";
@@ -101,7 +101,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
     private final HttpLogger logger;
     private LogFilter filter;
 
-    private volatile Set<String> careHeaders = new HashSet<>();
+    private final Set<String> careHeaders = new HashSet<>();
     private volatile Level level = Level.NONE;
 
 

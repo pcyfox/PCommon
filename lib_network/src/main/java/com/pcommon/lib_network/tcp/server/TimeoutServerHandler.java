@@ -7,7 +7,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 public class TimeoutServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final String TAG = "TimeoutServerHandler";
-    private NettyServerListener<String> mListener;
+    private final NettyServerListener<String> mListener;
 
     public TimeoutServerHandler(NettyServerListener<String> listener) {
         this.mListener = listener;

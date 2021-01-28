@@ -11,7 +11,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
 
     private static final String TAG = "EchoServerHandler";
-    private NettyServerListener<String> mListener;
+    private final NettyServerListener<String> mListener;
 
     public EchoServerHandler(NettyServerListener<String> listener) {
         this.mListener = listener;

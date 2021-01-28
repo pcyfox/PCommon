@@ -19,8 +19,7 @@ import java.util.List;
 public class LogCacheManager {
     private static final String TAG = "LogCacheManager";
     private final static String LOG_CACHE_NAME = "tk_cloud_log_cache";
-    private static LogCache logCache;
-    private static LogCacheManager logCacheManager = new LogCacheManager();
+    private static final LogCacheManager logCacheManager = new LogCacheManager();
 
     private LogCacheManager() {
         CacheDiskStaticUtils.setDefaultCacheDiskUtils(CacheDiskUtils.getInstance(LOG_CACHE_NAME));
@@ -34,12 +33,10 @@ public class LogCacheManager {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "save() called key:" + key);
         }
-        LogCacheManager.logCache = logCache;
         CacheDiskStaticUtils.put(key, new Gson().toJson(logCache));
     }
 
     public synchronized boolean clear(String key) {
-        logCache = null;
         boolean ret = CacheDiskStaticUtils.remove(key);
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "clear() called  key:" + key + " ret:" + ret);

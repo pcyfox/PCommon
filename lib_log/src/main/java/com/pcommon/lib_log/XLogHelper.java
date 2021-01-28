@@ -46,7 +46,7 @@ public class XLogHelper {
                 .cleanStrategy(new FileLastModifiedCleanStrategy(15 * 24 * 3600 * 1000))
                 .build();
 
-        XLog.init(logConfig, filePrinter, new AndroidPrinter(), mCloudLogPrinter);
+        XLog.init(logConfig, filePrinter, mCloudLogPrinter);
     }
 
 
