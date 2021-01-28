@@ -1,4 +1,4 @@
-package com.tk_edu.lib_vidget.widget
+package com.pcommon.lib_vidget.widget
 
 import android.app.Activity
 import android.view.LayoutInflater

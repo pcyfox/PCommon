@@ -1,5 +1,7 @@
 package com.pcommon.lib_network.udp;
 
+import android.util.Log;
+
 import androidx.annotation.Keep;
 
 import com.elvishew.xlog.XLog;
@@ -43,6 +45,8 @@ public class UDPSocketClient {
     private final ExecutorService mThreadPool;
     private HeartbeatTimer timer;
 
+    private static final Object lock = new Object();
+
     public boolean isStarted() {
         return isThreadRunning;
     }
@@ -61,8 +65,10 @@ public class UDPSocketClient {
     }
 
     public static UDPSocketClient getInstance() {
-        if (instance == null) {
-            instance = new UDPSocketClient();
+        synchronized (lock) {
+            if (instance == null) {
+                instance = new UDPSocketClient();
+            }
         }
         return instance;
     }
@@ -96,7 +102,7 @@ public class UDPSocketClient {
     }
 
     public void startUDPSocket() {
-        XLog.d(TAG + ":startUDPSocket() called client=" + datagramSocket + " isThreadRunning=" + isThreadRunning);
+        XLog.d(TAG + ":startUDPSocket() called  isThreadRunning=" + isThreadRunning);
         if (datagramSocket != null || isThreadRunning) return;
         try {
             datagramSocket = new DatagramSocket(null);
@@ -106,13 +112,16 @@ public class UDPSocketClient {
                 // 创建接受数据的 packet
                 receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
             }
-
             startSocketThread();
         } catch (SocketException e) {
             XLog.e(TAG + ":startUDPSocket() error =" + e.getMessage());
             if (datagramSocket != null) {
                 datagramSocket.disconnect();
                 datagramSocket.close();
+            }
+
+            if (onStateChangeLister != null) {
+                onStateChangeLister.onStop();
             }
             e.printStackTrace();
         }
@@ -124,6 +133,9 @@ public class UDPSocketClient {
     }
 
     public void setMsgArrivedListener(OnSocketMsgArrivedListener msgArrivedListener) {
+        if (msgArrivedListener == null) {
+            XLog.w(TAG + "setMsgArrivedListener() called with: msgArrivedListener = [" + null + "]");
+        }
         this.msgArrivedListener = msgArrivedListener;
     }
 
@@ -145,6 +157,7 @@ public class UDPSocketClient {
             }
         });
         clientThread.start();
+        XLog.d(TAG + "startSocketThread() clientThread start");
         if (onStateChangeLister != null) {
             onStateChangeLister.onStart();
         }
@@ -171,13 +184,14 @@ public class UDPSocketClient {
                 XLog.d("无法接收UDP数据或者接收到的UDP数据为空");
                 continue;
             }
-            //String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(),new C);
             try {
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
-                XLog.d("接收到广播数据 " + host + ":" + receivePacket.getPort() + "  内容  " + strReceive);
+                XLog.d(TAG + "接收到广播数据 form" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive);
+                } else {
+                    XLog.e(TAG + ":receiveMessage: msgArrivedListener is null ! ");
                 }
                 // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。
                 if (receivePacket != null) {
@@ -192,6 +206,7 @@ public class UDPSocketClient {
 
 
     public void clear() {
+        XLog.e(TAG + ":clear() called!");
         stopUDPSocket();
         onStateChangeLister = null;
         msgArrivedListener = null;
@@ -206,7 +221,7 @@ public class UDPSocketClient {
             timer.exit();
         }
         timer = new HeartbeatTimer();
-        timer.setOnScheduleListener(new HeartbeatTimer.OnScheduleListener() {
+        timer.setOnScheduleListener(new OnScheduleListener() {
             @Override
             public void onSchedule() {
                 XLog.d("timer is onSchedule...");

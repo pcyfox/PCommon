@@ -46,7 +46,7 @@ dependencies {
     implementation  rootProject.ext.dependencies.rxjava2
     implementation  rootProject.ext.dependencies.rxandroid
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation rootDependencies.kotlin
     implementation rootDependencies.ktx
     implementation project(path: ':lib_cache')
 }

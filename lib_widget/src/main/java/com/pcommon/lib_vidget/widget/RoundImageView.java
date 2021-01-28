@@ -1,4 +1,4 @@
-package com.tk_edu.lib_vidget.widget;
+package com.pcommon.lib_vidget.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;

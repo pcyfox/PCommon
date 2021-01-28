@@ -1,4 +1,4 @@
-package com.tk_edu.lib_vidget
+package com.pcommon.lib_vidget
 
 import org.junit.Test
 

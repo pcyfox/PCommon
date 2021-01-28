@@ -1,4 +1,4 @@
-package com.tk_edu.lib_vidget
+package com.pcommon.lib_vidget
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

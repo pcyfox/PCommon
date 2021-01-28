@@ -33,9 +33,10 @@ dependencies {
     api 'com.elvishew:xlog:1.6.1'
     implementation rootProject.ext.dependencies.gson
     implementation project(path: ':lib_network')
-    implementation rootDependencies.ktx
     implementation 'com.blankj:utilcode:1.24.7'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    //--------------kotlin---------------------
+    implementation rootDependencies.kotlin
+    implementation rootDependencies.ktx
 }
 repositories {
     mavenCentral()

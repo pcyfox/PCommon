@@ -28,7 +28,7 @@ android {
     }
 
     buildFeatures {
-      //  dataBinding = true
+        //  dataBinding = true
     }
     repositories {
         flatDir {
@@ -39,7 +39,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    //--------------kotlin---------------------
+    implementation rootDependencies.kotlin
+    implementation rootDependencies.ktx
     implementation rootDependencies.appcompat
     implementation project(path: ':lib_utils')
     implementation(rootDependencies.glide) {

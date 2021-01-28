@@ -38,9 +38,6 @@ public class HeartbeatTimer {
         }
     }
 
-    public interface OnScheduleListener {
-        void onSchedule();
-    }
 
     public void setOnScheduleListener(OnScheduleListener listener) {
         this.mListener = listener;

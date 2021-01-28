@@ -1,4 +1,4 @@
-package com.tk_edu.lib_vidget.widget;
+package com.pcommon.lib_vidget.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatCheckBox;
 
-import com.tk_edu.lib_vidget.R;
+import com.pcommon.lib_vidget.R;
 
 public class MyCheckBox extends AppCompatCheckBox {
 

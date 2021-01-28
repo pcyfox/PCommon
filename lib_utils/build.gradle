@@ -33,8 +33,9 @@ dependencies {
     implementation rootDependencies.appcompat
     //@see :https://github.com/Blankj/AndroidUtilCode
     api rootDependencies.utilcode
+    //--------------kotlin---------------------
+    implementation rootDependencies.kotlin
     implementation rootDependencies.ktx
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 repositories {
     mavenCentral()
