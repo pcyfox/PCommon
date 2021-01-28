@@ -6,7 +6,7 @@ public class MarkInfo {
     private float startX, startY, endX, endY;
     private String text;
 
-    private float RecstartX, RecstartY, RecWidth, RecHight;
+    private float recStartX, recStartY, recWidth, recHeight;
 
 
     public MarkInfo(float startX, float startY, float endX, float endY, String text) {
@@ -18,43 +18,43 @@ public class MarkInfo {
     }
 
     public void setRecT(float RecstartX, float RecstartY, float RecWidth, float RecHight) {
-        this.RecstartX = RecstartX;
-        this.RecstartY = RecstartY;
-        this.RecWidth = RecWidth;
-        this.RecHight = RecHight;
+        this.recStartX = RecstartX;
+        this.recStartY = RecstartY;
+        this.recWidth = RecWidth;
+        this.recHeight = RecHight;
     }
 
 
-    public float getRecstartX() {
-        return RecstartX;
+    public float getRecStartX() {
+        return recStartX;
     }
 
-    public void setRecstartX(float recstartX) {
-        RecstartX = recstartX;
+    public void setRecStartX(float recStartX) {
+        this.recStartX = recStartX;
     }
 
-    public float getRecstartY() {
-        return RecstartY;
+    public float getRecStartY() {
+        return recStartY;
     }
 
-    public void setRecstartY(float recstartY) {
-        RecstartY = recstartY;
+    public void setRecStartY(float recStartY) {
+        this.recStartY = recStartY;
     }
 
     public float getRecWidth() {
-        return RecWidth;
+        return recWidth;
     }
 
     public void setRecWidth(float recWidth) {
-        RecWidth = recWidth;
+        this.recWidth = recWidth;
     }
 
-    public float getRecHight() {
-        return RecHight;
+    public float getRecHeight() {
+        return recHeight;
     }
 
-    public void setRecHight(float recHight) {
-        RecHight = recHight;
+    public void setRecHeight(float recHeight) {
+        this.recHeight = recHeight;
     }
 
     public String getText() {

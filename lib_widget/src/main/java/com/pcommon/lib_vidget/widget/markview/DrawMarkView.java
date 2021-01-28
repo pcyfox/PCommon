@@ -145,7 +145,7 @@ public class DrawMarkView extends View {
         moveY = y;
         boolean exist = false;
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getRecstartX() - list.get(i).getRecWidth() < x && list.get(i).getRecstartX() + list.get(i).getRecWidth() > x && list.get(i).getRecstartY() - list.get(i).getRecHight() < y && list.get(i).getRecstartY() + list.get(i).getRecHight() > y) {
+            if (list.get(i).getRecStartX() - list.get(i).getRecWidth() < x && list.get(i).getRecStartX() + list.get(i).getRecWidth() > x && list.get(i).getRecStartY() - list.get(i).getRecHeight() < y && list.get(i).getRecStartY() + list.get(i).getRecHeight() > y) {
                 selectMarkInfo = list.get(i);
                 exist = true;
                 postDelayed(runnable, 1000);
@@ -188,7 +188,7 @@ public class DrawMarkView extends View {
         } else {
 
             float tendx = x - selectMarkInfo.getRecWidth() / 2 + 15;
-            float tendy = y - selectMarkInfo.getRecHight() / 2 + 15;
+            float tendy = y - selectMarkInfo.getRecHeight() / 2 + 15;
 
             float teampx = x - moveX;
             float teampy = y - moveY;
