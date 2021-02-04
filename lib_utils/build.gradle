@@ -36,6 +36,7 @@ dependencies {
     //--------------kotlin---------------------
     implementation rootDependencies.kotlin
     implementation rootDependencies.ktx
+    implementation rootDependencies.gson
 }
 repositories {
     mavenCentral()

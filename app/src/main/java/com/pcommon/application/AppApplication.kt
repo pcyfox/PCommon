@@ -21,7 +21,7 @@ import com.pcommon.manager.TrdServiceManager
  * @author LP
  */
 class AppApplication : BaseApplication() {
-    private  val ELK_URL=""
+    private val ELK_URL = "http://192.168.1.203"
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(this)
@@ -53,7 +53,7 @@ class AppApplication : BaseApplication() {
     }
 
     private fun initLog() {
-        val ELKPort = 0
+        val ELKPort = 80
         TrdServiceManager.initLog("TK-EDU-STU", "$ELK_URL:$ELKPort")
         if (PermissionUtils.isGranted(PermissionConstants.STORAGE)) {
             Thread {

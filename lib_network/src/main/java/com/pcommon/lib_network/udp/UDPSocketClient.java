@@ -16,6 +16,8 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.netty.util.NetUtil;
+
 /**
  * Created by melo on 2017/9/20.
  */
@@ -41,6 +43,8 @@ public class UDPSocketClient {
     private long lastReceiveTime = 0;
     private static final long TIME_OUT = 120 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
+
+    private CheckSelfListener checkSelfListener;
 
     private final ExecutorService mThreadPool;
     private HeartbeatTimer timer;
@@ -147,7 +151,7 @@ public class UDPSocketClient {
         Thread clientThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                XLog.i(TAG + ":clientThread start to working");
+                XLog.i(TAG + ":clientThread start to working,port:" + CLIENT_PORT);
                 receiveMessage();
                 isThreadRunning = false;
                 XLog.e(TAG + ":clientThread work broken!");
@@ -188,11 +192,19 @@ public class UDPSocketClient {
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 XLog.d(TAG + "接收到广播数据 form" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
+                if (CheckSelfListener.CHECK_BY_SELF.equals(strReceive)) {
+                    if (checkSelfListener != null) {
+                        checkSelfListener.increaseReceiveMsgTime();
+                    }
+                    continue;
+                }
+
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive);
                 } else {
                     XLog.e(TAG + ":receiveMessage: msgArrivedListener is null ! ");
                 }
+
                 // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。
                 if (receivePacket != null) {
                     receivePacket.setLength(BUFFER_LENGTH);
@@ -242,11 +254,24 @@ public class UDPSocketClient {
     }
 
 
+    public void checkBySelf(CheckSelfListener listener) {
+        if (listener == null || listener.getTimeOut() < 10) {
+            Log.e(TAG, "checkBySelf() called with illegal argument: listener = [" + listener + "]");
+            return;
+        }
+        checkSelfListener = listener;
+        boolean isCanCheck = listener.increaseSendMsgCount();
+        if (isCanCheck) {
+            sendMessage(CheckSelfListener.CHECK_BY_SELF, NetUtil.LOCALHOST4.getHostAddress(), CLIENT_PORT);
+        }
+    }
+
     public void sendBroadcast(final String message) {
         sendBroadcast(message, CLIENT_PORT);
     }
 
-    public void sendBroadcast(final String message, final int port) {
+    public void sendBroadcast(final String message, final String ip, final int port) {
+        XLog.d(TAG, "sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
         //说明通过指定端口创建的socket失败
         if (datagramSocket == null || datagramSocket.getPort() < 0) {
             try {
@@ -258,11 +283,12 @@ public class UDPSocketClient {
                 return;
             }
         }
+
         mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    InetAddress targetAddress = InetAddress.getByName(BROADCAST_IP);
+                    InetAddress targetAddress = InetAddress.getByName(ip);
                     DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, targetAddress, port);
                     try {
                         datagramSocket.send(packet);
@@ -279,6 +305,11 @@ public class UDPSocketClient {
         });
     }
 
+    public void sendBroadcast(final String message, final int port) {
+        sendBroadcast(message, BROADCAST_IP, port);
+    }
+
+
     public void sendMessage(final String message, final String Ip, final int port) {
         mThreadPool.execute(new Runnable() {
             @Override
@@ -286,10 +317,9 @@ public class UDPSocketClient {
                 try {
                     InetAddress targetAddress = InetAddress.getByName(Ip);
                     DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), targetAddress, port);
-                    XLog.d("client.send    " + datagramSocket);
                     datagramSocket.send(packet);
                     // 数据发送事件
-                    XLog.d("数据发送成功");
+                    XLog.d(TAG + ":client send to " + Ip + ":" + port + " over, msg:\n" + message);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

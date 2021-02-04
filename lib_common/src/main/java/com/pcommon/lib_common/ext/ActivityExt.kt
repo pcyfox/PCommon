@@ -162,11 +162,7 @@ fun Activity.toastNormal(text: String?, isLong: Boolean = true) {
     }
     val view = LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_normal, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
-    if (isLong) {
-        ToastUtils.showCustomLong(view)
-    } else {
-        ToastUtils.showCustomShort(view)
-    }
+    ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
 fun Activity.toastTip(text: String? = "", isLong: Boolean = true) {
@@ -175,11 +171,8 @@ fun Activity.toastTip(text: String? = "", isLong: Boolean = true) {
     }
     val view = LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_tip, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
-    if (isLong) {
-        ToastUtils.showCustomLong(view)
-    } else {
-        ToastUtils.showCustomShort(view)
-    }
+
+    ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
 fun Activity.toastOk(text: String? = "", isLong: Boolean = true) {
@@ -188,11 +181,7 @@ fun Activity.toastOk(text: String? = "", isLong: Boolean = true) {
     }
     val view = LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_ok, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
-    if (isLong) {
-        ToastUtils.showCustomLong(view)
-    } else {
-        ToastUtils.showCustomShort(view)
-    }
+    ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
 fun Activity.toastFail(text: String? = "", isLong: Boolean = true) {
@@ -201,11 +190,7 @@ fun Activity.toastFail(text: String? = "", isLong: Boolean = true) {
     }
     val view = LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_fail, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
-    if (isLong) {
-        ToastUtils.showCustomLong(view)
-    } else {
-        ToastUtils.showCustomShort(view)
-    }
+    ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
 

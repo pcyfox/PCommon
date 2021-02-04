@@ -56,7 +56,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     public void uncaughtException(Thread thread, Throwable ex) {
         ex.printStackTrace();
         // 将一些信息保存到SDcard中
-        savaInfoToSD(mContext, ex);
+        saveInfoToSD(mContext, ex);
         // 提示用户程序即将退出
         showToast(mContext, "很抱歉，程序遭遇异常，即将退出！");
         try {
@@ -157,13 +157,16 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     }
 
 
-    public String savaInfoToSD(Context context, Throwable ex) {
+    public String saveInfoToSD(Context context, Throwable ex) {
         String fileName = null;
         Map<String, String> info = obtainSimpleInfo(context);
         String crashLog = info.toString() + "-----Exception------>:" + obtainExceptionInfo(ex);
         XLog.log(CRASH_LOG_LEVEL, crashLog);
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File dir = new File(SDCARD_ROOT + File.separator + context.getPackageName() + ".crash" + File.separator);
+            if (!dir.canWrite()) {
+                return null;
+            }
             if (!dir.exists()) {
                 dir.mkdir();
             }
