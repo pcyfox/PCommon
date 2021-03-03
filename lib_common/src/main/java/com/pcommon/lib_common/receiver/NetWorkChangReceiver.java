@@ -17,7 +17,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 public class NetWorkChangReceiver extends BroadcastReceiver {
     private static final String TAG = "NetWorkChangReceiver";
     private NetWorkChangEvent event;
-    public boolean isNetWorkConnect;
+    public static boolean isNetWorkConnect;
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -77,8 +77,6 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
         /**
          * 获取连接类型
          *
-         * @param type
-         * @return
          */
         public static String getConnectionType(int type) {
 
