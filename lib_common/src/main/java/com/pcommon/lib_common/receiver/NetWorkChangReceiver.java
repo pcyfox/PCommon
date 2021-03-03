@@ -17,6 +17,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 public class NetWorkChangReceiver extends BroadcastReceiver {
     private static final String TAG = "NetWorkChangReceiver";
     private NetWorkChangEvent event;
+    public boolean isNetWorkConnect;
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -28,15 +29,17 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
                 Log.d(TAG, "onReceive() called with: info =" + info.toString());
             }
             if (info != null && info.isAvailable()) {
+                isNetWorkConnect = true;
                 event = new NetWorkChangEvent(true, info.getType());
                 sendEvent(event);
                 Helper.getInstance().setConnectionType(info.getType());
                 System.out.println(TAG + "NetworkInfo State: 网络已连接,type:" + Helper.getConnectionType(info.getType()));
             } else {
+                isNetWorkConnect = false;
                 event = new NetWorkChangEvent(false, -1);
                 sendEvent(event);
                 Helper.getInstance().setConnectionType(-1);
-                System.out.println(TAG + "NetworkInfo State: 网络已断开" );
+                System.out.println(TAG + "NetworkInfo State: 网络已断开");
             }
 
         }
