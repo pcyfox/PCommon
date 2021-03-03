@@ -76,7 +76,6 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
 
         /**
          * 获取连接类型
-         *
          */
         public static String getConnectionType(int type) {
 
