@@ -52,6 +52,9 @@ public class UDPSocketClient {
     private static final Object lock = new Object();
 
     public boolean isStarted() {
+        if (datagramSocket == null || datagramSocket.isClosed()) {
+            return false;
+        }
         return isThreadRunning;
     }
 
@@ -159,7 +162,7 @@ public class UDPSocketClient {
                     onStateChangeLister.onStop();
                 }
             }
-        });
+        }, TAG + ":client");
         clientThread.start();
         XLog.d(TAG + "startSocketThread() clientThread start");
         if (onStateChangeLister != null) {

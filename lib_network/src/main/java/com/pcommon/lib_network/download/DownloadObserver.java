@@ -36,41 +36,46 @@ public class DownloadObserver implements Observer<DownloadInfo> {
 
     @Override
     public void onError(Throwable e) {
-        if (downloadInfo != null) {
-            if (DownloadManager.getInstance().isDownCallContainsUrl(downloadInfo.getCacheKey())) {
-                DownloadManager.getInstance().pauseDownload(downloadInfo.getCacheKey());
-                downloadInfo.setDownloadStatus(DownloadInfo.DOWNLOAD_ERROR);
-                if (callback != null) {
-                    callback.onError(e.toString());
+        try {
+            if (downloadInfo != null) {
+                if (DownloadManager.getInstance().isDownCallContainsUrl(downloadInfo.getCacheKey())) {
+                    DownloadManager.getInstance().pauseDownload(downloadInfo.getCacheKey());
+                    downloadInfo.setDownloadStatus(DownloadInfo.DOWNLOAD_ERROR);
+                    if (callback != null) {
+                        callback.onError(e.toString());
+                    }
+                } else {
+                    downloadInfo.setDownloadStatus(DownloadInfo.DOWNLOAD_PAUSE);
+                    callback.onPause();
                 }
             } else {
-                downloadInfo.setDownloadStatus(DownloadInfo.DOWNLOAD_PAUSE);
-                callback.onPause();
-            }
-        } else {
-            if (callback != null) {
-                String msg = "";
-                if (e != null) {
-                    if (e.getMessage() != null) {
-                        msg = e.getMessage();
-                    } else {
-                        Throwable throwable = e.getCause();
-                        if (throwable != null) {
-                            msg = throwable.getMessage();
+                if (callback != null) {
+                    String msg = "";
+                    if (e != null) {
+                        if (e.getMessage() != null) {
+                            msg = e.getMessage();
+                        } else {
+                            Throwable throwable = e.getCause();
+                            if (throwable != null) {
+                                msg = throwable.getMessage();
+                            }
                         }
-                    }
 
-                    if (TextUtils.isEmpty(msg)) {
-                        msg = e.getLocalizedMessage();
+                        if (TextUtils.isEmpty(msg)) {
+                            msg = e.getLocalizedMessage();
+                        }
+                        if (TextUtils.isEmpty(msg)) {
+                            msg = e.toString();
+                        }
+                        e.printStackTrace();
                     }
-                    if (TextUtils.isEmpty(msg)) {
-                        msg = e.toString();
-                    }
-                    e.printStackTrace();
+                    callback.onError(msg);
                 }
-                callback.onError(msg);
             }
+        } catch (Exception error) {
+            error.printStackTrace();
         }
+
     }
 
     @Override
