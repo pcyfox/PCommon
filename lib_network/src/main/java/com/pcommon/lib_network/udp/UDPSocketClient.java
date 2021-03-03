@@ -102,7 +102,6 @@ public class UDPSocketClient {
         if (timer != null) {
             timer.exit();
         }
-
         if (onStateChangeLister != null) {
             onStateChangeLister.onStop();
         }
@@ -110,9 +109,13 @@ public class UDPSocketClient {
 
     public void startUDPSocket() {
         XLog.d(TAG + ":startUDPSocket() called  isThreadRunning=" + isThreadRunning);
-        if (datagramSocket != null || isThreadRunning) return;
+        if (isThreadRunning && datagramSocket != null) {
+            stopUDPSocket();
+        }
         try {
-            datagramSocket = new DatagramSocket(null);
+            if (datagramSocket == null) {
+                datagramSocket = new DatagramSocket(null);
+            }
             datagramSocket.setReuseAddress(true);
             datagramSocket.bind(new InetSocketAddress(CLIENT_PORT));
             if (receivePacket == null) {
