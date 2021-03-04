@@ -134,6 +134,4 @@ dependencies {
     }
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'me.jessyan:autosize:1.2.0'
-    implementation project(path: ':module_test')
-
 }

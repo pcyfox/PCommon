@@ -1,8 +1,6 @@
 if ("true" == getProperty("isTestMode").toString()) {
     include ':testApp'
 }
-
-include ':module_test'
 include ':app',
         ':lib_cache',
         ':lib_glide',
