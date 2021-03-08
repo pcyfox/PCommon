@@ -34,6 +34,7 @@ import com.pcommon.lib_utils.MaskUtils
  * @package
  * @describe Activity 基类
  */
+
 @Keep
 abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : FragmentActivity() {
     private val TAG = "BaseActivity"
