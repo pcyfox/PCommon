@@ -48,6 +48,13 @@ public class MaskUtils {
     }
 
 
+    public static boolean isShow(Activity activity, Object tag) {
+        View view = activity.getWindow().getDecorView().findViewWithTag(tag);
+        return view != null;
+    }
+
+    ;
+
     private static void removeViewByTag(Window window, Object tag) {
         View view = window.getDecorView().findViewWithTag(tag);
         removeView(window, view);

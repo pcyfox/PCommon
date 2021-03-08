@@ -307,11 +307,11 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
 
     open fun onNetWorkChange(isAvailable: Boolean) {
         XLog.i("$TAG:onNetWorkChange() called with: isAvailable = $isAvailable")
-        if (!window.decorView.isInvisible) {
-            return
-        }
         //网络异常悬浮窗
         if (!isAvailable) {
+            if (!window.decorView.isInvisible) {
+                return
+            }
             if (window.isActive) {
                 MaskUtils.show(window, R.layout.layout_toast_no_available_network_tip, this)
             }
