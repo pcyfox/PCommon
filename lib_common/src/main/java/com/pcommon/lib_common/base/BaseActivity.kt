@@ -313,6 +313,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
                 return
             }
             if (window.isActive) {
+                MaskUtils.hide(this, this)
                 MaskUtils.show(window, R.layout.layout_toast_no_available_network_tip, this)
             }
         } else {
