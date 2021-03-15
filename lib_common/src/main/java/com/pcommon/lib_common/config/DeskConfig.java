@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+
 @Keep
 public class DeskConfig {
     @Expose(serialize = false, deserialize = false)
@@ -26,10 +27,10 @@ public class DeskConfig {
     private final String PATH;
 
     @Expose
-    private int deskNumber = -1;
+    private String deskNumber = "-1";
+
     @Expose
     private String deviceId;
-
 
     @Expose
     private String location;
@@ -42,13 +43,19 @@ public class DeskConfig {
         PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DeskConfig.conf";
     }
 
+    //检测桌号合法性
+    public  static boolean isDeskNumberRight(String deskNumber) {
+        return !TextUtils.isEmpty(deskNumber) && !"-1".equals(deskNumber);
+    }
+
+
     private void copyLocationConfig() {
         localConfig = getLocalConfig(false);
         if (localConfig != null) {
             if (!TextUtils.isEmpty(localConfig.deviceId)) {
                 this.deviceId = localConfig.deviceId;
             }
-            if (localConfig.deskNumber > 0) {
+            if (!TextUtils.isEmpty(localConfig.deskNumber)) {
                 this.deskNumber = localConfig.deskNumber;
             }
             if (!TextUtils.isEmpty(localConfig.location)) {
@@ -83,12 +90,12 @@ public class DeskConfig {
         saveDeskConfig(this);
     }
 
-    public int getDeskNumber() {
+    public String getDeskNumber() {
         return getDeskNumber(false);
     }
 
-    public int getDeskNumber(boolean forceUpdate) {
-        if (deskNumber < 0) {
+    public String getDeskNumber(boolean forceUpdate) {
+        if (!isDeskNumberRight(deskNumber)) {
             localConfig = getLocalConfig(forceUpdate);
             if (localConfig != null) {
                 deskNumber = localConfig.deskNumber;
@@ -103,8 +110,8 @@ public class DeskConfig {
     }
 
 
-    public void setDeskNumber(int deskNumber) {
-        if (deskNumber >= 0) {
+    public void setDeskNumber(String deskNumber) {
+        if (isDeskNumberRight(deskNumber)) {
             copyLocationConfig();
             this.deskNumber = deskNumber;
             saveDeskConfig(this);

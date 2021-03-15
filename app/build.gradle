@@ -54,17 +54,11 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('taike.jks')
-            storePassword "dftk1689"
-            keyAlias "taike"
-            keyPassword "szyd2433"
+
         }
 
         release {
-            storeFile file('taike.jks')
-            storePassword "dftk1689"
-            keyAlias "taike"
-            keyPassword "szyd2433"
+
         }
     }
 
@@ -134,4 +128,6 @@ dependencies {
     }
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'me.jessyan:autosize:1.2.0'
+    implementation project(path: ':lib_common')
+    implementation project(path: ':lib_cache')
 }
