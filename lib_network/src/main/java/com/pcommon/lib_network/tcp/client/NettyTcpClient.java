@@ -58,22 +58,20 @@ public class NettyTcpClient {
 
     private boolean isNeedReconnect = true;
 
-
     private long reconnectIntervalTime = 5000;
-    private static final Integer CONNECT_TIMEOUT_MILLIS = 5000;
 
-    private String host;
-    private int tcp_port;
-    private String mIndex;
+    private final String host;
+    private final int tcp_port;
+    private final String mIndex;
     /**
      * 心跳间隔时间
      */
-    private long heartBeatInterval = 5;//单位秒
+    private long heartBeatInterval = 3;//单位秒
 
     /**
      * 是否发送心跳
      */
-    private boolean isSendheartBeat = true;
+    private boolean isSendHeartBeat = true;
 
     /**
      * 心跳数据，可以是String类型，也可以是byte[].
@@ -121,8 +119,8 @@ public class NettyTcpClient {
         return heartBeatInterval;
     }
 
-    public boolean isSendheartBeat() {
-        return isSendheartBeat;
+    public boolean isSendHeartBeat() {
+        return isSendHeartBeat;
     }
 
     public void connect() {
@@ -142,7 +140,7 @@ public class NettyTcpClient {
     }
 
 
-    private NettyClientCallback nettyClientCallback = new NettyClientCallback() {
+    private final NettyClientCallback nettyClientCallback = new NettyClientCallback() {
 
         @Override
         public void onConnect() {
@@ -167,7 +165,7 @@ public class NettyTcpClient {
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             public void initChannel(SocketChannel ch) throws Exception {
-                                if (isSendheartBeat) {
+                                if (isSendHeartBeat) {
                                     ch.pipeline().addLast("ping", new IdleStateHandler(0, heartBeatInterval, 0, TimeUnit.SECONDS));//5s未发送数据，回调userEventTriggered
                                 }
 
@@ -182,16 +180,16 @@ public class NettyTcpClient {
 
                                 ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
                                 ch.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8));
-                                // 定义一个发送消息协议格式：|--header:4 byte--|--content:2MB--|
-                                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024 * 2, 0, 4, 0, 4));
-                                ch.pipeline().addLast(new NettyClientHandler(listener, mIndex, isSendheartBeat, heartBeatData, packetSeparator, nettyClientCallback));
+                                // 定义一个发送消息协议格式：|--header:4 byte--|--content:3MB--|
+                                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024 * 3, 0, 4, 0, 4));
+                                ch.pipeline().addLast(new NettyClientHandler(listener, mIndex, isSendHeartBeat, heartBeatData, packetSeparator, nettyClientCallback));
                             }
                         });
 
                 try {
                     channelFuture = bootstrap.connect(host, tcp_port).addListener(new ChannelFutureListener() {
                         @Override
-                        public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                        public void operationComplete(ChannelFuture channelFuture) {
                             if (channelFuture.isSuccess()) {
                                 isConnect = true;
                                 XLog.i(TAG + ":连接成功");
@@ -224,12 +222,11 @@ public class NettyTcpClient {
                         XLog.d(TAG + "netty客户端----> connectServer    Thread.sleep ");
                         Thread.sleep(5000);
                     } catch (Exception ex) {
+                        isConnect = false;
                         //不会调用
                     }
                     XLog.d(TAG + "netty客户端----> connectServer    Thread.sleep +");
                     reconnect();
-                } finally {
-
                 }
             }
         }
@@ -443,7 +440,7 @@ public class NettyTcpClient {
             nettyTcpClient.MAX_CONNECT_TIMES = this.MAX_CONNECT_TIMES;
             nettyTcpClient.reconnectIntervalTime = this.reconnectIntervalTime;
             nettyTcpClient.heartBeatInterval = this.heartBeatInterval;
-            nettyTcpClient.isSendheartBeat = this.isSendheartBeat;
+            nettyTcpClient.isSendHeartBeat = this.isSendheartBeat;
             nettyTcpClient.heartBeatData = this.heartBeatData;
             nettyTcpClient.packetSeparator = this.packetSeparator;
             nettyTcpClient.maxPacketLong = this.maxPacketLong;
