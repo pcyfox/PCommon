@@ -26,7 +26,7 @@ public class UDPSocketClient {
     private OnSocketMsgArrivedListener msgArrivedListener;
     private OnStateChangeLister onStateChangeLister;
     private static UDPSocketClient instance;
-    private static final String TAG = "UDPSocket";
+    private static final String TAG = "UDPSocketClient";
     // 单个CPU线程池大小
     private static final int POOL_SIZE = 5;
     private static final int BUFFER_LENGTH = 8 * 1024;

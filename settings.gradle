@@ -3,7 +3,6 @@ if ("true" == getProperty("isTestMode").toString()) {
 }
 include ':app',
         ':lib_cache',
-        ':lib_glide',
         ':lib_common',
         ':lib_third',
         ':lib_utils',

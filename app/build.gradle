@@ -123,6 +123,6 @@ dependencies {
     implementation 'me.jessyan:autosize:1.2.0'
     implementation project(path: ':lib_common')
     implementation project(path: ':lib_cache')
-    implementation project(path: ':lib_glide')
+//    implementation project(path: ':lib_glide')
     implementation project(path: ':lib_widget')
 }
