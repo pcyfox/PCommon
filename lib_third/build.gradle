@@ -50,9 +50,6 @@ dependencies {
     api rootDependencies.rxjava2
     api rootDependencies.rxandroid
 
-    // api rootDependencies.bugly
-    //api rootDependencies.arouter
-
     //带丰富动画的进度条
     api 'com.wang.avi:library:2.1.3'
 
