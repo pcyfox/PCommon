@@ -14,13 +14,10 @@ android {
     buildToolsVersion = project.androidBuildTools
     compileSdkVersion project.compileSdkVersion
     defaultConfig {
-
         applicationId "com.pcyfox.common"
-
         projectName = "PCommon"
         versionCode project.versionCode
         versionName project.versionName
-
 
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.androidTargetSdk
@@ -31,14 +28,11 @@ android {
         }
         resConfigs('zh-rCN')
 
-
         compileOptions {
             sourceCompatibility rootProject.ext.javaSourceCompatibility
             targetCompatibility rootProject.ext.javaTargetCompatibility
         }
 
-        manifestPlaceholders = ["design_width_in_dp": 960]
-        manifestPlaceholders = ["design_height_in_dp": 540]
 
     }
     sourceSets {
@@ -69,7 +63,6 @@ android {
             isMinifyEnabled = minifyEnabled
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            //debuggable false
         }
         debug {
             manifestPlaceholders = [icon: "@drawable/ic_launcher", app_name: "PCommon"]
@@ -130,4 +123,6 @@ dependencies {
     implementation 'me.jessyan:autosize:1.2.0'
     implementation project(path: ':lib_common')
     implementation project(path: ':lib_cache')
+    implementation project(path: ':lib_glide')
+    implementation project(path: ':lib_widget')
 }

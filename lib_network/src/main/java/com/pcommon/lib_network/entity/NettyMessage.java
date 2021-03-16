@@ -2,7 +2,7 @@ package com.pcommon.lib_network.entity;
 
 public class NettyMessage<D> {
     private String from;
-    private int id;//发送者ID
+    private String id;//发送者ID
     private String action;
     private D data;
     private int code;
@@ -11,7 +11,7 @@ public class NettyMessage<D> {
     public NettyMessage() {
     }
 
-    public NettyMessage(String from, int id, String action, D data, int code, String desc) {
+    public NettyMessage(String from, String id, String action, D data, int code, String desc) {
         this.from = from;
         this.id = id;
         this.action = action;
@@ -20,7 +20,7 @@ public class NettyMessage<D> {
         this.desc = desc;
     }
 
-    public NettyMessage(String from, int id, String action, D data, String desc) {
+    public NettyMessage(String from, String id, String action, D data, String desc) {
         this.from = from;
         this.id = id;
         this.action = action;
@@ -28,7 +28,7 @@ public class NettyMessage<D> {
         this.desc = desc;
     }
 
-    public NettyMessage(String from, int id, String action, D data) {
+    public NettyMessage(String from, String id, String action, D data) {
         this.from = from;
         this.id = id;
         this.action = action;
@@ -43,11 +43,11 @@ public class NettyMessage<D> {
         this.from = from;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

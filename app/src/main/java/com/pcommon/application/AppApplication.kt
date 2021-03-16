@@ -8,7 +8,6 @@ import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
 import com.pcommon.AppConfig
 import com.pcommon.lib_cache.DiskCacheManager
-import com.pcommon.lib_common.BuildConfig
 import com.pcommon.lib_common.application.CommApplication
 import com.pcommon.lib_common.base.BaseApplication
 import com.pcommon.lib_network.RequestManager

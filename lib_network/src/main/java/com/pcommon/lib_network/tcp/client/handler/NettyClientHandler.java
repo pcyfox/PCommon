@@ -19,12 +19,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     private static final String TAG = "NettyClientHandler";
     private final boolean isSendheartBeat;
     private final NettyClientListener<String> listener;
-    private final int index;
+    private final String index;
     private final Object heartBeatData;
     private final String packetSeparator;
     private final NettyClientCallback nettyClientCallback;
 
-    public NettyClientHandler(NettyClientListener<String> listener, int index, boolean isSendheartBeat, Object heartBeatData, String separator, NettyClientCallback nettyClientCallback) {
+    public NettyClientHandler(NettyClientListener<String> listener, String index, boolean isSendheartBeat, Object heartBeatData, String separator, NettyClientCallback nettyClientCallback) {
         this.listener = listener;
         this.index = index;
         this.isSendheartBeat = isSendheartBeat;

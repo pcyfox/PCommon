@@ -64,7 +64,7 @@ public class NettyTcpClient {
 
     private String host;
     private int tcp_port;
-    private int mIndex;
+    private String mIndex;
     /**
      * 心跳间隔时间
      */
@@ -91,7 +91,7 @@ public class NettyTcpClient {
         this.maxPacketLong = maxPacketLong;
     }
 
-    private NettyTcpClient(String host, int tcp_port, int index) {
+    private NettyTcpClient(String host, int tcp_port, String index) {
         this.host = host;
         this.tcp_port = tcp_port;
         this.mIndex = index;
@@ -113,7 +113,7 @@ public class NettyTcpClient {
         return tcp_port;
     }
 
-    public int getIndex() {
+    public String getIndex() {
         return mIndex;
     }
 
@@ -362,7 +362,7 @@ public class NettyTcpClient {
         /**
          * 客户端标识，(因为可能存在多个连接)
          */
-        private int mIndex;
+        private String mIndex;
 
         /**
          * 是否发送心跳
@@ -418,7 +418,7 @@ public class NettyTcpClient {
             return this;
         }
 
-        public Builder setIndex(int mIndex) {
+        public Builder setIndex(String mIndex) {
             this.mIndex = mIndex;
             return this;
         }

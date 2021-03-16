@@ -34,13 +34,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DrawLineView extends View {
     private static final String TAG = "DrawLineView";
     private final List<LineInfo> list = new CopyOnWriteArrayList<>();
-    private final Paint mLinePaint;
     private final Paint lLinePaint;
-    private Path mPath;
     private final Path mPathLine;
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
-    private float startX;
     private float endX;
     private float endY;
     private Canvas mCanvas;
@@ -63,7 +60,7 @@ public class DrawLineView extends View {
         lLinePaint.setColor(Color.BLACK);
 
         //线的Paint
-        mLinePaint = new Paint();
+        Paint mLinePaint = new Paint();
         mLinePaint.setAntiAlias(true);
         mLinePaint.setStyle(Paint.Style.STROKE);
         mLinePaint.setStrokeWidth(5);
@@ -75,7 +72,7 @@ public class DrawLineView extends View {
         mLinePaint.setPathEffect(new DashPathEffect(new float[]{15, 5}, 0));
 
         //路径
-        mPath = new Path();
+        Path mPath = new Path();
 
         mPathLine = new Path();
 
@@ -114,12 +111,11 @@ public class DrawLineView extends View {
         mX = x;
         mY = y;
 
-        startX = x;
         endX = x;
         endY = y;
 
 
-        list.add(new LineInfo(startX, y, endX, endY));
+        list.add(new LineInfo(x, y, endX, endY));
         list.get(list.size() - 1).getPtList().add(new Point(x, y));
     }
 
@@ -199,9 +195,7 @@ public class DrawLineView extends View {
 
 
     private Bitmap getBitmapFromView() {
-
         int w = getMeasuredWidth();
-
         int h = getMeasuredHeight();
 
         Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
