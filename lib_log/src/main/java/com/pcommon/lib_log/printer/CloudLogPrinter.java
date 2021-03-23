@@ -32,6 +32,7 @@ import okhttp3.Response;
  * 主要是处理日志上传
  */
 public class CloudLogPrinter implements Printer {
+    public boolean isDebug = false;
     private static final String TAG = "CloudLogPrinter";
     private final List<String> mLogs = new ArrayList<>();
     private BasePrintLogReq printLogReq;//必需是个JavaBean
@@ -121,9 +122,9 @@ public class CloudLogPrinter implements Printer {
         if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(url)) {
             return;
         }
-       //只有在debug模式下才会打印日志级别低于或等于debug的
+        //只有在debug模式下才会打印日志级别低于或等于debug的
         if (logLevel <= LogLevel.DEBUG) {
-            if (BuildConfig.DEBUG) {
+            if (isDebug) {
                 Log.d(tag, msg);
             }
             return;
