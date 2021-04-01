@@ -1,0 +1,18 @@
+static def execCmd(String cmd)  {
+    Runtime run = Runtime.getRuntime()
+    try {
+        Process p = run.exec(cmd)
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
+        String lineMes
+        while ((lineMes = br.readLine()) != null)
+            System.out.println(lineMes);// 打印输出信息
+        //检查命令是否执行失败。
+        if (p.waitFor() != 0) {
+            if (p.exitValue() == 1)//0表示正常结束，1：非正常结束
+                System.err.println("命令执行失败!")
+        }
+        br.close()
+    } catch (Exception e) {
+        e.printStackTrace()
+    }
+}

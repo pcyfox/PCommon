@@ -209,7 +209,7 @@ public class UDPSocketClient {
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive);
                 } else {
-                    XLog.e(TAG + ":receiveMessage: msgArrivedListener is null ! ");
+                    XLog.e(TAG + ":receiveMessage,but msgArrivedListener is null ! ");
                 }
 
                 // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。

@@ -1,6 +1,7 @@
 if ("true" == getProperty("isTestMode").toString()) {
     include ':testApp'
 }
+//include 本质上也是一个函数
 include ':app',
         ':lib_cache',
         ':lib_common',
@@ -10,3 +11,34 @@ include ':app',
         ':lib_log',
         ':lib_widget'
 
+
+static def execCmd(String cmd) {
+    println "execCmd() called with,cmd=$cmd"
+    Runtime run = Runtime.getRuntime()
+    try {
+        Process p = run.exec(cmd)
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
+        String lineMes
+        while ((lineMes = br.readLine()) != null)
+            System.out.println(lineMes);// 打印输出信息
+        //检查命令是否执行失败。
+        if (p.waitFor() != 0) {
+            if (p.exitValue() == 1)//0表示正常结束，1：非正常结束
+                System.err.println("exec cmd fail!")
+        }
+        br.close()
+        println "exec cmd success!!"
+    } catch (Exception e) {
+        e.printStackTrace()
+    }
+
+}
+
+def initGradleEnvironment() {
+    println "..........initialize Gradle Environment ....."
+    //TODO doSomething you like
+    execCmd("git log")
+    println "...initialize Gradle Environment completes..."
+}
+//settings.gradle 加载的时候，会执行
+initGradleEnvironment()
