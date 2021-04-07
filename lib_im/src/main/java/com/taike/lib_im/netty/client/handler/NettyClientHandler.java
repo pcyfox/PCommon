@@ -1,11 +1,11 @@
-package com.taike.lib_im.tcp.client.handler;
+package com.taike.lib_im.netty.client.handler;
 
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.elvishew.xlog.XLog;
-import com.taike.lib_im.tcp.client.listener.NettyClientListener;
-import com.taike.lib_im.tcp.client.status.ConnectState;
+import com.taike.lib_im.netty.client.listener.NettyClientListener;
+import com.taike.lib_im.netty.client.status.ConnectState;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

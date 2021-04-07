@@ -1,14 +1,16 @@
-package com.taike.lib_im.udp;
+package com.pcommon.lib_network.udp;
 
 import android.util.Log;
 
 import androidx.annotation.Keep;
 
 import com.elvishew.xlog.XLog;
+import com.pcommon.lib_network.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -16,7 +18,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.netty.util.NetUtil;
 
 /**
  * Created by melo on 2017/9/20.
@@ -269,8 +270,12 @@ public class UDPSocketClient {
         checkSelfListener = listener;
         boolean isCanCheck = listener.increaseSendMsgCount();
         if (isCanCheck) {
-            sendMessage(CheckSelfListener.CHECK_BY_SELF, NetUtil.LOCALHOST4.getHostAddress(), CLIENT_PORT);
+            sendMessage(CheckSelfListener.CHECK_BY_SELF, getHostAddress(), CLIENT_PORT);
         }
+    }
+
+    public String getHostAddress() {
+        return Utils.LOCALHOST4.getHostAddress();
     }
 
     public void sendBroadcast(final String message) {

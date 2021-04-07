@@ -1,15 +1,15 @@
-package com.taike.lib_im.tcp.client;
+package com.taike.lib_im.netty.client;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.elvishew.xlog.XLog;
-import com.taike.lib_im.tcp.client.handler.NettyClientCallback;
-import com.taike.lib_im.tcp.client.handler.NettyClientHandler;
-import com.taike.lib_im.tcp.client.listener.MessageStateListener;
-import com.taike.lib_im.tcp.client.listener.NettyClientListener;
-import com.taike.lib_im.tcp.client.status.ConnectState;
+import com.taike.lib_im.netty.client.handler.NettyClientCallback;
+import com.taike.lib_im.netty.client.handler.NettyClientHandler;
+import com.taike.lib_im.netty.client.listener.MessageStateListener;
+import com.taike.lib_im.netty.client.listener.NettyClientListener;
+import com.taike.lib_im.netty.client.status.ConnectState;
 
 import java.util.concurrent.TimeUnit;
 

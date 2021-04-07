@@ -9,9 +9,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.nio.channels.FileChannel;
 
 final public class Utils {
+    public static final Inet4Address LOCALHOST4;
+    static {
+        byte[] LOCALHOST4_BYTES = new byte[]{127, 0, 0, 1};
+        Inet4Address localhost4 = null;
+        try {
+            localhost4 = (Inet4Address) InetAddress.getByAddress("localhost", LOCALHOST4_BYTES);
+        } catch (Exception var20) {
+            var20.printStackTrace();
+        }
+
+        LOCALHOST4 = localhost4;
+    }
+
     private static final String TAG = "Utils";
 
     public static <T> T checkNotNull(@Nullable T object, String message) {
@@ -46,5 +61,6 @@ final public class Utils {
             }
         }
     }
+
 
 }

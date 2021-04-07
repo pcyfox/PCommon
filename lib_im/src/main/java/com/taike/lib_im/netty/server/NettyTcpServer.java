@@ -1,10 +1,10 @@
-package com.taike.lib_im.tcp.server;
+package com.taike.lib_im.netty.server;
 
 import android.text.TextUtils;
 import android.util.Log;
 
 
-import com.taike.lib_im.tcp.Constant;
+import com.taike.lib_im.netty.Constant;
 
 import java.net.InetSocketAddress;
 
@@ -27,6 +27,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
+import io.netty.util.NetUtil;
 
 
 /**
