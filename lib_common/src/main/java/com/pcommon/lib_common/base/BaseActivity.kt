@@ -36,7 +36,7 @@ import com.pcommon.lib_utils.MaskUtils
  */
 
 @Keep
-abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : FragmentActivity() {
+abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) : FragmentActivity() {
     private val TAG = "BaseActivity"
     protected var viewModel: VM? = null
         private set
@@ -44,7 +44,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
         private set
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
     protected abstract val layoutId: Int
-    protected abstract fun createViewModel(): VM
     private val eventDetector by lazy { EventDetector(3, 1800) }
     open var isDoubleClickExit = false
     open var mainViewModelId = -1
@@ -52,6 +51,15 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
     open var isClickBack = true
     private var progress: MaskProgressDialog? = null
     private var isBeenHiddenProgress = false//标记菊花转是否被关闭
+
+    open fun createViewModel(): VM {
+        return BaseViewModel(application) as VM
+    }
+
+    private fun createViewModel(clazz: Class<VM>): VM {
+        return getViewModel(clazz)
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +71,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
             hideNavigationBar()
         }
         super.onCreate(savedInstanceState)
+
         initViewDataBinding()
         observeData()
         initData()
@@ -194,7 +203,11 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
      * 注入绑定
      */
     private fun initViewDataBinding() {
-        viewModel = createViewModel()
+        viewModel = if (vmClass != null) {
+            createViewModel(vmClass!!)
+        } else {
+            createViewModel()
+        }
         if (viewModel != null) {
             //让ViewModel拥有View的生命周期感应
             lifecycle.addObserver(viewModel!!)

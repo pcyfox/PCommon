@@ -124,4 +124,7 @@ dependencies {
     implementation project(path: ':lib_common')
     implementation project(path: ':lib_cache')
     implementation project(path: ':lib_widget')
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 }
