@@ -1,3 +1,4 @@
+include ':lib_im'
 if ("true" == getProperty("isTestMode").toString()) {
     include ':testApp'
 }

@@ -123,6 +123,7 @@ dependencies {
     implementation 'me.jessyan:autosize:1.2.0'
     implementation project(path: ':lib_common')
     implementation project(path: ':lib_cache')
+    implementation project(path: ':lib_im')
     implementation project(path: ':lib_widget')
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
