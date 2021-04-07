@@ -10,7 +10,7 @@ public interface NettyServerListener<T> {
 
     public final static byte STATUS_CONNECT_CLOSED = 0;
 
-    public final static byte STATUS_CONNECT_ERROR = 0;
+    public final static byte STATUS_CONNECT_ERROR = -1;
 
     /**
      *
