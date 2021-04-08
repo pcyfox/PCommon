@@ -42,6 +42,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         private set
     protected var viewDataBinding: VDB? = null
         private set
+
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
     protected abstract val layoutId: Int
     private val eventDetector by lazy { EventDetector(3, 1800) }
@@ -49,6 +50,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open var mainViewModelId = -1
     open var isFullScreen = true
     open var isClickBack = true
+
     private var progress: MaskProgressDialog? = null
     private var isBeenHiddenProgress = false//标记菊花转是否被关闭
 
