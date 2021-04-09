@@ -30,13 +30,13 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
             }
             if (info != null && info.isAvailable()) {
                 isNetWorkConnect = true;
-                event = new NetWorkChangEvent(true, info.getType());
+                event = new NetWorkChangEvent(true, getType(info));
                 sendEvent(event);
                 Helper.getInstance().setConnectionType(info.getType());
                 System.out.println(TAG + "NetworkInfo State: 网络已连接,type:" + Helper.getConnectionType(info.getType()));
             } else {
                 isNetWorkConnect = false;
-                event = new NetWorkChangEvent(false, -1);
+                event = new NetWorkChangEvent(false, getType(info));
                 sendEvent(event);
                 Helper.getInstance().setConnectionType(-1);
                 System.out.println(TAG + "NetworkInfo State: 网络已断开");
@@ -46,10 +46,30 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
 
     }
 
+
     private void sendEvent(final NetWorkChangEvent event) {
         LiveEventBus.get().with(event.getClass().getSimpleName()).post(event);
     }
 
+    public static NetWorkChangEvent.Type getType(NetworkInfo info) {
+        NetWorkChangEvent.Type type = NetWorkChangEvent.Type.UNKNOWN;
+        if (info == null) {
+            return type;
+        }
+        int connectivityManagerNetType = info.getType();
+        switch (connectivityManagerNetType) {
+            case ConnectivityManager.TYPE_WIFI:
+                type = NetWorkChangEvent.Type.WIFI;
+                break;
+            case ConnectivityManager.TYPE_ETHERNET:
+                type = NetWorkChangEvent.Type.ETHERNET;
+                break;
+            case ConnectivityManager.TYPE_VPN:
+                type = NetWorkChangEvent.Type.VPN;
+                break;
+        }
+        return type;
+    }
 
     private NetWorkChangEvent getEvent() {
         return event;
@@ -133,40 +153,4 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
     }
 
 
-    public class NetWorkChangEvent {
-        private boolean isAvailable;
-        private int type;
-
-        public NetWorkChangEvent() {
-        }
-
-        public NetWorkChangEvent(boolean isAvailable, int type) {
-            this.isAvailable = isAvailable;
-            this.type = type;
-        }
-
-        public boolean isAvailable() {
-            return isAvailable;
-        }
-
-        public void setAvailable(boolean available) {
-            isAvailable = available;
-        }
-
-        public int getType() {
-            return type;
-        }
-
-        public void setType(int type) {
-            this.type = type;
-        }
-
-        @Override
-        public String toString() {
-            return "NetWorkChangEvent{" +
-                    "isAvailable=" + isAvailable +
-                    ", type=" + type +
-                    '}';
-        }
-    }
 }

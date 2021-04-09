@@ -22,6 +22,7 @@ import com.pcommon.lib_common.base.BaseActivity.Click.hash
 import com.pcommon.lib_common.base.BaseActivity.Click.lastClickTime
 import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.toast
+import com.pcommon.lib_common.receiver.NetWorkChangEvent
 import com.pcommon.lib_common.receiver.NetWorkChangReceiver
 import com.pcommon.lib_common.utils.MaskProgressDialog
 import com.pcommon.lib_utils.CloseBarUtil
@@ -46,6 +47,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
     protected abstract val layoutId: Int
     private val eventDetector by lazy { EventDetector(3, 1800) }
+    open var isShowNetWorkChangNotice = true
     open var isDoubleClickExit = false
     open var mainViewModelId = -1
     open var isFullScreen = true
@@ -253,9 +255,11 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
     open fun observeData() {
-        LiveEventBus.get().with(NetWorkChangReceiver.NetWorkChangEvent::class.java.simpleName, NetWorkChangReceiver.NetWorkChangEvent::class.java).observe(this, {
-            onNetWorkChange(it.isAvailable)
-        })
+        if (isShowNetWorkChangNotice) {
+            LiveEventBus.get().with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java).observe(this, {
+                onNetWorkChange(it.isAvailable)
+            })
+        }
     }
 
     open fun initListener() {
@@ -323,15 +327,13 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     open fun onNetWorkChange(isAvailable: Boolean) {
         XLog.i("$TAG:onNetWorkChange() called with: isAvailable = $isAvailable")
+        if (!window.decorView.isEnabled) {
+            return
+        }
         //网络异常悬浮窗
         if (!isAvailable) {
-            if (!window.decorView.isInvisible) {
-                return
-            }
-            if (window.isActive) {
-                MaskUtils.hide(this, this)
-                MaskUtils.show(window, R.layout.layout_toast_no_available_network_tip, this)
-            }
+            MaskUtils.hide(this, this)
+            MaskUtils.show(window, R.layout.layout_toast_no_available_network_tip, this)
         } else {
             MaskUtils.hide(this, this)
         }
