@@ -42,11 +42,15 @@ public class CloudLogPrinter implements Printer {
     private final Map<String, String> header = new HashMap<>();
     private static final String KEY_LOG_LEVEL = "log_level";
     private final Handler logUpDateHandler;
-
+    private boolean isAutoUpdateLog = false;
     private LogUploadInterceptor logUploadInterceptor;
 
     public String getIndex() {
         return index;
+    }
+
+    public void setAutoUpdateLog(boolean autoUpdateLog) {
+        isAutoUpdateLog = autoUpdateLog;
     }
 
     public void setIndex(String index) {
@@ -166,6 +170,9 @@ public class CloudLogPrinter implements Printer {
     }
 
     private void upload(String tag, final String msg, String cacheKey, boolean isUpdateNow) {
+        if (!isAutoUpdateLog) {
+            return;
+        }
         synchronized (mLogs) {
             if (isUpdateNow) {
                 handleUpdate(createLog(msg), cacheKey);
