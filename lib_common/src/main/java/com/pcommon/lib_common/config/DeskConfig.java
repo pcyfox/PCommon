@@ -70,7 +70,7 @@ public class DeskConfig {
     }
 
 
-    private DeskConfig getLocalConfig(boolean isForceUpdate) {
+    public DeskConfig getLocalConfig(boolean isForceUpdate) {
         if (localConfig == null || isForceUpdate) {
             localConfig = loadDeskConfig();
         }
@@ -142,6 +142,24 @@ public class DeskConfig {
         }
     }
 
+    public String getHost() {
+        if (TextUtils.isEmpty(host)) {
+            localConfig = getLocalConfig(false);
+            if (localConfig != null) {
+                host= localConfig.host;
+            }
+        }
+        return host;
+    }
+
+    public void setHost(String host) {
+        if (!TextUtils.isEmpty(host)) {
+            copyLocationConfig();
+            this.host = host;
+            saveDeskConfig(this);
+        }
+    }
+
 
     public static DeskConfig getInstance() {
         return instance;
@@ -209,17 +227,6 @@ public class DeskConfig {
 
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        if (!TextUtils.isEmpty(host)) {
-            copyLocationConfig();
-            this.host = host;
-            saveDeskConfig(this);
-        }
-    }
 
 
 
