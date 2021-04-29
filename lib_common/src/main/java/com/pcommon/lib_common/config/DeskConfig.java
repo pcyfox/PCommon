@@ -35,6 +35,8 @@ public class DeskConfig {
     @Expose
     private String location;
 
+    @Expose
+    private String host;//如：192.168.2.3:8900
 
     @Expose(serialize = false, deserialize = false)
     private DeskConfig localConfig;
@@ -44,7 +46,7 @@ public class DeskConfig {
     }
 
     //检测桌号合法性
-    public  static boolean isDeskNumberRight(String deskNumber) {
+    public static boolean isDeskNumberRight(String deskNumber) {
         return !TextUtils.isEmpty(deskNumber) && !"-1".equals(deskNumber);
     }
 
@@ -61,8 +63,12 @@ public class DeskConfig {
             if (!TextUtils.isEmpty(localConfig.location)) {
                 this.location = localConfig.location;
             }
+            if (!TextUtils.isEmpty(localConfig.host)) {
+                this.location = localConfig.host;
+            }
         }
     }
+
 
     private DeskConfig getLocalConfig(boolean isForceUpdate) {
         if (localConfig == null || isForceUpdate) {
@@ -203,6 +209,20 @@ public class DeskConfig {
 
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        if (!TextUtils.isEmpty(host)) {
+            copyLocationConfig();
+            this.host = host;
+            saveDeskConfig(this);
+        }
+    }
+
+
+
     @Override
     public String toString() {
         return "DeskConfig{" +
@@ -210,6 +230,7 @@ public class DeskConfig {
                 ", deskNumber=" + deskNumber +
                 ", deviceId='" + deviceId + '\'' +
                 ", localConfig=" + localConfig +
+                ", host=" + host +
                 '}';
     }
 }

@@ -44,11 +44,27 @@ public class LogCacheManager {
         return ret;
     }
 
+    public File getLogDirFile() {
+        return new File(Utils.getApp().getCacheDir().getAbsoluteFile() + File.separator + LOG_CACHE_NAME);
+    }
+
+    public boolean clear() {
+        File logDirFile = getLogDirFile();
+        if (logDirFile.canRead() || logDirFile.exists()) {
+            return logDirFile.delete();
+        } else {
+            return false;
+        }
+    }
+
     public synchronized List<LogCache> getLogCaches() {
-        File logDirFile = new File(Utils.getApp().getCacheDir().getAbsoluteFile() + File.separator + LOG_CACHE_NAME);
+        List<LogCache> logCaches = new ArrayList<>();
+        File logDirFile = getLogDirFile();
+        if (!logDirFile.exists() || !logDirFile.canRead()) {
+            return logCaches;
+        }
         File[] logs = logDirFile.listFiles();
         //  Log.d(TAG, "getLogCache() called all logs;" + Arrays.toString(logs));
-        List<LogCache> logCaches = new ArrayList<>();
         if (logs == null) {
             return logCaches;
         }
