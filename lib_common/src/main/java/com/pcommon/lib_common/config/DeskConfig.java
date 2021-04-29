@@ -64,7 +64,7 @@ public class DeskConfig {
                 this.location = localConfig.location;
             }
             if (!TextUtils.isEmpty(localConfig.host)) {
-                this.location = localConfig.host;
+                this.host = localConfig.host;
             }
         }
     }
