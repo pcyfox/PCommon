@@ -57,7 +57,7 @@ class AppApplication : BaseApplication() {
         if (PermissionUtils.isGranted(PermissionConstants.STORAGE)) {
             Thread {
                 Thread.sleep(30 * 1000)//延迟处理，避免影响APP启动流畅度,以及重启后未连上网
-                TrdServiceManager.uploadCacheLog()
+                TrdServiceManager.uploadCacheLog(application)
             }.start()
         }
     }
@@ -68,7 +68,13 @@ class AppApplication : BaseApplication() {
 
 
     private fun initRequestManager() {
-        RequestManager.get().iniRetrofit(Util.genClientId(), AppConfig.getBaseUrl(), "" + AppUtils.getAppVersionCode(), AppUtils.getAppVersionName(), AppUtils.getAppPackageName())
+        RequestManager.get().iniRetrofit(
+            Util.genClientId(),
+            AppConfig.getBaseUrl(),
+            "" + AppUtils.getAppVersionCode(),
+            AppUtils.getAppVersionName(),
+            AppUtils.getAppPackageName()
+        )
         RequestManager.get().setHeaderInterceptorFilter {
             //oss下载请求不能添加请求头
             it.toString().contains(".oss-cn")

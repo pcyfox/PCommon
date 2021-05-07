@@ -112,7 +112,7 @@ public final class TrdServiceManager {
     /**
      * 上传上次APP未上传的log
      */
-    public static void uploadCacheLog() {
+    public static void uploadCacheLog(Context context) {
         Log.d(TAG, "uploadCacheLog() called");
         XLogHelper.uploadCache();
     }

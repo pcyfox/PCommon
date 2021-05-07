@@ -1,5 +1,6 @@
 package com.pcommon.lib_log;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -60,12 +61,17 @@ public class XLogHelper {
         return printer;
     }
 
+    public static void uploadCache(long maxSize) {
+        if (printer != null) {//确保初始化完成
+            CloudLogPrinter.getInstance().uploadCache(maxSize);
+        }
+    }
+
     public static void uploadCache() {
         if (printer != null) {//确保初始化完成
             CloudLogPrinter.getInstance().uploadCache();
         }
     }
-
 
     public static void updateLogByUser() {
         if (printer != null) {//确保初始化完成

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class LogCacheManager {
     private static final String TAG = "LogCacheManager";
-    private final static String LOG_CACHE_NAME = "tk_cloud_log_cache";
+    private final static String LOG_CACHE_NAME = "LogCache";
     private static final LogCacheManager logCacheManager = new LogCacheManager();
 
     private LogCacheManager() {
@@ -29,6 +29,12 @@ public class LogCacheManager {
         return logCacheManager;
     }
 
+    /**
+     * 保存日志到磁盘
+     *
+     * @param logCache
+     * @param key
+     */
     public void save(LogCache logCache, String key) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "save() called key:" + key);
@@ -57,22 +63,32 @@ public class LogCacheManager {
         }
     }
 
+
     public synchronized List<LogCache> getLogCaches() {
-        List<LogCache> logCaches = new ArrayList<>();
+        return getLogCaches(-1);
+    }
+
+    public synchronized List<LogCache> getLogCaches(long maxSize) {
+        List<LogCache> logCaches;
+        logCaches = new ArrayList<>();
         File logDirFile = getLogDirFile();
         if (!logDirFile.exists() || !logDirFile.canRead()) {
             return logCaches;
         }
         File[] logs = logDirFile.listFiles();
-        //  Log.d(TAG, "getLogCache() called all logs;" + Arrays.toString(logs));
         if (logs == null) {
             return logCaches;
         }
+        int size = 0;
         for (File log : logs) {
+            if (maxSize > 0 && size >= maxSize) {
+                break;
+            }
             LogCache logCache = getLogCache(log);
             if (logCache != null) {
                 logCaches.add(logCache);
             }
+            size += log.getTotalSpace();
         }
         return logCaches;
     }
@@ -81,7 +97,6 @@ public class LogCacheManager {
     public static LogCache getLogCache(File file) {
         BufferedReader reader = null;
         try {
-            //  InputStream in = context.getAssets().open(name);
             InputStream in = new FileInputStream(file);
             reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder jsonString = new StringBuilder();

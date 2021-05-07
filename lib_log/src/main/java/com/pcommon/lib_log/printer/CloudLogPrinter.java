@@ -1,11 +1,15 @@
 package com.pcommon.lib_log.printer;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blankj.utilcode.util.ConvertUtils;
+import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
@@ -339,10 +343,18 @@ public class CloudLogPrinter implements Printer {
     }
 
     public void uploadCache() {
+        //剩余内存
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        Log.d(TAG, "uploadCache appFreeMemory: " + freeMemory);
+        uploadCache((long) (freeMemory * 0.1f));
+    }
+
+    public void uploadCache(final long maxSize) {
+        Log.d(TAG, "uploadCache() called with: maxSize = [" + ConvertUtils.byte2FitMemorySize(maxSize) + "]");
         logUpDateHandler.post(new Runnable() {
             @Override
             public void run() {
-                List<LogCache> caches = LogCacheManager.getInstance().getLogCaches();
+                List<LogCache> caches = LogCacheManager.getInstance().getLogCaches(maxSize);
                 if (caches.size() > 0) {
                     XLog.d(TAG + ":------------------uploadCache() called----------------------  size=" + caches.size());
                 }
@@ -354,4 +366,6 @@ public class CloudLogPrinter implements Printer {
             }
         });
     }
+
+
 }
