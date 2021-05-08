@@ -115,11 +115,11 @@ public class UDPSocketClient {
             stopUDPSocket();
         }
         try {
-            if (datagramSocket == null) {
-                datagramSocket = new DatagramSocket(null);
-            }
+            datagramSocket = new DatagramSocket(null);
+            Log.d(TAG, "startUDPSocket()  new  create a DatagramSocket ");
             datagramSocket.setReuseAddress(true);
             datagramSocket.bind(new InetSocketAddress(CLIENT_PORT));
+            Log.d(TAG, "startUDPSocket()   DatagramSocket  bind :" + CLIENT_PORT);
             if (receivePacket == null) {
                 // 创建接受数据的 packet
                 receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
@@ -155,6 +155,7 @@ public class UDPSocketClient {
      * 开启发送数据的线程
      */
     private void startSocketThread() {
+        Log.d(TAG, "startSocketThread() called");
         isThreadRunning = true;
         Thread clientThread = new Thread(new Runnable() {
             @Override
