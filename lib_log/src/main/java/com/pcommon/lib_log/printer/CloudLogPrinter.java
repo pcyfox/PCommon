@@ -1,7 +1,5 @@
 package com.pcommon.lib_log.printer;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
@@ -9,14 +7,12 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.blankj.utilcode.util.ConvertUtils;
-import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
 import com.elvishew.xlog.printer.Printer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pcommon.lib_log.BuildConfig;
 import com.pcommon.lib_log.LogCache;
 import com.pcommon.lib_log.LogCacheManager;
 import com.pcommon.lib_network.RequestManager;
@@ -48,6 +44,12 @@ public class CloudLogPrinter implements Printer {
     private final Handler logUpDateHandler;
     private boolean isAutoUpdateLog = false;
     private LogUploadInterceptor logUploadInterceptor;
+    private volatile boolean isUpdateByUser = false;
+    private static volatile boolean isUpdating = false;
+    private float addLogCount;
+    private long lastAddTime;
+    private boolean isTooFast = false;
+    private int tooFastCount;//持续发生添加日志过快的次数
 
     public String getIndex() {
         return index;
@@ -69,13 +71,6 @@ public class CloudLogPrinter implements Printer {
         this.quantityInterval = quantityInterval;
     }
 
-    private volatile boolean isUpdateByUser = false;
-
-    private static volatile boolean isUpdating = false;
-    private float addLogCount;
-    private long lastAddTime;
-    private boolean isTooFast = false;
-    private int tooFastCount;//持续发生添加日志过快的次数
 
 
     private CloudLogPrinter() {
@@ -346,7 +341,7 @@ public class CloudLogPrinter implements Printer {
         //剩余内存
         long freeMemory = Runtime.getRuntime().freeMemory();
         Log.d(TAG, "uploadCache appFreeMemory: " + freeMemory);
-        uploadCache((long) (freeMemory * 0.1f));
+        uploadCache((long) (freeMemory * 0.2f));
     }
 
     public void uploadCache(final long maxSize) {

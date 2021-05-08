@@ -1,5 +1,6 @@
 package com.pcommon.lib_log;
 
+import android.os.Environment;
 import android.util.Log;
 
 import com.blankj.utilcode.util.CacheDiskStaticUtils;
@@ -18,8 +19,9 @@ import java.util.List;
 
 public class LogCacheManager {
     private static final String TAG = "LogCacheManager";
-    private final static String LOG_CACHE_NAME = "LogCache";
+    private final static String LOG_CACHE_NAME = "CloudLogCache";
     private static final LogCacheManager logCacheManager = new LogCacheManager();
+    private CacheDiskUtils defaultCacheDiskUtils;
 
     private LogCacheManager() {
         CacheDiskStaticUtils.setDefaultCacheDiskUtils(CacheDiskUtils.getInstance(LOG_CACHE_NAME));
@@ -39,7 +41,10 @@ public class LogCacheManager {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "save() called key:" + key);
         }
-        CacheDiskStaticUtils.put(key, new Gson().toJson(logCache));
+        if (defaultCacheDiskUtils == null) {
+            defaultCacheDiskUtils = CacheDiskUtils.getInstance(getLogDirFile());
+        }
+        defaultCacheDiskUtils.put(key, new Gson().toJson(logCache));
     }
 
     public synchronized boolean clear(String key) {
@@ -51,7 +56,7 @@ public class LogCacheManager {
     }
 
     public File getLogDirFile() {
-        return new File(Utils.getApp().getCacheDir().getAbsoluteFile() + File.separator + LOG_CACHE_NAME);
+        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + LOG_CACHE_NAME);
     }
 
     public boolean clear() {
