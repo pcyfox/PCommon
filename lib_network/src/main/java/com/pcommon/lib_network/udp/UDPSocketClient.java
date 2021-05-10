@@ -32,7 +32,6 @@ public class UDPSocketClient {
     private static final int POOL_SIZE = 5;
     private static final int BUFFER_LENGTH = 8 * 1024;
     private final byte[] receiveByte = new byte[BUFFER_LENGTH];
-
     private static final String BROADCAST_IP = "255.255.255.255";
 
     // 端口号，
@@ -44,13 +43,11 @@ public class UDPSocketClient {
     private long lastReceiveTime = 0;
     private static final long TIME_OUT = 120 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
-
     private CheckSelfListener checkSelfListener;
-
     private final ExecutorService mThreadPool;
     private HeartbeatTimer timer;
-
     private static final Object lock = new Object();
+
 
     public boolean isStarted() {
         if (datagramSocket == null || datagramSocket.isClosed()) {
@@ -86,11 +83,13 @@ public class UDPSocketClient {
     }
 
     public void startUDPSocket(int port) {
+        XLog.i(TAG + ":startUDPSocket() called with: port = [" + port + "]");
         setClientPort(port);
         startUDPSocket();
     }
 
     public void stopUDPSocket() {
+        XLog.i(TAG + ":stopUDPSocket() called");
         isThreadRunning = false;
         if (datagramSocket != null) {
             datagramSocket.disconnect();
@@ -115,15 +114,13 @@ public class UDPSocketClient {
             stopUDPSocket();
         }
         try {
+            // 创建接受数据的 packet
+            receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
             datagramSocket = new DatagramSocket(null);
-            Log.d(TAG, "startUDPSocket()  new  create a DatagramSocket ");
+            XLog.i(TAG + ":startUDPSocket()  create a new  DatagramSocket ");
             datagramSocket.setReuseAddress(true);
             datagramSocket.bind(new InetSocketAddress(CLIENT_PORT));
-            Log.d(TAG, "startUDPSocket()   DatagramSocket  bind :" + CLIENT_PORT);
-            if (receivePacket == null) {
-                // 创建接受数据的 packet
-                receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
-            }
+            XLog.i(TAG + ":startUDPSocket()   DatagramSocket  bind :" + CLIENT_PORT);
             startSocketThread();
         } catch (SocketException e) {
             XLog.e(TAG + ":startUDPSocket() error =" + e.getMessage());
@@ -155,7 +152,7 @@ public class UDPSocketClient {
      * 开启发送数据的线程
      */
     private void startSocketThread() {
-        Log.d(TAG, "startSocketThread() called");
+        XLog.i(TAG + ":startSocketThread() called");
         isThreadRunning = true;
         Thread clientThread = new Thread(new Runnable() {
             @Override
@@ -168,7 +165,7 @@ public class UDPSocketClient {
                     onStateChangeLister.onStop();
                 }
             }
-        }, TAG + ":client");
+        }, TAG + ":receive socket data thread");
         clientThread.start();
         XLog.d(TAG + "startSocketThread() clientThread start");
         if (onStateChangeLister != null) {
@@ -180,15 +177,17 @@ public class UDPSocketClient {
      * 处理接受到的消息
      */
     private void receiveMessage() {
+        Log.d(TAG, "receiveMessage() called,isThreadRunning=" + isThreadRunning);
         while (isThreadRunning && !Thread.interrupted()) {
             try {
-                if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed() || !isThreadRunning || datagramSocket.isConnected()) {
+                if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed()) {
+                    XLog.e(TAG + ":receiveMessage  return,because receivePacket == null || datagramSocket == null || datagramSocket.isClosed()");
                     return;
                 }
                 datagramSocket.receive(receivePacket);
                 lastReceiveTime = System.currentTimeMillis();
             } catch (IOException e) {
-                XLog.d("UDP数据包接收失败！线程停止");
+                XLog.d("UDP数据包接收失败！线程停止 e:" + e.getMessage());
                 stopUDPSocket();
                 e.printStackTrace();
                 return;
@@ -207,21 +206,19 @@ public class UDPSocketClient {
                     }
                     continue;
                 }
-
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive);
                 } else {
                     XLog.e(TAG + ":receiveMessage,but msgArrivedListener is null ! ");
                 }
-
                 // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。
                 if (receivePacket != null) {
                     receivePacket.setLength(BUFFER_LENGTH);
                 }
             } catch (Exception e) {
+                XLog.i(TAG + ":receiveMessage() e:" + e.getMessage());
                 e.printStackTrace();
             }
-
         }
     }
 
