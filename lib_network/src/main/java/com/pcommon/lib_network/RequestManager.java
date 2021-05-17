@@ -29,7 +29,7 @@ public class RequestManager extends AbsRequest {
     }
 
     @Override
-    OkHttpClient.Builder createOkHttpClientBuilder() {
+    public OkHttpClient.Builder createOkHttpClientBuilder() {
         return new OkHttpClient().newBuilder()
                 .retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
                 .dns(new OkHttpDns(3L))
@@ -39,7 +39,7 @@ public class RequestManager extends AbsRequest {
     }
 
     @Override
-    Retrofit.Builder createRetrofitBuilder() {
+    public Retrofit.Builder createRetrofitBuilder() {
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create());

@@ -30,9 +30,9 @@ public abstract class AbsRequest {
     //标记关于URL的网络请求日志能否上传
     protected volatile WeakHashMap<String, Boolean> uploadLogRequests = new WeakHashMap<>();
 
-    abstract OkHttpClient.Builder createOkHttpClientBuilder();
+    public abstract OkHttpClient.Builder createOkHttpClientBuilder();
 
-    abstract Retrofit.Builder createRetrofitBuilder();
+    public abstract Retrofit.Builder createRetrofitBuilder();
 
 
     AbsRequest() {
