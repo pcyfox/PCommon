@@ -1,13 +1,12 @@
 package com.pcommon.lib_log;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.elvishew.xlog.LogConfiguration;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
-import com.elvishew.xlog.printer.AndroidPrinter;
+import com.elvishew.xlog.flattener.ClassicFlattener;
 import com.elvishew.xlog.printer.Printer;
 import com.elvishew.xlog.printer.file.FilePrinter;
 import com.elvishew.xlog.printer.file.clean.FileLastModifiedCleanStrategy;
@@ -35,6 +34,7 @@ public class XLogHelper {
 
         Printer filePrinter = new FilePrinter
                 .Builder(LogDir)
+                .flattener(new ClassicFlattener())
                 .fileNameGenerator(new DateFileNameGenerator() {
                     @Override
                     public String generateFileName(int logLevel, long timestamp) {

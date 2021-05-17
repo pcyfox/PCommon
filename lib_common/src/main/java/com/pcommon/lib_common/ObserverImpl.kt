@@ -1,6 +1,9 @@
 package com.pcommon.lib_common
 
 
+import android.accounts.NetworkErrorException
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import com.blankj.utilcode.util.GsonUtils
 import com.elvishew.xlog.XLog
@@ -25,7 +28,11 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
 
     override fun onError(e: Throwable) {
         //  e.printStackTrace()
-        XLog.e("ObserverImpl onError() called:" + genName() + "\n Exception:" + Util.getExceptionContent(e))
+        XLog.e(
+            "ObserverImpl onError() called:" + genName() + "\n Exception:" + Util.getExceptionContent(
+                e
+            )
+        )
         if (checkAuth(e)) {
             liveData?.postValue(buildErrorData(e, clazz))
         }
@@ -55,25 +62,24 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
         var cont = 0
         const val AUTHORIZATION_EXPIRED = "AUTHORIZATION_EXPIRED"
 
+        @RequiresApi(Build.VERSION_CODES.ECLAIR)
         private fun <T> buildErrorData(e: Throwable, clazz: Class<T>): T {
             var code = -200
-            val tip = if (e.javaClass.name.startsWith("java.net")) {
-                when (e) {
-                    is SocketTimeoutException -> {
-                        code = -300
-                        "连接服务器超时!"
-                    }
-                    is ConnectException -> {
-                        code = -400
-                        "连接服务器失败!"
-                    }
-                    else -> {
-                        code = -500
-                        "网络异常!"
-                    }
+            val tip = when (e) {
+                is SocketTimeoutException -> {
+                    "连接服务器超时!"
                 }
-            } else {
-                e.javaClass.simpleName
+                is ConnectException -> {
+                    code = -400
+                    "连接服务器失败!"
+                }
+                is HttpException -> {
+                    code = e.code()
+                    e.message()
+                }
+                else -> {
+                    e.localizedMessage
+                }
             }
             val baseEntity = BaseRespEntity<T>()
             baseEntity.message = tip

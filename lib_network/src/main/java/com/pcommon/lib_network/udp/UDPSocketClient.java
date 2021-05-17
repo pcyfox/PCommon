@@ -199,7 +199,7 @@ public class UDPSocketClient {
             try {
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
-                XLog.d(TAG + "接收到广播数据 form" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
+                XLog.d(TAG + "接收到广播数据 form:" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
                 if (CheckSelfListener.CHECK_BY_SELF.equals(strReceive)) {
                     if (checkSelfListener != null) {
                         checkSelfListener.increaseReceiveMsgTime();
