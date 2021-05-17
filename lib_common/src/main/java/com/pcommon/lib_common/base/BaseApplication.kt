@@ -32,15 +32,14 @@ abstract class BaseApplication : BaseAbstractApplication(), Application.Activity
     }
 
     override fun onActivityStarted(activity: Activity?) {
-        XLog.i("$TAG:onActivityStarted() called with: activity = $activity")
+        // XLog.i("$TAG:onActivityStarted() called with: activity = $activity")
 
     }
 
     override fun onActivityDestroyed(activity: Activity?) {
         val activityList = ActivityUtils.getActivityList()
-        XLog.d(TAG + "onActivityDestroyed() called activity size=" + activityList.size)
         if (activityList.isNullOrEmpty()) {
-            Log.e(TAG, "onActivityDestroyed() called with: app be killed")
+            XLog.w("$TAG:onActivityDestroyed() called with: app be killed")
         }
     }
 
@@ -65,7 +64,7 @@ abstract class BaseApplication : BaseAbstractApplication(), Application.Activity
     @RequiresApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     override fun onTerminate() {
         super.onTerminate()
-        Log.e(TAG, "onTerminate() called")
+        // Log.e(TAG, "onTerminate() called")
         unregisterActivityLifecycleCallbacks(this)
     }
 
