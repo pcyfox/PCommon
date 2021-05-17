@@ -53,6 +53,7 @@ public class RequestManager extends AbsRequest {
     public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName) {
         XLog.i(TAG + ":iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], pkgName = [" + pkgName + "]");
         this.baseUrl = baseUrl;
+        retrofit=null;
         headerInterceptor = new HeaderInterceptor();
         headerInterceptor.setDeviceId(clientId);
         headerInterceptor.setAppVersionCode(appVersionCode);

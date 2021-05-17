@@ -26,7 +26,7 @@ public abstract class AbsRequest {
     private Set<Interceptor> interceptors;
     String baseUrl;
     private OkHttpClient httpClient;
-    private Retrofit retrofit;
+    protected Retrofit retrofit;
     //标记关于URL的网络请求日志能否上传
     protected volatile WeakHashMap<String, Boolean> uploadLogRequests = new WeakHashMap<>();
 
