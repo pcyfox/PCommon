@@ -98,9 +98,6 @@ android {
                     }
 
                     File out = new File("${rootDir}/app/build/outputs")
-                    //删除output目录
-                    //delete desFilePath
-                    // 将编译好的apk 复制到output目录，方便使用
                     copy {
                         from out
                         into desFilePath
