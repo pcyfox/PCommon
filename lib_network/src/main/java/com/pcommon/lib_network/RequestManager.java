@@ -60,7 +60,6 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.setPkgName(pkgName);
         headerInterceptor.setAppVersionName(appVersionName);
         headerInterceptor.addHeader("Connection", "close");
-
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
         loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token");
         cleatInterceptor();
