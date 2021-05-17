@@ -39,9 +39,9 @@ public class XLogHelper {
                     @Override
                     public String generateFileName(int logLevel, long timestamp) {
                         if (logRprFileName == null) {
-                            return super.generateFileName(logLevel, timestamp) + ".log";
+                            return super.generateFileName(logLevel, timestamp) + ".txt";
                         }
-                        return logRprFileName + "_" + super.generateFileName(logLevel, timestamp) + ".log";
+                        return logRprFileName + "_" + super.generateFileName(logLevel, timestamp) + ".txt";
                     }
                 })
                 .cleanStrategy(new FileLastModifiedCleanStrategy(15 * 24 * 3600 * 1000))
