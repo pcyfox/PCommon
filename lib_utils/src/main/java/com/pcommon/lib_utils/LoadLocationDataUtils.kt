@@ -1,5 +1,7 @@
 package com.pcommon.lib_utils
 
+import android.util.Log
+import com.blankj.utilcode.util.GsonUtils
 import com.google.gson.Gson
 import java.io.*
 
@@ -34,4 +36,29 @@ object LoadLocationDataUtils {
         }
         return null
     }
+
+    fun saveObjectToSD(data: Any?, path: String) {
+        val file = File(path)
+        if (file.exists() && file.canRead()) {
+            file.delete()
+        }
+        var fWriter: FileWriter? = null
+        try {
+            fWriter = FileWriter(path, false)
+            val json = GsonUtils.toJson(data)
+            fWriter.write(json)
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+        } finally {
+            try {
+                if (fWriter != null) {
+                    fWriter.flush()
+                    fWriter.close()
+                }
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
 }
