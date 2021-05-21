@@ -14,27 +14,39 @@ object UploadUtils {
 
     fun upload(
         url: String,
-        headers: Headers,
+        headers: Headers? = null,
+        formDataParts: Map<String, String>? = null,
         filePath: String,
-        fileName: String
+        fileName: String,
+        okHttpClient: OkHttpClient? = null
     ): Observable<String?> {
         Log.d(
             TAG,
             "upload() called with: url = $url, headers = $headers, filePath = $filePath, fileName = $fileName"
         )
-        val client = OkHttpClient()
+        val client = okHttpClient ?: OkHttpClient()
         val requestBody: RequestBody = MultipartBody.Builder()
             .setType(FORM)
             .addFormDataPart(
                 "file", fileName,
                 File(filePath).asRequestBody("multipart/form-data".toMediaTypeOrNull())
-            )
+            ).apply {
+                formDataParts?.forEach {
+                    addFormDataPart(it.key, it.value)
+                }
+            }
             .build()
+
         val request: Request = Request.Builder()
-            .headers(headers)
             .url(url)
+            .apply {
+                headers?.run {
+                    headers(this)
+                }
+            }
             .post(requestBody)
             .build()
+
         return Observable.create {
             try {
                 val response = client.newCall(request).execute()
@@ -57,7 +69,14 @@ object UploadUtils {
         filePath: String,
         fileName: String
     ): Observable<String?> {
-        val headers = Headers.Builder().add("Authorization", authorization).build()
-        return upload(url, headers, filePath, fileName)
+        val header = Headers.Builder().add("Authorization", authorization).build()
+        return upload(
+            url,
+            headers = header,
+            formDataParts = null,
+            filePath,
+            fileName,
+            okHttpClient = null
+        )
     }
 }
