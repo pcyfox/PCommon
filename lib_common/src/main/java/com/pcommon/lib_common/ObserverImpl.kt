@@ -75,7 +75,7 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
                 }
                 is HttpException -> {
                     code = e.code()
-                    e.message()
+                    e.localizedMessage
                 }
                 else -> {
                     e.localizedMessage
