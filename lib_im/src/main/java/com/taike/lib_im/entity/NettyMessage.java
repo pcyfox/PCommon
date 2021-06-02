@@ -1,5 +1,8 @@
 package com.taike.lib_im.entity;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class NettyMessage<D> {
     private String from;
     private String id;//发送者ID
