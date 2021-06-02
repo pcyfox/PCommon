@@ -198,14 +198,6 @@ public class UDPSocketClient {
             }
             try {
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
-                String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
-                XLog.d(TAG + "接收到广播数据 form:" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
-                if (CheckSelfListener.CHECK_BY_SELF.equals(strReceive)) {
-                    if (checkSelfListener != null) {
-                        checkSelfListener.increaseReceiveMsgTime();
-                    }
-                    continue;
-                }
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive);
                 } else {
@@ -215,6 +207,9 @@ public class UDPSocketClient {
                 if (receivePacket != null) {
                     receivePacket.setLength(BUFFER_LENGTH);
                 }
+
+                String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
+                XLog.d(TAG + "接收到广播数据 form:" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
             } catch (Exception e) {
                 XLog.i(TAG + ":receiveMessage() e:" + e.getMessage());
                 e.printStackTrace();
