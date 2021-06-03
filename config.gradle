@@ -11,7 +11,7 @@ ext {
     def rxAndroid = '2.1.1'
     def rxJava = '2.2.19'
     def constraintLayoutVersion = '2.0.4'
-    def glideVersion = '4.12.0'
+    def glideVersion = '4.11.0'
     def junitVersion = '4.12'
     def testRunnerVersion = '1.0.1'
     def gsonVersion = "2.8.6"
