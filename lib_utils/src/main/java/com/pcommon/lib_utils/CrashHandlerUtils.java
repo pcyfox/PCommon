@@ -8,7 +8,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.Keep;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.elvishew.xlog.LogLevel;
@@ -28,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-
+@Keep
 public class CrashHandlerUtils implements UncaughtExceptionHandler {
     public static final int CRASH_LOG_LEVEL = LogLevel.NONE;
     private static final String TAG = "CrashHandler";
@@ -85,6 +88,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
      * 为我们的应用程序设置自定义Crash处理
      */
     public void init(Context context) {
+        Log.d(TAG, "init() called with: context = [" + context.getClass().getSimpleName() + "]");
         mContext = context;
         Thread.setDefaultUncaughtExceptionHandler(this);
     }

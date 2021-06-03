@@ -70,7 +70,6 @@ public class NettyMessage<D> {
         this.data = data;
     }
 
-
     public int getCode() {
         return code;
     }
