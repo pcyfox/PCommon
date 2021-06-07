@@ -276,7 +276,7 @@ public class UDPSocketClient {
     }
 
     public void sendBroadcast(final String message, final String ip, final int port) {
-        XLog.d(TAG, "sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
+        XLog.i(TAG + ":LsendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
         //说明通过指定端口创建的socket失败
         if (datagramSocket == null || datagramSocket.getPort() < 0) {
             try {
@@ -316,20 +316,17 @@ public class UDPSocketClient {
 
 
     public void sendMessage(final String message, final String Ip, final int port) {
-        mThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    InetAddress targetAddress = InetAddress.getByName(Ip);
-                    DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), targetAddress, port);
-                    datagramSocket.send(packet);
-                    // 数据发送事件
-                    XLog.d(TAG + ":client send to " + Ip + ":" + port + " over, msg:\n" + message);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+        mThreadPool.execute(() -> {
+            try {
+                InetAddress targetAddress = InetAddress.getByName(Ip);
+                DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), targetAddress, port);
+                datagramSocket.send(packet);
+                // 数据发送事件
+                XLog.d(TAG + ":client send to " + Ip + ":" + port + " over, msg:\n" + message);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
         });
     }
 
