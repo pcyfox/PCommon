@@ -10,7 +10,6 @@ import com.pcommon.lib_network.Utils;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -36,14 +35,14 @@ public class UDPSocketClient {
 
     // 端口号，
     private int CLIENT_PORT = 1999;
-
     private volatile boolean isThreadRunning = false;
+
     private DatagramSocket datagramSocket;
     private DatagramPacket receivePacket;
+
     private long lastReceiveTime = 0;
     private static final long TIME_OUT = 120 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
-    private CheckSelfListener checkSelfListener;
     private final ExecutorService mThreadPool;
     private HeartbeatTimer timer;
     private static final Object lock = new Object();
@@ -255,18 +254,6 @@ public class UDPSocketClient {
     }
 
 
-    public void checkBySelf(CheckSelfListener listener) {
-        if (listener == null || listener.getTimeOut() < 10) {
-            Log.e(TAG, "checkBySelf() called with illegal argument: listener = [" + listener + "]");
-            return;
-        }
-        checkSelfListener = listener;
-        boolean isCanCheck = listener.increaseSendMsgCount();
-        if (isCanCheck) {
-            sendMessage(CheckSelfListener.CHECK_BY_SELF, getHostAddress(), CLIENT_PORT);
-        }
-    }
-
     public String getHostAddress() {
         return Utils.LOCALHOST4.getHostAddress();
     }
@@ -278,7 +265,7 @@ public class UDPSocketClient {
     public void sendBroadcast(final String message, final String ip, final int port) {
         XLog.i(TAG + ":LsendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
         //说明通过指定端口创建的socket失败
-        if (datagramSocket == null || datagramSocket.getPort() < 0) {
+        if (datagramSocket == null) {
             try {
                 //使用系统分配端口创建socket，保证消息能正常发送
                 datagramSocket = new DatagramSocket();
