@@ -51,6 +51,7 @@ object UploadUtils {
             try {
                 val response = client.newCall(request).execute()
                 if (!response.isSuccessful || response.body == null) {
+                    Log.e(TAG, "upload() fail,$fileName")
                     it.onNext("")
                     return@create
                 }
@@ -58,7 +59,8 @@ object UploadUtils {
                 Log.d(TAG, "upload() ret=$ret")
                 it.onNext(ret)
             } catch (e: Exception) {
-                it.onNext("")
+                e.printStackTrace()
+                it.onNext(e.toString())
             }
         }
     }

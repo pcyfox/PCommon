@@ -153,16 +153,13 @@ public class UDPSocketClient {
     private void startSocketThread() {
         XLog.i(TAG + ":startSocketThread() called");
         isThreadRunning = true;
-        Thread clientThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                XLog.i(TAG + ":clientThread start to working,port:" + CLIENT_PORT);
-                receiveMessage();
-                isThreadRunning = false;
-                XLog.e(TAG + ":clientThread work broken!");
-                if (onStateChangeLister != null) {
-                    onStateChangeLister.onStop();
-                }
+        Thread clientThread = new Thread(() -> {
+            XLog.i(TAG + ":clientThread start to working,port:" + CLIENT_PORT);
+            receiveMessage();
+            isThreadRunning = false;
+            XLog.e(TAG + ":clientThread work broken!");
+            if (onStateChangeLister != null) {
+                onStateChangeLister.onStop();
             }
         }, TAG + ":receive socket data thread");
         clientThread.start();
@@ -196,9 +193,11 @@ public class UDPSocketClient {
                 continue;
             }
             try {
+                String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive);
+                    msgArrivedListener.from(host, receivePacket.getPort());
                 } else {
                     XLog.e(TAG + ":receiveMessage,but msgArrivedListener is null ! ");
                 }
@@ -207,7 +206,6 @@ public class UDPSocketClient {
                     receivePacket.setLength(BUFFER_LENGTH);
                 }
 
-                String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 XLog.d(TAG + "接收到广播数据 form:" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
             } catch (Exception e) {
                 XLog.i(TAG + ":receiveMessage() e:" + e.getMessage());
@@ -327,6 +325,9 @@ public class UDPSocketClient {
 
     public interface OnSocketMsgArrivedListener {
         void onSocketMsgArrived(String msg);
+
+        void from(String ip, int pot);
+
     }
 
 

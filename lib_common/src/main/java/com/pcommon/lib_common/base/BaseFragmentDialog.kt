@@ -15,11 +15,16 @@ import com.blankj.utilcode.util.ScreenUtils
 
 
 @Keep
-open class BaseFragmentDialog(@LayoutRes val layoutId: Int, var widthPercent: Float = 1.0f, var heightPercent: Float = 1.0f, private val cancelable: Boolean = false, val ct: Context?) : AppCompatDialog(ct) {
+open class BaseFragmentDialog(
+    @LayoutRes val layoutId: Int,
+    var widthPercent: Float = 1.0f,
+    var heightPercent: Float = 1.0f,
+    private val cancelable: Boolean = false,
+    val ct: Context?
+) : AppCompatDialog(ct) {
     protected var activity: Activity? = null
-
     init {
-        if (activity == null && ct is Activity) {
+        if (ct is Activity) {
             activity = ct
         }
     }
@@ -62,7 +67,8 @@ open class BaseFragmentDialog(@LayoutRes val layoutId: Int, var widthPercent: Fl
 
     private fun fullScreenImmersive(view: View) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            view.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_FULLSCREEN
+            view.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_FULLSCREEN
         }
     }
 }

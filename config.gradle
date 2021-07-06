@@ -17,7 +17,7 @@ ext {
     def gsonVersion = "2.8.6"
     def lifecycleVersion = "1.1.1"
     def liveEventBusVersion = "1.4.4"
-    def okHttpVersion = '4.8.1'
+    def okHttpVersion = '4.9.1'
     def appcompat = "1.1.0"
     def recyclerview = "1.1.0"
     def annotation = "1.1.0"
