@@ -196,8 +196,7 @@ public class UDPSocketClient {
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
                 if (msgArrivedListener != null) {
-                    msgArrivedListener.onSocketMsgArrived(strReceive);
-                    msgArrivedListener.from(host, receivePacket.getPort());
+                    msgArrivedListener.onSocketMsgArrived(strReceive, host, receivePacket.getPort());
                 } else {
                     XLog.e(TAG + ":receiveMessage,but msgArrivedListener is null ! ");
                 }
@@ -324,10 +323,7 @@ public class UDPSocketClient {
     }
 
     public interface OnSocketMsgArrivedListener {
-        void onSocketMsgArrived(String msg);
-
-        void from(String ip, int pot);
-
+        void onSocketMsgArrived(String msg, String ip, int pot);
     }
 
 
