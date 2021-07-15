@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,12 +29,11 @@ public class UDPSocketClient {
     private static UDPSocketClient instance;
     private static final String TAG = "UDPSocketClient";
     // 单个CPU线程池大小
-    private static final int POOL_SIZE = 5;
+    private static final int POOL_SIZE = 2;
     private static final int BUFFER_LENGTH = 8 * 1024;
     private final byte[] receiveByte = new byte[BUFFER_LENGTH];
     private static final String BROADCAST_IP = "255.255.255.255";
 
-    // 端口号，
     private int CLIENT_PORT = 1999;
     private volatile boolean isThreadRunning = false;
 
@@ -41,7 +41,7 @@ public class UDPSocketClient {
     private DatagramPacket receivePacket;
 
     private long lastReceiveTime = 0;
-    private static final long TIME_OUT = 120 * 1000;
+    private static final long TIME_OUT = 12 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
     private final ExecutorService mThreadPool;
     private HeartbeatTimer timer;
@@ -194,7 +194,7 @@ public class UDPSocketClient {
             }
             try {
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
-                String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), "utf-8");
+                String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive, host, receivePacket.getPort());
                 } else {
@@ -230,22 +230,18 @@ public class UDPSocketClient {
             timer.exit();
         }
         timer = new HeartbeatTimer();
-        timer.setOnScheduleListener(new OnScheduleListener() {
-            @Override
-            public void onSchedule() {
-                XLog.d("timer is onSchedule...");
-                long duration = System.currentTimeMillis() - lastReceiveTime;
-                XLog.d("duration:" + duration);
-                if (duration > TIME_OUT) {//若超过两分钟都没收到我的心跳包，则认为对方不在线。
-                    XLog.d("超时，对方已经下线");
-                    // 刷新时间，重新进入下一个心跳周期
-                    lastReceiveTime = System.currentTimeMillis();
-                } else if (duration > HEARTBEAT_MESSAGE_DURATION) {//若超过十秒他没收到我的心跳包，则重新发一个。
-                    String string = "hello,this is a heartbeat message";
-                    sendBroadcast(string);
-                }
+        timer.setOnScheduleListener(() -> {
+            XLog.d("timer is onSchedule...");
+            long duration = System.currentTimeMillis() - lastReceiveTime;
+            XLog.d("duration:" + duration);
+            if (duration > TIME_OUT) {//若超过两分钟都没收到我的心跳包，则认为对方不在线。
+                XLog.d("超时，对方已经下线");
+                // 刷新时间，重新进入下一个心跳周期
+                lastReceiveTime = System.currentTimeMillis();
+            } else if (duration > HEARTBEAT_MESSAGE_DURATION) {//若超过十秒他没收到我的心跳包，则重新发一个。
+                String string = "hello,this is a heartbeat message";
+                sendBroadcast(string);
             }
-
         });
         timer.startTimer(0, 1000 * 10);
     }
@@ -273,23 +269,20 @@ public class UDPSocketClient {
             }
         }
 
-        mThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
+        mThreadPool.execute(() -> {
+            try {
+                InetAddress targetAddress = InetAddress.getByName(ip);
+                DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, targetAddress, port);
                 try {
-                    InetAddress targetAddress = InetAddress.getByName(ip);
-                    DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, targetAddress, port);
-                    try {
-                        datagramSocket.send(packet);
-                        XLog.d(TAG + ":sendBroadcast message:" + message);
-                    } catch (IOException e) {
-                        XLog.e(TAG + "sendBroadcast error:" + e.getMessage());
-                        e.printStackTrace();
-                    }
-                } catch (UnknownHostException e) {
+                    datagramSocket.send(packet);
+                    XLog.d(TAG + ":sendBroadcast message:" + message);
+                } catch (IOException e) {
                     XLog.e(TAG + "sendBroadcast error:" + e.getMessage());
                     e.printStackTrace();
                 }
+            } catch (UnknownHostException e) {
+                XLog.e(TAG + "sendBroadcast error:" + e.getMessage());
+                e.printStackTrace();
             }
         });
     }

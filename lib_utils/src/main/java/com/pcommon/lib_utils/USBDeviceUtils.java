@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.input.InputManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.util.Log;
 import android.view.InputDevice;
 
@@ -32,6 +33,15 @@ public final class USBDeviceUtils {
             InputDevice device = inputManager.getInputDevice(id);
             if (device.toString().contains("Location: external")) {
                 if (!list.contains(device.getName())) {
+                    Log.d(TAG, "getDeviceList() input device:" + device.toString());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                        if (!device.isEnabled()) {
+                            continue;
+                        }
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        continue;
+                    }
                     list.add(device.getName());
                 }
             }
@@ -40,7 +50,7 @@ public final class USBDeviceUtils {
         Log.i(TAG, "getUSBDeviceList() called inputDevices = [" + list + "]");
         //获取usb设备
         HashMap<String, UsbDevice> deviceHashMap = ((UsbManager) context.getSystemService(USB_SERVICE)).getDeviceList();
-        Log.i(TAG, "getUSBDeviceList() called   size=" + deviceHashMap.size() + "  deviceHashMapSize.values = [" + deviceHashMap.values() + "]");
+        Log.i(TAG, "getUSBDeviceList() called  usbDevices size=" + deviceHashMap.size() + "values =\n[" + deviceHashMap.values() + "]");
         for (Map.Entry<String, UsbDevice> entry : deviceHashMap.entrySet()) {
             UsbDevice device = entry.getValue();
             if (device != null) {
@@ -51,16 +61,7 @@ public final class USBDeviceUtils {
                 }
             }
         }
-     //   CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-     //   String[] cameraIds;
-
-//        try {
-//            cameraIds = manager.getCameraIdList();
-//            Log.i(TAG, "getUSBDeviceList() called cameraIds = [" + Arrays.toString(cameraIds) + "]");
-//        } catch (CameraAccessException e) {
-//            e.printStackTrace();
-//        }
-        Log.i(TAG, "getUSBDeviceList() called inputDevices = " + list + "");
+        Log.i(TAG, "getUSBDeviceList() called All Devices = " + list + "");
         return list;
     }
 
