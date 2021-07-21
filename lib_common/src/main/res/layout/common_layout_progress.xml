@@ -53,8 +53,9 @@
                 android:gravity="center"
                 android:padding="4dp"
                 android:textColor="@color/common_textColorPrimary"
-                android:textSize="@dimen/common_tip_text"
+                android:textSize="@dimen/common_sub_content_text"
                 app:layout_constraintEnd_toEndOf="@+id/avi_loading"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/avi_loading"
                 app:layout_constraintTop_toBottomOf="@+id/avi_loading"
                 tools:text="78%" />
