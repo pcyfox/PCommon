@@ -110,7 +110,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
 
     protected fun showProgress(tips: String? = "") {
-        if (tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
+        if (!tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
             progress!!.setTips(tips)
             return
         }
