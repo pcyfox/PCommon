@@ -37,8 +37,11 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
                 runOnUiThread {
                     showProgress("$i%")
                 }
-                Thread.sleep(2000)
+                Thread.sleep(100)
             }
+           runOnUiThread {
+               hideProgress()
+           }
 
         }.start()
 

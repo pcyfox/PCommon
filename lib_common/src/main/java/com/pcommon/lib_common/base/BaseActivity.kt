@@ -115,7 +115,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             return
         }
 
-
         if (isBeenHiddenProgress) {
             progress?.dismiss()
             return
