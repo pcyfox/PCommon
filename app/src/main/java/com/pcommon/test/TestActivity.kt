@@ -16,6 +16,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         super.initView()
         viewModel?.test()
         test()
+        testProgressDialog()
     }
 
     fun test() {
@@ -26,6 +27,23 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         for (i in 0..100) {
             XLog.i("$TAG:test() called --------------$i")
         }
+    }
+
+
+    fun testProgressDialog() {
+        showProgress()
+        Thread {
+            for (i in 1..100) {
+                runOnUiThread {
+                    showProgress("$i%")
+                }
+                Thread.sleep(2000)
+            }
+
+        }.start()
+
 
     }
+
+
 }

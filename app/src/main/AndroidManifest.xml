@@ -23,6 +23,7 @@
         android:label="${app_name}"
         android:largeHeap="true"
         android:supportsRtl="true"
+        android:theme="@style/CommonAppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
         <activity android:name="com.pcommon.test.TestActivity">

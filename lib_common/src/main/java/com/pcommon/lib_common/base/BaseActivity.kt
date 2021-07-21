@@ -37,7 +37,8 @@ import com.pcommon.lib_utils.MaskUtils
  */
 
 @Keep
-abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) : FragmentActivity() {
+abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
+    FragmentActivity() {
     private val TAG = "BaseActivity"
     protected var viewModel: VM? = null
         private set
@@ -70,8 +71,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         if (isFullScreen) {
             requestWindowFeature(Window.FEATURE_NO_TITLE)
             //全屏
-            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
             hideNavigationBar()
         }
         super.onCreate(savedInstanceState)
@@ -106,7 +109,13 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    protected fun showProgress() {
+    protected fun showProgress(tips: String? = "") {
+        if (tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
+            progress!!.setTips(tips)
+            return
+        }
+
+
         if (isBeenHiddenProgress) {
             progress?.dismiss()
             return
@@ -129,6 +138,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             }
         }
         progress?.show()
+        progress?.setTips(tips)
         isBeenHiddenProgress = false
     }
 
@@ -185,7 +195,12 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         if (isDoubleClickExit) {
             eventDetector.addEvent()
             if (eventDetector.timesLack - 1 != 0) {
-                toast(String.format(getString(R.string.common_click_more_will_finish), eventDetector.timesLack - 1))
+                toast(
+                    String.format(
+                        getString(R.string.common_click_more_will_finish),
+                        eventDetector.timesLack - 1
+                    )
+                )
             } else if (eventDetector.timesLack == 1) {
                 if (!onDoubleClickOverIntercept()) {
                     finish()
@@ -256,9 +271,11 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     open fun observeData() {
         if (isShowNetWorkChangNotice) {
-            LiveEventBus.get().with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java).observe(this, {
-                onNetWorkChange(it.isAvailable)
-            })
+            LiveEventBus.get()
+                .with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java)
+                .observe(this, {
+                    onNetWorkChange(it.isAvailable)
+                })
         }
     }
 

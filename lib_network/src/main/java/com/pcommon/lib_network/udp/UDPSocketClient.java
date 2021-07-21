@@ -256,7 +256,7 @@ public class UDPSocketClient {
     }
 
     public void sendBroadcast(final String message, final String ip, final int port) {
-        XLog.i(TAG + ":LsendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
+        //XLog.i(TAG + ":sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
         //说明通过指定端口创建的socket失败
         if (datagramSocket == null) {
             try {

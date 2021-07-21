@@ -126,7 +126,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
             e.printStackTrace();
         }
         if (mPackageInfo == null) return map;
-        map.put("appCrash", "**---------------------------------Crash-----------------------------------**");
+        map.put("appCrash", "**---------------------------------Crash-----------------------------------**\n");
         map.put("versionName", "" + mPackageInfo.versionName);
         map.put("versionCode", "" + mPackageInfo.versionCode);
         map.put("crashTime", "" + formatTime(System.currentTimeMillis()));
