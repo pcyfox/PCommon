@@ -121,7 +121,7 @@ public class UDPSocketClient {
             datagramSocket.bind(new InetSocketAddress(CLIENT_PORT));
             XLog.i(TAG + ":startUDPSocket()   DatagramSocket  bind :" + CLIENT_PORT);
             startSocketThread();
-        } catch (SocketException e) {
+        } catch (Exception e) {
             XLog.e(TAG + ":startUDPSocket() error =" + e.getMessage());
             if (datagramSocket != null) {
                 datagramSocket.disconnect();
