@@ -33,10 +33,10 @@ public class DeskConfig {
     private static final DeskConfig instance = new DeskConfig();
 
     @Expose(serialize = false, deserialize = false)
-    private final String DESK_CONFIG_PATH;
+    public final String DESK_CONFIG_PATH;
 
     @Expose(serialize = false, deserialize = false)
-    private final String DESK_NUMBER_MAPPING_DATA_PATH;
+    public final String DESK_NUMBER_MAPPING_DATA_PATH;
 
     @Expose
     private String deskNumber = "-1";
@@ -268,7 +268,7 @@ public class DeskConfig {
             gsonBuilder.excludeFieldsWithoutExposeAnnotation();
             Gson gson = gsonBuilder.create();
             fwriter.write(gson.toJson(data));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             try {
@@ -276,7 +276,7 @@ public class DeskConfig {
                     fwriter.flush();
                     fwriter.close();
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -303,13 +303,13 @@ public class DeskConfig {
                 Gson gson = gsonBuilder.create();
                 return gson.fromJson(jsonString.toString(), clazz);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
