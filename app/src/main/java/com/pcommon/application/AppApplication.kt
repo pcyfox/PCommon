@@ -35,6 +35,7 @@ class AppApplication : BaseApplication() {
     }
 
 
+
     //TODO：这里面的大多初始化方法其实都可以移动到SplashActivity中执行，反正SplashActivity中有三秒时间无事可做，这样可以优化APP启动速度
     override fun onCreate() {
         super.onCreate()

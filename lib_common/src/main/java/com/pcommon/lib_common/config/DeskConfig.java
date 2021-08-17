@@ -346,15 +346,13 @@ public class DeskConfig {
         }
 
         public String findDeskLineAndColumn(String deskNumber) {
-            if (mappingData == null || TextUtils.isEmpty(deskNumber)) {
+            if (mappingData == null || mappingData.isEmpty() || TextUtils.isEmpty(deskNumber)) {
                 return null;
             }
-            Collection<String> values = mappingData.values();
-            if (values.contains(deskNumber)) {
-                for (String d : values) {
-                    if (deskNumber.equals(d)) {
-                        return d;
-                    }
+            Set<Map.Entry<String, String>> entrySet = mappingData.entrySet();
+            for (Map.Entry<String, String> e : entrySet) {
+                if (deskNumber.equals(e.getValue())) {
+                    return e.getKey();
                 }
             }
             return null;

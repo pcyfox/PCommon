@@ -2,7 +2,7 @@ ext {
     versionCode=3
     versionName="1.0.3"
 
-    compileSdkVersion = 28
+    compileSdkVersion = 30
     androidBuildTools = '29.0.2'
 
     androidTargetSdk = 26 //必须大于等于26  canRequestPackageInstalls才能返回正确的值

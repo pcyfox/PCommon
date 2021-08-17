@@ -8,11 +8,12 @@ android {
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.androidTargetSdk
-        versionCode 1
-        versionName "1.0"
         resourcePrefix 'view_'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'view-proguard-rules.pro'
+
+        versionCode 1
+        versionName "1.0"
     }
     sourceSets {
         main {

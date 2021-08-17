@@ -5,14 +5,14 @@ android {
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.androidTargetSdk
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs('zh-rCN')
         ndk {
             abiFilters  'armeabi-v7a'
         }
 
+        versionCode 1
+        versionName "1.0"
         consumerProguardFiles 'proguard-rules.pro'
     }
 

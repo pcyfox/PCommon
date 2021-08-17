@@ -8,25 +8,18 @@ android {
     defaultConfig {
         minSdkVersion minSdkVersion
         targetSdkVersion androidTargetSdk
-        versionCode 1
-        versionName "1.0"
         //在这个模块的资源命名必需以这个字符开头，否则编译器会给出警告
         resourcePrefix 'common_'
         buildConfigField("String", "BUILD_TIME", "\"" + new Date().format("yyyy-MM-dd_HH-mm-ss") + "\"")
 
+        versionCode 1
+        versionName "1.0"
     }
 
     buildFeatures {
         dataBinding = true
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
 
     buildTypes {
         release {

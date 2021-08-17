@@ -23,43 +23,41 @@ import com.pcommon.lib_common.application.BaseAbstractApplication
 @RequiresApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 abstract class BaseApplication : BaseAbstractApplication(), Application.ActivityLifecycleCallbacks {
     private val TAG = "BaseApplication"
-    override fun onActivityPaused(activity: Activity?) {
 
-    }
-
-    override fun onActivityResumed(activity: Activity?) {
-
-    }
-
-    override fun onActivityStarted(activity: Activity?) {
-        // XLog.i("$TAG:onActivityStarted() called with: activity = $activity")
-
-    }
-
-    override fun onActivityDestroyed(activity: Activity?) {
+    override fun onActivityDestroyed(activity: Activity) {
         val activityList = ActivityUtils.getActivityList()
         if (activityList.isNullOrEmpty()) {
             XLog.w("$TAG:onActivityDestroyed() called with: app be killed")
         }
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {
-
-    }
-
-    override fun onActivityStopped(activity: Activity?) {
-
-    }
-
-    override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
-
-    }
 
     @RequiresApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     override fun onCreate() {
         super.onCreate()
         registerActivityLifecycleCallbacks(this)
     }
+
+
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     override fun onTerminate() {

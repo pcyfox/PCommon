@@ -15,9 +15,9 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     private val TAG = "TestActivity"
     override fun initView() {
         super.initView()
-        viewModel?.test()
-        test()
-        testProgressDialog()
+      //  viewModel?.test()
+       // test()
+        //testProgressDialog()
         testLoadDeskConfig()
     }
 
@@ -51,12 +51,17 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 //        }.start()
     }
 
-    fun testLoadDeskConfig() {
+  private  fun testLoadDeskConfig() {
         DeskConfig.getInstance().deskNumber = "1-1"
         Log.d(
             TAG,
             "testLoadDeskConfig ------------->deskNumber=" + DeskConfig.getInstance().deskNumber
         )
-    }
+
+      Log.d(
+          TAG,
+          "testLoadDeskConfig ------------->deskNumber=D1,find raw deskNumber=" + DeskConfig.getInstance().mappingData.findDeskLineAndColumn("D1")
+      )
+  }
 
 }
