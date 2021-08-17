@@ -151,8 +151,7 @@ public class DeskConfig {
     private void loadLocalDeskNumberMappingData() {
         Map<String, String> data = new HashMap<>();
         data = loadDeskData(data.getClass(), DESK_NUMBER_MAPPING_DATA_PATH);
-        Log.d(TAG, "loadLocalDeskNumberMappingData() called with: deskLine = [" + deskLine + "], deskColumn = [" + deskColumn + "]" + ",mappingData=" + data);
-        mappingData.mappingData = data;
+        mappingData.setMappingData(data);
     }
 
     /**
@@ -318,7 +317,16 @@ public class DeskConfig {
     }
 
     public static class DeskNumberMappingData {
-        public Map<String, String> mappingData;
+        private Map<String, String> mappingData;
+
+        public Map<String, String> getMappingData() {
+            return mappingData;
+        }
+
+        public void setMappingData(Map<String, String> mappingData) {
+            Log.d(TAG, "setMappingData() called with: mappingData = [" + mappingData + "]");
+            this.mappingData = mappingData;
+        }
 
         public String findDeskNumber(String deskLine, String deskColumn) {
             String defNumber = deskLine + "-" + deskColumn;
