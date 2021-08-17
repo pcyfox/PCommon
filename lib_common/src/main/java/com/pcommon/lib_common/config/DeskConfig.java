@@ -17,8 +17,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 @Keep
@@ -141,7 +143,7 @@ public class DeskConfig {
             deskNumber = localConfig.deskNumber;
         }
         boolean isOk = tryParseDeskNumberToXY(deskNumber);
-        if (isOk || (!TextUtils.isEmpty(deskLine) & !TextUtils.isEmpty(deskColumn))) {
+        if (isOk || (!TextUtils.isEmpty(deskLine) && !TextUtils.isEmpty(deskColumn))) {
             deskNumber = findDeskNumberFormMappingFile(deskLine, deskColumn);
         }
         return deskNumber;
@@ -172,13 +174,21 @@ public class DeskConfig {
             //有可能此时本地配置文件已被其它APP修改了
             copyLocationConfig();
             this.deskNumber = deskNumber;
-            tryParseDeskNumberToXY(deskNumber);
+            if (deskNumber.contains("-")) {
+                tryParseDeskNumberToXY(deskNumber);
+            } else {
+                String rawDeskNumber = mappingData.findDeskLineAndColumn(deskNumber);
+                tryParseDeskNumberToXY(rawDeskNumber);
+            }
             saveDeskConfig(this);
         }
     }
 
 
     private boolean tryParseDeskNumberToXY(String deskNumber) {
+        if (TextUtils.isEmpty(deskNumber)) {
+            return false;
+        }
         if (deskNumber.contains("-")) {
             String[] data = deskNumber.split("-");
             if (data.length == 2) {
@@ -335,11 +345,27 @@ public class DeskConfig {
             this.mappingData = mappingData;
         }
 
+        public String findDeskLineAndColumn(String deskNumber) {
+            if (mappingData == null || TextUtils.isEmpty(deskNumber)) {
+                return null;
+            }
+            Collection<String> values = mappingData.values();
+            if (values.contains(deskNumber)) {
+                for (String d : values) {
+                    if (deskNumber.equals(d)) {
+                        return d;
+                    }
+                }
+            }
+            return null;
+        }
+
+
         public String findDeskNumber(String deskLine, String deskColumn) {
             String defNumber = deskLine + "-" + deskColumn;
             if (mappingData != null) {
                 String deskNumber = mappingData.get(defNumber);
-                if (!TextUtils.isEmpty(defNumber)) {
+                if (!TextUtils.isEmpty(deskNumber)) {
                     defNumber = deskNumber;
                 }
             }
