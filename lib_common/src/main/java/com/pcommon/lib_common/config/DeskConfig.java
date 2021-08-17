@@ -226,6 +226,13 @@ public class DeskConfig {
         }
     }
 
+    public String getDeskColumn() {
+        return deskColumn;
+    }
+
+    public String getDeskLine() {
+        return deskLine;
+    }
 
     public static DeskConfig getInstance() {
         return instance;
