@@ -59,7 +59,7 @@ public class DeskConfig {
 
 
     @Expose(serialize = false, deserialize = false)
-    private final DeskNumberMappingData mappingData = new DeskNumberMappingData();
+    public final DeskNumberMappingData mappingData = new DeskNumberMappingData();
 
 
     private DeskConfig() {
