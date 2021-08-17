@@ -5,6 +5,7 @@ import com.elvishew.xlog.XLog
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
 import com.pcommon.lib_common.base.BaseActivity
+import com.pcommon.lib_common.config.DeskConfig
 import com.pcommon.lib_common.manager.ConnectivityManagerHelper
 import com.pcommon.lib_log.LogCacheManager
 import com.pcommon.lib_log.printer.CloudLogPrinter
@@ -17,6 +18,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         viewModel?.test()
         test()
         testProgressDialog()
+        testLoadDeskConfig()
     }
 
     fun test() {
@@ -31,22 +33,30 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 
 
     fun testProgressDialog() {
-        showProgress()
-        Thread {
-            for (i in 1..100) {
-                runOnUiThread {
-                    showProgress("$i%")
-                }
-                Thread.sleep(100)
-            }
-           runOnUiThread {
-               hideProgress()
-           }
+        showProgress(2000)
+        hideProgress(4000)
 
-        }.start()
-
-
+//        Thread {
+//            for (i in 1..100) {
+//                runOnUiThread {
+//                    showProgress("$i%")
+//                }
+//                Thread.sleep(100)
+//            }
+//
+//           runOnUiThread {
+//               hideProgress()
+//           }
+//
+//        }.start()
     }
 
+    fun testLoadDeskConfig() {
+        DeskConfig.getInstance().deskNumber = "1-1"
+        Log.d(
+            TAG,
+            "testLoadDeskConfig ------------->deskNumber=" + DeskConfig.getInstance().deskNumber
+        )
+    }
 
 }

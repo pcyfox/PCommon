@@ -1,6 +1,7 @@
 package com.pcommon.application
 
 import android.content.Context
+import android.util.Log
 import androidx.multidex.MultiDex
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.AppUtils
@@ -20,6 +21,7 @@ import com.pcommon.manager.TrdServiceManager
  * @author LP
  */
 class AppApplication : BaseApplication() {
+    private val TAG = "AppApplication"
     private val ELK_URL = "http://192.168.1.203"
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
@@ -54,6 +56,7 @@ class AppApplication : BaseApplication() {
     private fun initLog() {
         val ELKPort = 80
         TrdServiceManager.initLog("TK-EDU-STU", "$ELK_URL:$ELKPort")
+        Log.d(TAG, "initLog() called--------------")
         if (PermissionUtils.isGranted(PermissionConstants.STORAGE)) {
             Thread {
                 Thread.sleep(30 * 1000)//延迟处理，避免影响APP启动流畅度,以及重启后未连上网

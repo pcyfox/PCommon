@@ -85,6 +85,7 @@ public final class TrdServiceManager {
         header.put("model", Build.MODEL);
 
         String deviceId = DeskConfig.getInstance().getDeviceId();
+
         if (TextUtils.isEmpty(deviceId)) {
             deviceId = Util.genClientId();
             DeskConfig.getInstance().setDeviceId(deviceId);

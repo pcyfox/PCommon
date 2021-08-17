@@ -53,9 +53,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open var mainViewModelId = -1
     open var isFullScreen = true
     open var isClickBack = true
+    private var isBeenHiddenProgress = false
 
     private var progress: MaskProgressDialog? = null
-    private var isBeenHiddenProgress = false//标记菊花转是否被关闭
+
 
     open fun createViewModel(): VM {
         return BaseViewModel(application) as VM
@@ -93,30 +94,29 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             return
         }
         postDelayed(delay) {
-            showProgress()
+            if (!isBeenHiddenProgress) {
+                showProgress()
+            }
         }
     }
 
     protected fun hideProgress(delay: Long) {
-        isBeenHiddenProgress = true
-        if (progress != null && progress!!.isShowing) {
+        postDelayed(delay) {
+            isBeenHiddenProgress = true
             hideProgress()
-        } else {
-            postDelayed(delay) {
-                hideProgress()
-            }
         }
+    }
+
+
+    protected fun hideProgress() {
+        isBeenHiddenProgress = true
+        progress?.dismiss()
     }
 
 
     protected fun showProgress(tips: String? = "") {
         if (!tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
             progress!!.setTips(tips)
-            return
-        }
-
-        if (isBeenHiddenProgress) {
-            progress?.dismiss()
             return
         }
         if (progress == null) {
@@ -141,10 +141,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         isBeenHiddenProgress = false
     }
 
-    protected fun hideProgress() {
-        isBeenHiddenProgress = true
-        progress?.dismiss()
-    }
 
     protected fun startTimeOutTimer(time: Long) {
         postDelayed(time, Runnable {
@@ -169,7 +165,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             lifecycle.removeObserver(this)
         }
         onKeyDownListeners?.clear()
-
         progress?.run {
             listener = null
             progress?.dismiss()
