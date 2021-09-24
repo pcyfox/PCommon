@@ -21,8 +21,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RequestManager extends AbsRequest {
     private static final String TAG = "RequestManager";
-    private static RequestManager requestManager = new RequestManager();
+    private static final RequestManager requestManager = new RequestManager();
     private HeaderInterceptor headerInterceptor;
+    private OkHttpClient.Builder okhttpBuilder;
 
     private RequestManager() {
         super();
@@ -30,6 +31,9 @@ public class RequestManager extends AbsRequest {
 
     @Override
     public OkHttpClient.Builder createOkHttpClientBuilder() {
+        if (okhttpBuilder != null) {
+            return okhttpBuilder;
+        }
         return new OkHttpClient().newBuilder()
                 .retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
                 .dns(new OkHttpDns(3L))
@@ -37,6 +41,7 @@ public class RequestManager extends AbsRequest {
                 .readTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(5, TimeUnit.SECONDS);
     }
+
 
     @Override
     public Retrofit.Builder createRetrofitBuilder() {
@@ -52,8 +57,10 @@ public class RequestManager extends AbsRequest {
 
     public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName) {
         XLog.i(TAG + ":iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], pkgName = [" + pkgName + "]");
-        this.baseUrl = baseUrl;
-        retrofit=null;
+        if (TextUtils.isEmpty(baseUrl)) {
+            XLog.e("iniRetrofit fail, bad baseUrl+" + baseUrl);
+            return;
+        }
         headerInterceptor = new HeaderInterceptor();
         headerInterceptor.setDeviceId(clientId);
         headerInterceptor.setAppVersionCode(appVersionCode);
@@ -62,7 +69,11 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
         loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token");
-        cleatInterceptor();
+
+        this.baseUrl = baseUrl;
+        retrofit = null;
+
+        clearInterceptor();
         addInterceptor(loggingInterceptor, headerInterceptor);
         cleaConverterFactories();
         addConverterFactory(GsonConverterFactory.create());
@@ -112,6 +123,11 @@ public class RequestManager extends AbsRequest {
         if (loggingInterceptor != null) {
             loggingInterceptor.setFilter(filter);
         }
+    }
+
+
+    public void setOkhttpBuilder(OkHttpClient.Builder okhttpBuilder) {
+        this.okhttpBuilder = okhttpBuilder;
     }
 
     private final MyHttpLoggingInterceptor loggingInterceptor = new MyHttpLoggingInterceptor(new HttpLogger() {

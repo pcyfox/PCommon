@@ -24,7 +24,7 @@ public abstract class AbsRequest {
     static final Object lock = new Object();
     private Set<Converter.Factory> converterFactories;
     private Set<Interceptor> interceptors;
-    String baseUrl;
+    protected String baseUrl;
     private OkHttpClient httpClient;
     protected Retrofit retrofit;
     //标记关于URL的网络请求日志能否上传
@@ -98,8 +98,12 @@ public abstract class AbsRequest {
         converterFactories.addAll(Arrays.asList(factories));
     }
 
-    public void cleatInterceptor() {
-        interceptors = new HashSet<>();
+    public void clearInterceptor() {
+        if (interceptors != null) {
+            interceptors.clear();
+        } else {
+            interceptors = new HashSet<>();
+        }
     }
 
     public void addInterceptor(Interceptor... interceptors) {
