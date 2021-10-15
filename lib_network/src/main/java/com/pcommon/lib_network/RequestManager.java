@@ -36,10 +36,10 @@ public class RequestManager extends AbsRequest {
         }
         return new OkHttpClient().newBuilder()
                 .retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
-                .dns(new OkHttpDns(3L))
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS);
+                .dns(new OkHttpDns(8L))
+                .connectTimeout(6, TimeUnit.SECONDS)
+                .readTimeout(6, TimeUnit.SECONDS)
+                .writeTimeout(6, TimeUnit.SECONDS);
     }
 
 

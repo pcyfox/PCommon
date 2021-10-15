@@ -34,6 +34,11 @@ class MaskProgressDialog constructor(ct: Context, var listener: DialogListener?)
     }
 
 
+    fun isCancelable(isCan: Boolean) {
+        teach_close_progress.visibility = if (isCan) View.VISIBLE else View.GONE
+    }
+
+
     fun setTips(tips: String?) {
         tv_dialog_tips.run {
             visibility = if (tips.isNullOrEmpty()) {
