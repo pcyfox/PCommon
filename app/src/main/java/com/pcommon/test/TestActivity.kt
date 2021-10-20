@@ -1,6 +1,8 @@
 package com.pcommon.test
 
 import android.util.Log
+import com.blankj.utilcode.constant.PermissionConstants
+import com.blankj.utilcode.util.PermissionUtils
 import com.elvishew.xlog.XLog
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
@@ -15,10 +17,34 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     private val TAG = "TestActivity"
     override fun initView() {
         super.initView()
-      //  viewModel?.test()
-       // test()
+
+        testRequestPermission()
+        //  viewModel?.test()
+        // test()
         //testProgressDialog()
+
         testLoadDeskConfig()
+
+    }
+
+
+    private fun testRequestPermission(){
+        PermissionUtils.permission(PermissionConstants.STORAGE).callback(object:PermissionUtils.SingleCallback{
+            override fun callback(
+                isAllGranted: Boolean,
+                granted: MutableList<String>,
+                deniedForever: MutableList<String>,
+                denied: MutableList<String>
+            ) {
+
+                testCashUtils()
+            }
+        }).request()
+    }
+
+    private fun testCashUtils() {
+        val i = 11111 / 0;
+        Log.d(TAG, "initView() called $i")
     }
 
     fun test() {
@@ -51,17 +77,19 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 //        }.start()
     }
 
-  private  fun testLoadDeskConfig() {
+    private fun testLoadDeskConfig() {
         DeskConfig.getInstance().deskNumber = "1-1"
         Log.d(
             TAG,
             "testLoadDeskConfig ------------->deskNumber=" + DeskConfig.getInstance().deskNumber
         )
 
-      Log.d(
-          TAG,
-          "testLoadDeskConfig ------------->deskNumber=D1,find raw deskNumber=" + DeskConfig.getInstance().mappingData.findDeskLineAndColumn("D1")
-      )
-  }
+        Log.d(
+            TAG,
+            "testLoadDeskConfig ------------->deskNumber=D1,find raw deskNumber=" + DeskConfig.getInstance().mappingData.findDeskLineAndColumn(
+                "D1"
+            )
+        )
+    }
 
 }

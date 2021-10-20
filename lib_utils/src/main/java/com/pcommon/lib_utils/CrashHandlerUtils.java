@@ -38,6 +38,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     private Context mContext;
     private static final String SDCARD_ROOT = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
     private static CrashHandlerUtils mInstance = new CrashHandlerUtils();
+    private String path;
 
     private CrashHandlerUtils() {
 
@@ -59,9 +60,9 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     public void uncaughtException(Thread thread, Throwable ex) {
         ex.printStackTrace();
         // 将一些信息保存到SDcard中
-        saveInfoToSD(mContext, ex);
+        String f = saveInfoToSD(mContext, ex);
         // 提示用户程序即将退出
-        showToast(mContext, "很抱歉，程序遭遇异常，即将退出！");
+        showToast(mContext, "很抱歉，程序遭遇异常，即将退出！" + (f == null ? "-1" : ""));
         try {
             Thread.sleep(2500);
             killAppProcess();
@@ -88,8 +89,9 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
      * 为我们的应用程序设置自定义Crash处理
      */
     public void init(Context context) {
-        Log.d(TAG, "init() called with: context = [" + context.getClass().getSimpleName() + "]");
         mContext = context;
+        path = SDCARD_ROOT + File.separator + context.getPackageName() + ".crash" + File.separator;
+        Log.d(TAG, "init() called with store path=:" + path);
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
@@ -98,13 +100,10 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
      * @param msg
      */
     private void showToast(final Context context, final String msg) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                Looper.loop();
-            }
+        new Thread(() -> {
+            Looper.prepare();
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+            Looper.loop();
         }).start();
     }
 
@@ -167,21 +166,19 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
         String crashLog = info.toString() + "-----Exception------>:" + obtainExceptionInfo(ex);
         XLog.log(CRASH_LOG_LEVEL, crashLog);
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File dir = new File(SDCARD_ROOT + File.separator + context.getPackageName() + ".crash" + File.separator);
-            if (!dir.canWrite()) {
-                return null;
-            }
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
             FileOutputStream fos = null;
             try {
+                File dir = new File(path);
+                if (!dir.exists()) {
+                    dir.mkdir();
+                }
                 fileName = dir.toString() + File.separator
                         + formatTime(System.currentTimeMillis()) + ".log";
                 fos = new FileOutputStream(fileName);
                 fos.write(crashLog.getBytes());
                 fos.flush();
                 fos.close();
+                Log.e(TAG, "-------------------saveInfoToSD() called with: file= [" + fileName + "] ");
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
