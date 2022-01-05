@@ -113,6 +113,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         progress?.dismiss()
     }
 
+    fun isProgressCancelable(isCan: Boolean) {
+        progress?.isCancelable(isCan)
+    }
 
     protected fun showProgress(tips: String? = "") {
         if (!tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
