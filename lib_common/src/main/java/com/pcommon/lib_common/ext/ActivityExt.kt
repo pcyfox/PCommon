@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.pcommon.lib_common.R
 import com.pcommon.lib_utils.AnimUtil
@@ -223,6 +224,9 @@ fun Activity.setChildViewClickable(viewGroup: ViewGroup?, clickable: Boolean) {
     }
 }
 
+
+fun Activity.dp2px(dp: Float): Int = SizeUtils.dp2px(dp)
+fun Activity.px2dp(px: Float): Int = SizeUtils.px2dp(px)
 
 
 

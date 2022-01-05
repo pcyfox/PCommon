@@ -11,6 +11,7 @@ import com.pcommon.lib_network.log.HttpLogger;
 import com.pcommon.lib_network.log.LogFilter;
 import com.pcommon.lib_network.log.MyHttpLoggingInterceptor;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +22,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RequestManager extends AbsRequest {
     private static final String TAG = "RequestManager";
-    private static RequestManager requestManager = new RequestManager();
+    private static final RequestManager requestManager = new RequestManager();
     private HeaderInterceptor headerInterceptor;
+    private int[] timeOuts = {5, 5, 5, 5};
 
     private RequestManager() {
         super();
@@ -30,12 +32,16 @@ public class RequestManager extends AbsRequest {
 
     @Override
     public OkHttpClient.Builder createOkHttpClientBuilder() {
+        if (timeOuts == null || timeOuts.length < 4) {
+            throw new IllegalArgumentException("time out params error");
+        }
+        Log.d(TAG, "createOkHttpClientBuilder() called timeOuts=" + Arrays.toString(timeOuts));
         return new OkHttpClient().newBuilder()
                 .retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
-                .dns(new OkHttpDns(3L))
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS);
+                .dns(new OkHttpDns(timeOuts[0]))
+                .connectTimeout(timeOuts[1], TimeUnit.SECONDS)
+                .readTimeout(timeOuts[2], TimeUnit.SECONDS)
+                .writeTimeout(timeOuts[3], TimeUnit.SECONDS);
     }
 
     @Override
@@ -50,10 +56,16 @@ public class RequestManager extends AbsRequest {
     }
 
 
+    public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName, int[] timeOuts) {
+        iniRetrofit(clientId, baseUrl, appVersionCode, appVersionName, pkgName);
+        this.timeOuts = timeOuts;
+    }
+
+
     public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName) {
         XLog.i(TAG + ":iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], pkgName = [" + pkgName + "]");
         this.baseUrl = baseUrl;
-        retrofit=null;
+        retrofit = null;
         headerInterceptor = new HeaderInterceptor();
         headerInterceptor.setDeviceId(clientId);
         headerInterceptor.setAppVersionCode(appVersionCode);

@@ -9,7 +9,7 @@ import java.util.TimerTask;
 
 public class HeartbeatTimer {
 
-    private Timer timer;
+    private final Timer timer;
     private TimerTask task;
     private OnScheduleListener mListener;
 
