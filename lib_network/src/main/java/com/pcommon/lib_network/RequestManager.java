@@ -35,7 +35,6 @@ public class RequestManager extends AbsRequest {
         if (timeOuts == null || timeOuts.length < 4) {
             throw new IllegalArgumentException("time out params error");
         }
-        Log.d(TAG, "createOkHttpClientBuilder() called timeOuts=" + Arrays.toString(timeOuts));
         return new OkHttpClient().newBuilder()
                 .retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
                 .dns(new OkHttpDns(timeOuts[0]))
@@ -56,14 +55,15 @@ public class RequestManager extends AbsRequest {
     }
 
 
-    public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName, int[] timeOuts) {
-        iniRetrofit(clientId, baseUrl, appVersionCode, appVersionName, pkgName);
+    public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName, int retryTime, int[] timeOuts) {
+        Log.d(TAG, "iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], appVersionName = [" + appVersionName + "], pkgName = [" + pkgName + "], retryTime = [" + retryTime + "], timeOuts = [" + Arrays.toString(timeOuts) + "]");
+        iniRetrofit(clientId, baseUrl, appVersionCode, appVersionName, pkgName, retryTime);
         this.timeOuts = timeOuts;
     }
 
 
-    public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName) {
-        XLog.i(TAG + ":iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], pkgName = [" + pkgName + "]");
+    public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName, int retryTime) {
+        Log.d(TAG, "iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], appVersionName = [" + appVersionName + "], pkgName = [" + pkgName + "], retryTime = [" + retryTime + "]");
         this.baseUrl = baseUrl;
         retrofit = null;
         headerInterceptor = new HeaderInterceptor();
@@ -74,8 +74,10 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
         loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token");
+
+
         cleatInterceptor();
-        addInterceptor(loggingInterceptor, headerInterceptor);
+        addInterceptor(new RetryInterceptor(retryTime), loggingInterceptor, headerInterceptor);
         cleaConverterFactories();
         addConverterFactory(GsonConverterFactory.create());
         buildHttpClient();

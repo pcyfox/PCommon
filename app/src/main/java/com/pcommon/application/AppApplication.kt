@@ -77,7 +77,7 @@ class AppApplication : BaseApplication() {
             AppConfig.getBaseUrl(),
             "" + AppUtils.getAppVersionCode(),
             AppUtils.getAppVersionName(),
-            AppUtils.getAppPackageName()
+            AppUtils.getAppPackageName(),5, intArrayOf(10,10,10,10)
         )
         RequestManager.get().setHeaderInterceptorFilter {
             //oss下载请求不能添加请求头

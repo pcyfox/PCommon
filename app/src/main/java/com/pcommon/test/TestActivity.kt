@@ -9,16 +9,23 @@ import com.pcommon.lib_common.config.DeskConfig
 import com.pcommon.lib_common.manager.ConnectivityManagerHelper
 import com.pcommon.lib_log.LogCacheManager
 import com.pcommon.lib_log.printer.CloudLogPrinter
+import com.pcommon.lib_network.OKHttpUtils
+import com.pcommon.lib_network.RequestManager
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
+import java.io.IOException
 
 class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     BaseActivity<ActivityTestBinding, TestViewModel>(TestViewModel::class.java) {
     private val TAG = "TestActivity"
     override fun initView() {
         super.initView()
-      //  viewModel?.test()
-       // test()
+        //  viewModel?.test()
+        // test()
         //testProgressDialog()
-        testLoadDeskConfig()
+//        testLoadDeskConfig()
+        testHttp()
     }
 
     fun test() {
@@ -29,6 +36,22 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         for (i in 0..100) {
             XLog.i("$TAG:test() called --------------$i")
         }
+    }
+
+
+
+   private fun testHttp() {
+       val c=RequestManager.get().httpClient;
+        OKHttpUtils.get(c,"https://my.oschina.net/fonddream/blog/5216845",object: Callback{
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d(TAG, "onFailure() called with: call = $call, e = $e")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                Log.d(TAG, "onResponse() called with: call = $call, response = ${response.body?.string()}")
+            }
+        })
+
     }
 
 
@@ -51,17 +74,19 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 //        }.start()
     }
 
-  private  fun testLoadDeskConfig() {
+    private fun testLoadDeskConfig() {
         DeskConfig.getInstance().deskNumber = "1-1"
         Log.d(
             TAG,
             "testLoadDeskConfig ------------->deskNumber=" + DeskConfig.getInstance().deskNumber
         )
 
-      Log.d(
-          TAG,
-          "testLoadDeskConfig ------------->deskNumber=D1,find raw deskNumber=" + DeskConfig.getInstance().mappingData.findDeskLineAndColumn("D1")
-      )
-  }
+        Log.d(
+            TAG,
+            "testLoadDeskConfig ------------->deskNumber=D1,find raw deskNumber=" + DeskConfig.getInstance().mappingData.findDeskLineAndColumn(
+                "D1"
+            )
+        )
+    }
 
 }
