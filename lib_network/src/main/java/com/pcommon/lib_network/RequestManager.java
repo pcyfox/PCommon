@@ -75,8 +75,7 @@ public class RequestManager extends AbsRequest {
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
         loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token");
 
-
-        cleatInterceptor();
+        clearInterceptor();
         addInterceptor(new RetryInterceptor(retryTime), loggingInterceptor, headerInterceptor);
         cleaConverterFactories();
         addConverterFactory(GsonConverterFactory.create());
