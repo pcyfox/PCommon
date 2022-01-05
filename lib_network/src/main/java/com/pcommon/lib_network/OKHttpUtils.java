@@ -252,87 +252,8 @@ public class OKHttpUtils {
         //RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
         Request request = new Request.Builder().url(url).post(body).build();
         //AppLog.d(TAG, "Http Req --> " + url + temp);
-        Response response = getOkHttpClient().newCall(request).execute();// execute(同步) enqueue(异步)
-
-     /*   if(response)
-        if (response.isSuccessful()) {
-            String result = response.body().string();
-            //AppLog.d(TAG, "Http Res --> " + result);
-            return result;
-        } else {
-            throw new IOException("Unexpected code " + response);
-        }*/
-        return response;
+        return getOkHttpClient().newCall(request).execute();
     }
 
 
-    /**
-     * 下载文件
-     *
-     * @param fileUrl  文件url
-     * @param filepath 文件绝对存储路径
-     */
-    public static void downLoadFile(String fileUrl, final String filepath, final GrabCallback callBack) {
-  /*      final String fileName = MD5.encode(fileUrl);
-        final File file = new File(destFileDir, fileName);
-        if (file.exists()) {
-            successCallBack((T) file, callBack);
-
-            callBack.onResponse();
-            return;
-        }*/
-        final File file = new File(filepath);
-        final Request request = new Request.Builder().url(fileUrl).build();
-        final Call call = getOkHttpClient().newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, e.toString());
-                callBack.onFailure(e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                InputStream is = null;
-                byte[] buf = new byte[2048];
-                int len = 0;
-                FileOutputStream fos = null;
-                try {
-                    long total = response.body().contentLength();
-                    Log.d(TAG, "total------>" + total);
-                    long current = 0;
-                    is = response.body().byteStream();
-                    fos = new FileOutputStream(file);
-                    while ((len = is.read(buf)) != -1) {
-                        current += len;
-                        fos.write(buf, 0, len);
-                        Log.d(TAG, "current------>" + current);
-                    }
-                    fos.flush();
-                    callBack.onSuccess(filepath);
-                } catch (IOException e) {
-                    Log.e(TAG, e.toString());
-                    callBack.onFailure(e);
-                } finally {
-                    try {
-                        if (is != null) {
-                            is.close();
-                        }
-                        if (fos != null) {
-                            fos.close();
-                        }
-                    } catch (IOException e) {
-                        Log.e(TAG, e.toString());
-                    }
-                }
-            }
-        });
-    }
-
-
-    public interface GrabCallback {
-        void onFailure(Exception e);
-
-        void onSuccess(String filePath);
-    }
 }
