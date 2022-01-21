@@ -15,11 +15,17 @@ import java.io.IOException
 
 object OSSDownloadUtil {
     private const val TAG = "OSSDownloadUtil"
-    fun downLoad(rawUrl: String, dir: String? = null, isUseCache: Boolean = true, liveData: MutableLiveData<DownloadData>) {
+    fun downLoad(
+        rawUrl: String,
+        dir: String? = null,
+        isUseCache: Boolean = true,
+        liveData: MutableLiveData<DownloadData>
+    ) {
         Log.d(TAG, "downLoad() called with: rawUrl = $rawUrl, dir = $dir, liveData = $liveData")
         val file: String? = null
         OKHttpUtils.get(rawUrl, object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
                 liveData.postValue(DownloadData(rawUrl, file))
             }
 
@@ -31,18 +37,24 @@ object OSSDownloadUtil {
                     if (resp.isOK() && resp.data != null) {
                         val downloadUrl = resp.data
                         val index = downloadUrl!!.indexOf("?Expires");
-                        val cacheKey = if (index > 0) downloadUrl.subSequence(0, index).toString() else rawUrl
-                        DownloadManager.getInstance().downloadToDir(downloadUrl, dir, cacheKey, isUseCache, object : DownLoadCallback() {
-                            override fun onFinish(file: String?) {
-                                Log.d(TAG, "onFinish() called with: file = $file")
-                                liveData.postValue(DownloadData(rawUrl, file))
-                            }
+                        val cacheKey =
+                            if (index > 0) downloadUrl.subSequence(0, index).toString() else rawUrl
+                        DownloadManager.getInstance().downloadToDir(
+                            downloadUrl,
+                            dir,
+                            cacheKey,
+                            isUseCache,
+                            object : DownLoadCallback() {
+                                override fun onFinish(file: String?) {
+                                    Log.d(TAG, "onFinish() called with: file = $file")
+                                    liveData.postValue(DownloadData(rawUrl, file))
+                                }
 
-                            override fun onError(msg: String?) {
-                                super.onError(msg)
-                                liveData.postValue(DownloadData(rawUrl, file))
-                            }
-                        })
+                                override fun onError(msg: String?) {
+                                    super.onError(msg)
+                                    liveData.postValue(DownloadData(rawUrl, file))
+                                }
+                            })
                     } else {
                         liveData.postValue(DownloadData(rawUrl, file))
                     }
