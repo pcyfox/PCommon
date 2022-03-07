@@ -257,20 +257,19 @@ public class UDPSocketClient {
 
     public void sendBroadcast(final String message, final String ip, final int port) {
         //XLog.i(TAG + ":sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
-        //说明通过指定端口创建的socket失败
-        if (datagramSocket == null) {
-            try {
-                //使用系统分配端口创建socket，保证消息能正常发送
-                datagramSocket = new DatagramSocket();
-            } catch (SocketException e) {
-                XLog.e(TAG + ";sendBroadcast() called with: message = [" + message + "], port = [" + port + "] create socket error:" + e.getMessage());
-                e.printStackTrace();
-                return;
-            }
-        }
-
         mThreadPool.execute(() -> {
             try {
+                //说明通过指定端口创建的socket失败
+                if (datagramSocket == null) {
+                    try {
+                        //使用系统分配端口创建socket，保证消息能正常发送
+                        datagramSocket = new DatagramSocket();
+                    } catch (SocketException e) {
+                        XLog.e(TAG + ";sendBroadcast() called with: message = [" + message + "], port = [" + port + "] create socket error:" + e.getMessage());
+                        e.printStackTrace();
+                        return;
+                    }
+                }
                 InetAddress targetAddress = InetAddress.getByName(ip);
                 DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, targetAddress, port);
                 try {
