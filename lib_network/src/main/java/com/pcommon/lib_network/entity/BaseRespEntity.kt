@@ -2,9 +2,13 @@ package com.pcommon.lib_network.entity
 
 import com.pcommon.lib_network.entity.RespCode.OK
 
-open class BaseRespEntity<D>(var resultCode: Int = -1,
-                             var message: String = "",
-                             var data: D? = null) {
+open class BaseRespEntity<D>(
+    var resultCode: Int = -1,
+    var message: String = "",
+    var data: D? = null
+) {
+    var tag: Any? = null
+
     fun isOK() = resultCode == OK
 }
 

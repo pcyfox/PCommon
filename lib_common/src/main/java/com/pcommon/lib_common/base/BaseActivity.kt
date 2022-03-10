@@ -39,6 +39,7 @@ import com.pcommon.lib_utils.MaskUtils
 @Keep
 abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
     FragmentActivity() {
+
     private val TAG = "BaseActivity"
     protected var viewModel: VM? = null
         private set
@@ -89,7 +90,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    protected fun showProgress(delay: Long) {
+    fun showProgress(delay: Long) {
         if (delay < 0) {
             return
         }
@@ -100,7 +101,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
-    protected fun hideProgress(delay: Long) {
+    fun hideProgress(delay: Long) {
         postDelayed(delay) {
             isBeenHiddenProgress = true
             hideProgress()
@@ -108,7 +109,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    protected fun hideProgress() {
+    fun hideProgress() {
         isBeenHiddenProgress = true
         progress?.dismiss()
     }
@@ -117,7 +118,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         progress?.isCancelable(isCan)
     }
 
-    protected fun showProgress(tips: String? = "") {
+    fun showProgress(tips: String? = "") {
         if (!tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
             progress!!.setTips(tips)
             return
@@ -145,7 +146,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    protected fun startTimeOutTimer(time: Long) {
+    fun startTimeOutTimer(time: Long) {
         postDelayed(time, Runnable {
             onTimeOut(time)
         })
@@ -238,7 +239,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    protected fun <T : BaseViewModel> getViewModel(clazz: Class<T>): T {
+    fun <T : BaseViewModel> getViewModel(clazz: Class<T>): T {
         return ViewModelProvider(this).get(clazz)
     }
 
@@ -270,9 +271,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         if (isShowNetWorkChangNotice) {
             LiveEventBus.get()
                 .with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java)
-                .observe(this, {
+                .observe(this) {
                     onNetWorkChange(it.isAvailable)
-                })
+                }
         }
     }
 

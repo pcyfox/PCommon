@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.Keep
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 
 
 /**
@@ -17,7 +18,8 @@ import androidx.fragment.app.Fragment
  */
 
 @Keep
-abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragment(), OnKeyDownListener {
+abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
+    Fragment(), OnKeyDownListener {
     protected var viewModel: VM? = null
     private var viewDataBinding: VDB? = null
     protected abstract val fragmentLayoutId: Int
@@ -26,13 +28,22 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = createViewModel()
+        viewModel = if (vmClass != null) {
+            createViewModel(vmClass!!)
+        } else {
+            createViewModel()
+        }
+
         if (viewModel != null) {
             lifecycle.addObserver(viewModel!!)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         if (contentView != null) {
             return contentView
         }
@@ -76,6 +87,15 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
         return false;
     }
 
+
+    fun <T : BaseViewModel> getViewModel(clazz: Class<T>): T {
+        return ViewModelProvider(this).get(clazz)
+
+    }
+
+    private fun createViewModel(clazz: Class<VM>): VM {
+        return getViewModel(clazz)
+    }
 
     protected abstract fun createViewModel(): VM
 
