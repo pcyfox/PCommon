@@ -17,6 +17,10 @@ android {
         resConfigs('zh-rCN')
     }
 
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaSourceCompatibility
+        targetCompatibility rootProject.ext.javaTargetCompatibility
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -31,7 +35,7 @@ android {
 }
 
 dependencies {
-    api 'com.elvishew:xlog:1.6.1'
+    api 'com.elvishew:xlog:1.10.1'
     implementation rootProject.ext.dependencies.gson
     implementation project(path: ':lib_network')
     implementation 'com.blankj:utilcode:1.30.0'

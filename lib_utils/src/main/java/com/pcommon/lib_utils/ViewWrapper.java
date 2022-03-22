@@ -4,7 +4,7 @@ import android.view.View;
 
 
 public class ViewWrapper {
-    private View view;
+    private final View view;
 
     ViewWrapper(View view) {
         this.view = view;

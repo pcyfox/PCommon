@@ -14,6 +14,10 @@ android {
         resConfigs('zh-rCN')
     }
 
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaSourceCompatibility
+        targetCompatibility rootProject.ext.javaTargetCompatibility
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -38,6 +42,9 @@ dependencies {
     implementation rootDependencies.ktx
     implementation rootDependencies.gson
 }
+
+
+
 repositories {
     mavenCentral()
 }

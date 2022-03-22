@@ -20,6 +20,10 @@ android {
         dataBinding = true
     }
 
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaSourceCompatibility
+        targetCompatibility rootProject.ext.javaTargetCompatibility
+    }
 
     buildTypes {
         release {

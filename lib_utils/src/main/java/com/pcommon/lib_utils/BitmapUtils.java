@@ -67,7 +67,7 @@ public class BitmapUtils {
      * @param drawable drawable对象
      * @return
      */
-    public static final Bitmap drawableToBitmap(Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable) {
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
                 drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
