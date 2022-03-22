@@ -51,6 +51,16 @@ public class CloudLogPrinter implements Printer {
     private boolean isTooFast = false;
     private int tooFastCount;//持续发生添加日志过快的次数
 
+    private int logSegmentSize = 4 * 1024-1;
+
+    public int getLogSegmentSize() {
+        return logSegmentSize;
+    }
+
+    public void setLogSegmentSize(int logSegmentSize) {
+        this.logSegmentSize = logSegmentSize;
+    }
+
     public String getIndex() {
         return index;
     }
@@ -70,6 +80,7 @@ public class CloudLogPrinter implements Printer {
     public void setQuantityInterval(int quantityInterval) {
         this.quantityInterval = quantityInterval;
     }
+
 
 
 
@@ -120,6 +131,27 @@ public class CloudLogPrinter implements Printer {
         return System.currentTimeMillis() + timeDifference;
     }
 
+    public void printlnL(int logLevel, String tag, String msg) {
+        if (tag == null || tag.length() == 0
+                || msg == null || msg.length() == 0)
+            return;
+        long length = msg.length();
+
+        if (length <= logSegmentSize) {// 长度小于等于限制直接打印
+            Log.println(logLevel, tag, msg);
+        } else {
+            Log.println(logLevel, tag, "---------------------------------------------------------->");
+            while (msg.length() > logSegmentSize) {// 循环分段打印日志
+                String logContent = msg.substring(0, logSegmentSize);
+                msg = msg.replace(logContent, "");
+                Log.println(logLevel, tag, msg);
+            }
+            Log.println(logLevel, tag, msg);
+            Log.println(logLevel, tag, "<----------------------------------------------------------");
+        }
+    }
+
+
     @Override
     public void println(final int logLevel, final String tag, final String msg) {
         if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(url)) {
@@ -128,12 +160,13 @@ public class CloudLogPrinter implements Printer {
         //只有在debug模式下才会打印日志级别低于或等于debug的
         if (logLevel <= LogLevel.DEBUG) {
             if (isDebug) {
-                Log.d(tag, msg);
+                printlnL(logLevel, tag, msg);
             }
             return;
         }
 
-        Log.println(logLevel, tag, msg);
+        printlnL(logLevel, tag, msg+msg+msg+msg+msg);
+
         Runnable worker = new Runnable() {
             @Override
             public void run() {
