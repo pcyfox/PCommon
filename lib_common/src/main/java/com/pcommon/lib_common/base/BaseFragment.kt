@@ -60,9 +60,9 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observeData()
         initData()
         initView()
-        observeData()
         initListener()
     }
 

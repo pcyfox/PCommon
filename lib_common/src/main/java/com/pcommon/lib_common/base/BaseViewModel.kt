@@ -80,12 +80,6 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
-    fun startActivityInNewTask(ct: Context, to: Class<out Activity>) {
-        ct.startActivity(Intent().run {
-            setClass(ct, to)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
-    }
 
 
 }

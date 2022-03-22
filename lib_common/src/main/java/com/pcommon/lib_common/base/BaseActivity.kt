@@ -38,7 +38,7 @@ import com.pcommon.lib_utils.MaskUtils
 
 @Keep
 abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
-    FragmentActivity() {
+        FragmentActivity() {
 
     private val TAG = "BaseActivity"
     protected var viewModel: VM? = null
@@ -74,8 +74,8 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             requestWindowFeature(Window.FEATURE_NO_TITLE)
             //全屏
             window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
             hideNavigationBar()
         }
@@ -194,10 +194,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             eventDetector.addEvent()
             if (eventDetector.timesLack - 1 != 0) {
                 toast(
-                    String.format(
-                        getString(R.string.common_click_more_will_finish),
-                        eventDetector.timesLack - 1
-                    )
+                        String.format(
+                                getString(R.string.common_click_more_will_finish),
+                                eventDetector.timesLack - 1
+                        )
                 )
             } else if (eventDetector.timesLack == 1) {
                 if (!onDoubleClickOverIntercept()) {
@@ -224,17 +224,17 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             createViewModel(vmClass!!)
         } else {
             createViewModel()
-        }
-        if (viewModel != null) {
+        }.apply {
             //让ViewModel拥有View的生命周期感应
-            lifecycle.addObserver(viewModel!!)
-        }
-        //DataBindingUtil类需要在project的build中配置 dataBinding {enabled true }, 同步后会自动关联android.databinding包
-        viewDataBinding = DataBindingUtil.setContentView(this, layoutId)
-        //注入Lifecycle生命周期
-        viewDataBinding?.lifecycleOwner = this
-        if (mainViewModelId != -1) {
-            viewDataBinding?.setVariable(mainViewModelId, viewModel)
+            lifecycle.addObserver(this)
+            //DataBindingUtil类需要在project的build中配置 dataBinding {enabled true }, 同步后会自动关联android.databinding包
+            viewDataBinding = DataBindingUtil.setContentView<VDB>(this@BaseActivity, layoutId).apply {
+                //注入Lifecycle生命周期
+                lifecycleOwner = this@BaseActivity
+                if (mainViewModelId != -1) {
+                    setVariable(mainViewModelId, this)
+                }
+            }
         }
     }
 
@@ -270,10 +270,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open fun observeData() {
         if (isShowNetWorkChangNotice) {
             LiveEventBus.get()
-                .with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java)
-                .observe(this) {
-                    onNetWorkChange(it.isAvailable)
-                }
+                    .with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java)
+                    .observe(this) {
+                        onNetWorkChange(it.isAvailable)
+                    }
         }
     }
 

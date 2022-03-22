@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 @Keep
 public abstract class SimpleBindingAdapter<M, B extends ViewDataBinding> extends BaseBindingAdapter<M, B> {
 
-    private int layout;
+    private final int layout;
 
     public SimpleBindingAdapter(Context context, int layout) {
         super(context);
