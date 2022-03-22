@@ -138,17 +138,26 @@ public class CloudLogPrinter implements Printer {
         if (length <= logSegmentSize) {// 长度小于等于限制直接打印
             Log.println(logLevel, tag, msg);
         } else {
-            Log.println(logLevel, tag, "---------------------------------------------------------->");
-            while (msg.length() > logSegmentSize) {// 循环分段打印日志
-                String logContent = msg.substring(0, logSegmentSize);
-                msg = msg.replace(logContent, "");
-                Log.println(logLevel, tag, msg);
+            if (length > logSegmentSize * 3L) {
+                new Thread(() -> {
+                    printlnLarge(logLevel, tag, msg);
+                }).start();
+            } else {
+                printlnLarge(logLevel, tag, msg);
             }
-            Log.println(logLevel, tag, msg);
-            Log.println(logLevel, tag, "<----------------------------------------------------------");
         }
     }
 
+    public void printlnLarge(int logLevel, String tag, String msg) {
+        Log.println(logLevel, tag, "---------------------------------------------------------->");
+        while (msg.length() > logSegmentSize) {// 循环分段打印日志
+            String logContent = msg.substring(0, logSegmentSize);
+            msg = msg.replace(logContent, "");
+            Log.println(logLevel, tag, msg);
+        }
+        Log.println(logLevel, tag, msg);
+        Log.println(logLevel, tag, "<----------------------------------------------------------");
+    }
 
     @Override
     public void println(final int logLevel, final String tag, final String msg) {
