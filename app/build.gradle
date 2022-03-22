@@ -39,6 +39,23 @@ android {
         }
 
     }
+    signingConfigs {
+        debug {
+            storeFile file('taike.jks')
+            storePassword "dftk1689"
+            keyAlias "taike"
+            keyPassword "szyd2433"
+        }
+
+        release {
+            storeFile file('taike.jks')
+            storePassword "dftk1689"
+            keyAlias "taike"
+            keyPassword "szyd2433"
+        }
+    }
+
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']

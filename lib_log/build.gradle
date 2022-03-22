@@ -42,6 +42,7 @@ dependencies {
     //--------------kotlin---------------------
     implementation rootDependencies.kotlin
     implementation rootDependencies.ktx
+    implementation rootDependencies.appcompat
 }
 repositories {
     mavenCentral()
