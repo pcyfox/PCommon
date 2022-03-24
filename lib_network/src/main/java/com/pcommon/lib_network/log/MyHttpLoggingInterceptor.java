@@ -290,7 +290,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
                 ",mediaType: " + mediaTypeString +
                 ",code: " + response.code() +
                 ",url: " + url +
-                "body:\n" + (TextUtils.isEmpty(responseBodyString) ? "" : responseBodyString));
+                "\nbody:\n" + (TextUtils.isEmpty(responseBodyString) ? "" : responseBodyString));
     }
 
 

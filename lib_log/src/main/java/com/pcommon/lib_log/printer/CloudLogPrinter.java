@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.pcommon.lib_log.LogCache;
 import com.pcommon.lib_log.LogCacheManager;
 import com.pcommon.lib_network.RequestManager;
+import com.pcommon.lib_network.log.LogPrintInterceptor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,6 +45,7 @@ public class CloudLogPrinter implements Printer {
     private final Handler logUpDateHandler;
     private boolean isAutoUpdateLog = false;
     private LogUploadInterceptor logUploadInterceptor;
+    private LogPrintInterceptor logPrintInterceptor;
     private volatile boolean isUpdateByUser = false;
     private static volatile boolean isUpdating = false;
     private float addLogCount;
@@ -53,12 +55,30 @@ public class CloudLogPrinter implements Printer {
 
     private int logSegmentSize = 4 * 1024 - 1;
 
+    private int maxLogSegmentCount = 10;
+
     public int getLogSegmentSize() {
         return logSegmentSize;
     }
 
     public void setLogSegmentSize(int logSegmentSize) {
         this.logSegmentSize = logSegmentSize;
+    }
+
+    public int getMaxLogSegmentCount() {
+        return maxLogSegmentCount;
+    }
+
+    public void setMaxLogSegmentCount(int maxLogSegmentCount) {
+        this.maxLogSegmentCount = maxLogSegmentCount;
+    }
+
+    public LogPrintInterceptor getLogPrintInterceptor() {
+        return logPrintInterceptor;
+    }
+
+    public void setLogPrintInterceptor(LogPrintInterceptor logPrintInterceptor) {
+        this.logPrintInterceptor = logPrintInterceptor;
     }
 
     public String getIndex() {
@@ -130,6 +150,9 @@ public class CloudLogPrinter implements Printer {
     }
 
     public void printlnL(int logLevel, String tag, String msg) {
+        if (logPrintInterceptor != null && logPrintInterceptor.onLogPrint(logLevel, tag, msg)) {
+            return;
+        }
         if (tag == null || tag.length() == 0
                 || msg == null || msg.length() == 0)
             return;
@@ -150,10 +173,14 @@ public class CloudLogPrinter implements Printer {
 
     public void printlnLarge(int logLevel, String tag, String msg) {
         Log.println(logLevel, tag, "---------------------------------------------------------->");
+        int count = 0;
         while (msg.length() > logSegmentSize) {// 循环分段打印日志
             String logContent = msg.substring(0, logSegmentSize);
             msg = msg.replace(logContent, "");
             Log.println(logLevel, tag, msg);
+            if (count++ >= maxLogSegmentCount) {
+                return;
+            }
         }
         Log.println(logLevel, tag, msg);
         Log.println(logLevel, tag, "<----------------------------------------------------------");
