@@ -75,10 +75,10 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
                 }
                 is HttpException -> {
                     code = e.code()
-                    e.localizedMessage
+                    if (e.localizedMessage == null) e.cause.toString() else e.message()
                 }
                 else -> {
-                    e.localizedMessage
+                    if (e.localizedMessage == null) e.cause.toString() else e.message()
                 }
             }
             val baseEntity = BaseRespEntity<T>()
