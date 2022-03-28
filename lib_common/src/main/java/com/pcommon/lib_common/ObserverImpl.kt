@@ -13,6 +13,7 @@ import com.pcommon.lib_utils.Util
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import retrofit2.HttpException
+import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
@@ -73,12 +74,18 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
                     code = -400
                     "连接服务器失败!"
                 }
+
+                is IOException -> {
+                    code = -500
+                    "连接服务器失败!"
+                }
+
                 is HttpException -> {
                     code = e.code()
-                    if (e.localizedMessage == null) e.cause.toString() else e.message()
+                    if (e.localizedMessage == null) e.javaClass.simpleName else e.localizedMessage
                 }
                 else -> {
-                    if (e.localizedMessage == null) e.cause.toString() else e.message()
+                    if (e.localizedMessage == null) e.javaClass.simpleName else e.localizedMessage
                 }
             }
             val baseEntity = BaseRespEntity<T>()
