@@ -35,6 +35,7 @@ open class BaseFragmentDialog(
             activity = ownerActivity
         }
         setContentView(layoutId)
+        initData()
         initView()
     }
 
@@ -52,6 +53,8 @@ open class BaseFragmentDialog(
     open fun initView() {
     }
 
+    open fun initData() {
+    }
     open fun onDismiss() {}
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)

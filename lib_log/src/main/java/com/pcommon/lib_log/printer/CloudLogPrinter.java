@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.pcommon.lib_log.LogCache;
 import com.pcommon.lib_log.LogCacheManager;
 import com.pcommon.lib_network.RequestManager;
+import com.pcommon.lib_network.log.LogPrintInterceptor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,12 +45,41 @@ public class CloudLogPrinter implements Printer {
     private final Handler logUpDateHandler;
     private boolean isAutoUpdateLog = false;
     private LogUploadInterceptor logUploadInterceptor;
+    private LogPrintInterceptor logPrintInterceptor;
     private volatile boolean isUpdateByUser = false;
     private static volatile boolean isUpdating = false;
     private float addLogCount;
     private long lastAddTime;
     private boolean isTooFast = false;
     private int tooFastCount;//持续发生添加日志过快的次数
+
+    private int logSegmentSize = 4 * 1024 - 1;
+
+    private int maxLogSegmentCount = 10;
+
+    public int getLogSegmentSize() {
+        return logSegmentSize;
+    }
+
+    public void setLogSegmentSize(int logSegmentSize) {
+        this.logSegmentSize = logSegmentSize;
+    }
+
+    public int getMaxLogSegmentCount() {
+        return maxLogSegmentCount;
+    }
+
+    public void setMaxLogSegmentCount(int maxLogSegmentCount) {
+        this.maxLogSegmentCount = maxLogSegmentCount;
+    }
+
+    public LogPrintInterceptor getLogPrintInterceptor() {
+        return logPrintInterceptor;
+    }
+
+    public void setLogPrintInterceptor(LogPrintInterceptor logPrintInterceptor) {
+        this.logPrintInterceptor = logPrintInterceptor;
+    }
 
     public String getIndex() {
         return index;
@@ -70,7 +100,6 @@ public class CloudLogPrinter implements Printer {
     public void setQuantityInterval(int quantityInterval) {
         this.quantityInterval = quantityInterval;
     }
-
 
 
     private CloudLogPrinter() {
@@ -120,6 +149,43 @@ public class CloudLogPrinter implements Printer {
         return System.currentTimeMillis() + timeDifference;
     }
 
+    public void printlnL(int logLevel, String tag, String msg) {
+        if (logPrintInterceptor != null && logPrintInterceptor.onLogPrint(logLevel, tag, msg)) {
+            return;
+        }
+        if (tag == null || tag.length() == 0
+                || msg == null || msg.length() == 0)
+            return;
+        long length = msg.length();
+
+        if (length <= logSegmentSize) {// 长度小于等于限制直接打印
+            Log.println(logLevel, tag, msg);
+        } else {
+            if (length > logSegmentSize * 3L) {
+                new Thread(() -> {
+                    printlnLarge(logLevel, tag, msg);
+                }).start();
+            } else {
+                printlnLarge(logLevel, tag, msg);
+            }
+        }
+    }
+
+    public void printlnLarge(int logLevel, String tag, String msg) {
+        Log.println(logLevel, tag, "---------------------------------------------------------->");
+        int count = 0;
+        while (msg.length() > logSegmentSize) {// 循环分段打印日志
+            String logContent = msg.substring(0, logSegmentSize);
+            msg = msg.replace(logContent, "");
+            Log.println(logLevel, tag, msg);
+            if (count++ >= maxLogSegmentCount) {
+                return;
+            }
+        }
+        Log.println(logLevel, tag, msg);
+        Log.println(logLevel, tag, "<----------------------------------------------------------");
+    }
+
     @Override
     public void println(final int logLevel, final String tag, final String msg) {
         if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(url)) {
@@ -128,37 +194,35 @@ public class CloudLogPrinter implements Printer {
         //只有在debug模式下才会打印日志级别低于或等于debug的
         if (logLevel <= LogLevel.DEBUG) {
             if (isDebug) {
-                Log.d(tag, msg);
+                printlnL(logLevel, tag, msg);
             }
             return;
         }
 
-        Log.println(logLevel, tag, msg);
-        Runnable worker = new Runnable() {
-            @Override
-            public void run() {
-                String logMsg = msg;
-                if (logUploadInterceptor != null) {
-                    logMsg = logUploadInterceptor.upload(logLevel, tag, msg);
-                }
-                String time = "" + SystemClock.uptimeMillis();
-                String levelName = "";
-                switch (logLevel) {
-                    case LogLevel.NONE:
-                        levelName = "CRASH";
-                        header.put(KEY_LOG_LEVEL, levelName);
-                        upload(tag, logMsg, levelName + "-" + time, true);
-                        break;
-                    case LogLevel.ERROR:
-                        levelName = LogLevel.getLevelName(logLevel);
-                        header.put(KEY_LOG_LEVEL, levelName);
-                        upload(tag, logMsg, levelName + "-" + time, true);
-                        break;
-                    default:
-                        levelName = LogLevel.getLevelName(logLevel);
-                        header.put(KEY_LOG_LEVEL, levelName);
-                        upload(tag, logMsg, levelName + "-" + time, false);
-                }
+        printlnL(logLevel, tag, msg);
+
+        Runnable worker = () -> {
+            String logMsg = msg;
+            if (logUploadInterceptor != null) {
+                logMsg = logUploadInterceptor.upload(logLevel, tag, msg);
+            }
+            String time = "" + SystemClock.uptimeMillis();
+            String levelName = "";
+            switch (logLevel) {
+                case LogLevel.NONE:
+                    levelName = "CRASH";
+                    header.put(KEY_LOG_LEVEL, levelName);
+                    handleLog(tag, logMsg, levelName + "-" + time, true);
+                    break;
+                case LogLevel.ERROR:
+                    levelName = LogLevel.getLevelName(logLevel);
+                    header.put(KEY_LOG_LEVEL, levelName);
+                    handleLog(tag, logMsg, levelName + "-" + time, true);
+                    break;
+                default:
+                    levelName = LogLevel.getLevelName(logLevel);
+                    header.put(KEY_LOG_LEVEL, levelName);
+                    handleLog(tag, logMsg, levelName + "-" + time, false);
             }
         };
         if (logLevel >= LogLevel.ERROR) {
@@ -168,7 +232,7 @@ public class CloudLogPrinter implements Printer {
         }
     }
 
-    private void upload(String tag, final String msg, String cacheKey, boolean isUpdateNow) {
+    private void handleLog(String tag, final String msg, String cacheKey, boolean isUpdateNow) {
         if (!isAutoUpdateLog) {
             return;
         }
@@ -187,11 +251,11 @@ public class CloudLogPrinter implements Printer {
             }
             int size = mLogs.size();
             Log.d(TAG, "upload log:-----------------> 日志已满，开始打包上传  size:" + size + " quantityInterval:" + quantityInterval);
-            doUpdate(cacheKey);
+            preUpdate(cacheKey);
         }
     }
 
-    private void doUpdate(String cacheKey) {
+    private void preUpdate(String cacheKey) {
         int size = mLogs.size();
         try {
             List<String> temp = new ArrayList<>();
@@ -214,13 +278,17 @@ public class CloudLogPrinter implements Printer {
     }
 
 
-    private void handleUpdate(String reqContent, String cacheKey) {
-        LogCache logCache = new LogCache(header, reqContent, cacheKey);
+    private void saveLog(String cacheKey, LogCache logCache) {
         try {
             LogCacheManager.getInstance().save(logCache, cacheKey);
         } catch (OutOfMemoryError error) {//日志过大可能搞爆内存
             XLog.e(error.getMessage());
         }
+    }
+
+    private void handleUpdate(String reqContent, String cacheKey) {
+        LogCache logCache = new LogCache(header, reqContent, cacheKey);
+        saveLog(cacheKey, logCache);
         realUpdate(header, reqContent, cacheKey);
     }
 
@@ -280,6 +348,9 @@ public class CloudLogPrinter implements Printer {
     }
 
     private static void realUpdate(final Map<String, String> header, final String reqContent, final String cacheKey) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
         isUpdating = true;
         RequestManager.get().asyncPost(url, reqContent, header, false, new Callback() {
             @Override
@@ -312,21 +383,18 @@ public class CloudLogPrinter implements Printer {
             return;
         }
         isUpdateByUser = true;
-        logUpDateHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (mLogs) {
-                    while (!mLogs.isEmpty()) {
-                        String time = "" + SystemClock.uptimeMillis();
-                        doUpdate(LogLevel.INFO + "-" + time);
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+        logUpDateHandler.post(() -> {
+            synchronized (mLogs) {
+                while (!mLogs.isEmpty()) {
+                    String time = "" + SystemClock.uptimeMillis();
+                    preUpdate(LogLevel.INFO + "-" + time);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    isUpdateByUser = false;
                 }
+                isUpdateByUser = false;
             }
         });
     }
@@ -346,17 +414,14 @@ public class CloudLogPrinter implements Printer {
 
     public void uploadCache(final long maxSize) {
         Log.d(TAG, "uploadCache() called with: maxSize = [" + ConvertUtils.byte2FitMemorySize(maxSize) + "]");
-        logUpDateHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                List<LogCache> caches = LogCacheManager.getInstance().getLogCaches(maxSize);
-                if (caches.size() > 0) {
-                    XLog.d(TAG + ":------------------uploadCache() called----------------------  size=" + caches.size());
-                }
-                for (LogCache logCache : caches) {
-                    if (logCache != null && !TextUtils.isEmpty(logCache.getLogContent())) {
-                        realUpdate(logCache.getHeader(), logCache.getLogContent(), logCache.getCacheKey());
-                    }
+        logUpDateHandler.post(() -> {
+            List<LogCache> caches = LogCacheManager.getInstance().getLogCaches(maxSize);
+            if (caches.size() > 0) {
+                XLog.d(TAG + ":------------------uploadCache() called----------------------  size=" + caches.size());
+            }
+            for (LogCache logCache : caches) {
+                if (logCache != null && !TextUtils.isEmpty(logCache.getLogContent())) {
+                    realUpdate(logCache.getHeader(), logCache.getLogContent(), logCache.getCacheKey());
                 }
             }
         });

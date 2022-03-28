@@ -286,11 +286,11 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
         }
         String url = response.request().url().toString();
         logger.log(url, RESPONSE_MESSAGE_START +
-                " costTime:" + costTime + " ms" +
-                " code: " + response.code() +
-                " url: " + url +
-                " mediaType: " + mediaTypeString +
-                "\nbody: " + (TextUtils.isEmpty(responseBodyString) ? "" : responseBodyString));
+                "costTime:" + costTime + "ms" +
+                ",mediaType: " + mediaTypeString +
+                ",code: " + response.code() +
+                ",url: " + url +
+                "\nbody:\n" + (TextUtils.isEmpty(responseBodyString) ? "" : responseBodyString));
     }
 
 

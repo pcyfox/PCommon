@@ -16,12 +16,14 @@
 
 package com.pcommon.lib_common.base;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.Keep;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,8 +50,10 @@ public abstract class BaseBindingAdapter<M, B extends ViewDataBinding> extends R
         this.mContext = context;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setList(List<M> list) {
         this.mList = list;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -57,10 +61,11 @@ public abstract class BaseBindingAdapter<M, B extends ViewDataBinding> extends R
         return null == this.mList ? 0 : this.mList.size();
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         B binding = DataBindingUtil.inflate(LayoutInflater.from(this.mContext), this.getLayoutResId(viewType), parent, false);
-        return new AdapterViewHodler(binding);
+        return new AdapterViewHolder(binding);
     }
 
     @Override
@@ -85,10 +90,10 @@ public abstract class BaseBindingAdapter<M, B extends ViewDataBinding> extends R
     protected abstract void onBindItem(B binding, M item, RecyclerView.ViewHolder holder);
 
 
-    public static class AdapterViewHodler extends RecyclerView.ViewHolder {
+    public static class AdapterViewHolder extends RecyclerView.ViewHolder {
         private ViewDataBinding binding;
 
-        public AdapterViewHodler(ViewDataBinding binding) {
+        public AdapterViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

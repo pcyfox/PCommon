@@ -62,7 +62,6 @@ abstract class BaseApplication : BaseAbstractApplication(), Application.Activity
     @RequiresApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     override fun onTerminate() {
         super.onTerminate()
-        // Log.e(TAG, "onTerminate() called")
         unregisterActivityLifecycleCallbacks(this)
     }
 
