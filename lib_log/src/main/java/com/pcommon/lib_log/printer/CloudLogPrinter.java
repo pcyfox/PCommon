@@ -52,10 +52,8 @@ public class CloudLogPrinter implements Printer {
     private long lastAddTime;
     private boolean isTooFast = false;
     private int tooFastCount;//持续发生添加日志过快的次数
-
     private int logSegmentSize = 4 * 1024 - 1;
-
-    private int maxLogSegmentCount = 10;
+    private int maxLogSegmentCount = 1;
 
     public int getLogSegmentSize() {
         return logSegmentSize;
