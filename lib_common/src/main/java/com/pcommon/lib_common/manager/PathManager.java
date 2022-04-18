@@ -31,7 +31,7 @@ public class PathManager {
 
     private void init() {
         String appDataPath = PathUtils.getExternalAppFilesPath() + "/";
-        mDataRootPath = createDir(appDataPath, "tk");
+        mDataRootPath = createDir(appDataPath, "df");
         mLogPath = createDir(mDataRootPath, "log");
         mCachePath = createDir(mDataRootPath, "cache");
         mDownloadPath = createDir(mDataRootPath, "download");
@@ -40,11 +40,6 @@ public class PathManager {
     private String createDir(String parent, String dirName) {
         String path = parent + dirName + "/";
         FileUtils.createOrExistsDir(path);
-//        if (!FileUtils.isDir(path)) {
-//            Log.e(TAG, path + " create fail");
-//        } else {
-//            Log.i(TAG, path + " exists");
-//        }
         return path;
     }
 
@@ -52,15 +47,39 @@ public class PathManager {
         return mDataRootPath;
     }
 
+    public void setDataRootPath(String mDataRootPath) {
+        this.mDataRootPath = mDataRootPath;
+    }
+
     public String getLogPath() {
         return mLogPath;
+    }
+
+    public void setLogPath(String mLogPath) {
+        this.mLogPath = mLogPath;
     }
 
     public String getCachePath() {
         return mCachePath;
     }
 
+    public void setCachePath(String mCachePath) {
+        this.mCachePath = mCachePath;
+    }
+
     public String getDownloadPath() {
         return mDownloadPath;
+    }
+
+    public void setDownloadPath(String mDownloadPath) {
+        this.mDownloadPath = mDownloadPath;
+    }
+
+    public static PathManager getInstance() {
+        return mInstance;
+    }
+
+    public static void setInstance(PathManager mInstance) {
+        PathManager.mInstance = mInstance;
     }
 }
