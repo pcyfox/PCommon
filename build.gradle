@@ -1,6 +1,6 @@
 apply from: "config.gradle"
 buildscript {
-    ext.kotlin_version = "1.5.21"
+    ext.kotlin_version = "1.6.20"
     repositories {
         google()
         jcenter()
@@ -8,7 +8,7 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -21,6 +21,7 @@ allprojects {
         jcenter()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url "https://oss.jfrog.org/libs-snapshot" }
     }
 }
 
@@ -29,6 +30,6 @@ task clean(type: Delete) {
 }
 
 ext {
-    javaSourceCompatibility = JavaVersion.VERSION_1_8
-    javaTargetCompatibility = JavaVersion.VERSION_1_8
+    javaSourceCompatibility = JavaVersion.VERSION_11
+    javaTargetCompatibility = JavaVersion.VERSION_11
 }

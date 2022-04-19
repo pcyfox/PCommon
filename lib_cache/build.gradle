@@ -9,8 +9,6 @@ android {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.androidTargetSdk
 
-        versionCode 1
-        versionName "1.0"
         buildConfigField("Integer", "VERSION_CODE", versionCode.toString())
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"

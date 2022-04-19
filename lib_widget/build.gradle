@@ -12,8 +12,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'view-proguard-rules.pro'
 
-        versionCode 1
-        versionName "1.0"
     }
 
     buildTypes {
@@ -38,5 +36,7 @@ dependencies {
     implementation(rootDependencies.glide) {
         exclude group: 'com.android.support'
     }
+
+
 
 }

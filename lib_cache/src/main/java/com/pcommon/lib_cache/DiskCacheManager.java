@@ -49,12 +49,20 @@ public class DiskCacheManager {
             maxSize = (long) (availableExternalMemorySize * 0.9);
         }
         File file = new File(directory);
+        if (file == null) {
+            Log.e(TAG, "init() called with: directory = [" + directory + "]");
+            return;
+        }
+
+
         if (file.isFile()) {
             return;
         }
+
         if (maxSize < 1024 * 1024 * 1024) {//小于1GB
             //TODO 该清理其他应用的数据
         }
+
         // maxSize=3*1024*1024;
         init(file, BuildConfig.VERSION_CODE, 1, maxSize);
     }

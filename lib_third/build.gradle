@@ -11,8 +11,6 @@ android {
             abiFilters  'armeabi-v7a'
         }
 
-        versionCode 1
-        versionName "1.0"
         consumerProguardFiles 'proguard-rules.pro'
     }
 
@@ -51,10 +49,9 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    api rootDependencies.rxjava2
+    api rootDependencies.rxjava
     api rootDependencies.rxandroid
 
-    //带丰富动画的进度条
     //带丰富动画的进度条
     api 'com.wang.avi:library:2.1.3'
 

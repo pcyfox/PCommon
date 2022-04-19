@@ -11,7 +11,6 @@ kapt {
 }
 
 android {
-    buildToolsVersion = project.androidBuildTools
     compileSdkVersion project.compileSdkVersion
     defaultConfig {
         applicationId "com.pcyfox.common"
@@ -147,7 +146,7 @@ dependencies {
     implementation project(path: ':lib_network')
     implementation project(path: ':lib_third')
 
-    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 }

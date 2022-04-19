@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-group='com.github.pcyfox'
+group = 'com.github.pcyfox'
 
 def rootDependencies = rootProject.ext.dependencies
 android {
@@ -9,8 +9,6 @@ android {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.androidTargetSdk
 
-        versionCode 1
-        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //在这个模块的资源命名必需以这个字符开头，否则编译器会给出警告
         resourcePrefix 'log_'
@@ -35,14 +33,13 @@ android {
 }
 
 dependencies {
-    api 'com.elvishew:xlog:1.10.1'
-    implementation rootProject.ext.dependencies.gson
-    implementation project(path: ':lib_network')
-    implementation 'com.blankj:utilcode:1.30.0'
-    //--------------kotlin---------------------
+    api rootDependencies.xlog
     implementation rootDependencies.kotlin
     implementation rootDependencies.ktx
     implementation rootDependencies.appcompat
+    implementation rootDependencies.gson
+    implementation rootDependencies.utilcode
+    implementation project(path: ':lib_network')
 }
 repositories {
     mavenCentral()
