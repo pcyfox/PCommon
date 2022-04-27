@@ -1,6 +1,8 @@
 package com.pcommon.test
 
 import android.util.Log
+import com.blankj.utilcode.constant.PermissionConstants
+import com.blankj.utilcode.util.PermissionUtils
 import com.elvishew.xlog.XLog
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
@@ -11,9 +13,12 @@ import com.pcommon.lib_log.LogCacheManager
 import com.pcommon.lib_log.printer.CloudLogPrinter
 import com.pcommon.lib_network.OKHttpUtils
 import com.pcommon.lib_network.RequestManager
+import com.pcommon.lib_vidget.widget.CustomSourceImageView
+import kotlinx.android.synthetic.main.activity_test.*
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
+import java.io.File
 import java.io.IOException
 
 class TestActivity(override val layoutId: Int = R.layout.activity_test) :
@@ -25,7 +30,23 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         // test()
         //testProgressDialog()
 //        testLoadDeskConfig()
-        testHttp()
+        //  testHttp()
+        //    ivCs.setDefDir("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.jj20.com%2Fup%2Fallimg%2F1113%2F052420110515%2F200524110515-2-1200.jpg&refer=http%3A%2F%2Fimg.jj20.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1653634832&t=6a8b202fda06aed794cd48653159f674")
+
+
+        PermissionUtils.permission(PermissionConstants.STORAGE)
+            .callback { isAllGranted, granted, deniedForever, denied ->
+                Log.d(
+                    TAG,
+                    "permission() called with: isAllGranted = $isAllGranted, granted = $granted, deniedForever = $deniedForever, denied = $denied"
+                )
+
+                CustomSourceImageView.getDefLoadLogoDir()?.run {
+                    val ret = File(this).mkdirs()
+                    Log.d(TAG, "create DefLoadLogoDir ret:$ret")
+                }
+
+            }.request()
     }
 
     fun test() {
@@ -39,16 +60,18 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     }
 
 
-
-   private fun testHttp() {
-       val c=RequestManager.get().httpClient;
-        OKHttpUtils.get(c,"https://my.oschina.net/fonddream/blog/5216845",object: Callback{
+    private fun testHttp() {
+        val c = RequestManager.get().httpClient;
+        OKHttpUtils.get(c, "https://my.oschina.net/fonddream/blog/5216845", object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.d(TAG, "onFailure() called with: call = $call, e = $e")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.d(TAG, "onResponse() called with: call = $call, response = ${response.body?.string()}")
+                Log.d(
+                    TAG,
+                    "onResponse() called with: call = $call, response = ${response.body?.string()}"
+                )
             }
         })
 

@@ -14,7 +14,9 @@ import com.pcommon.lib_common.base.BaseApplication
 import com.pcommon.lib_network.RequestManager
 import com.pcommon.lib_network.download.DownloadManager
 import com.pcommon.lib_utils.Util
+import com.pcommon.lib_vidget.widget.CustomSourceImageView
 import com.pcommon.manager.TrdServiceManager
+import java.io.File
 
 
 /**
@@ -32,8 +34,9 @@ class AppApplication : BaseApplication() {
     override fun initModuleApplication() {
         registerApplicationLogic(CommApplication::class.java)
         //IMMLeaks.fixFocusedViewLeak(this)
-    }
 
+
+    }
 
 
     //TODO：这里面的大多初始化方法其实都可以移动到SplashActivity中执行，反正SplashActivity中有三秒时间无事可做，这样可以优化APP启动速度
@@ -51,6 +54,7 @@ class AppApplication : BaseApplication() {
             TrdServiceManager.initCrashHandler(this)
             initRequestManager()
             initCache()
+
         }.start()
     }
 
@@ -77,7 +81,7 @@ class AppApplication : BaseApplication() {
             AppConfig.getBaseUrl(),
             "" + AppUtils.getAppVersionCode(),
             AppUtils.getAppVersionName(),
-            AppUtils.getAppPackageName(),5, intArrayOf(10,10,10,10)
+            AppUtils.getAppPackageName(), 5, intArrayOf(10, 10, 10, 10)
         )
         RequestManager.get().setHeaderInterceptorFilter {
             //oss下载请求不能添加请求头

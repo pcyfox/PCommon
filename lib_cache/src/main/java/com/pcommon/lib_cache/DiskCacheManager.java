@@ -64,7 +64,7 @@ public class DiskCacheManager {
         }
 
         // maxSize=3*1024*1024;
-        init(file, BuildConfig.VERSION_CODE, 1, maxSize);
+        init(file, 1, 1, maxSize);
     }
 
     public boolean isInitOk() {

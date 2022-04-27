@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 
 public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatImageView {
-    private static String defDir = "";
+    private static String defDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "AppImages/CompanyLogo";
 
     public CustomSourceImageView(Context context) {
         super(context);
@@ -28,32 +28,14 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
         super(context, attrs, defStyleAttr);
     }
 
-    public static synchronized String getAppName(Context context) {
-        try {
-            PackageManager packageManager = context.getPackageManager();
-            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-            int labelRes = packageInfo.applicationInfo.labelRes;
-            if (labelRes <= 0) {
-                String[] names = packageInfo.packageName.split("\\.");
-                return names[names.length - 1];
-            }
-            return context.getResources().getString(labelRes);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
-    public void setDefDir(String defDir) {
+    public void setDefLoadLogoDir(String defDir) {
         CustomSourceImageView.defDir = defDir;
     }
 
 
-    public static String getDefLoadImgDir(Context context) {
-        if (!TextUtils.isEmpty(defDir)) {
-            return defDir;
-        }
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + getAppName(context) + File.separator + "CompanyLogo";
+    public static String getDefLoadLogoDir() {
+        return defDir;
     }
 
     @Override
@@ -70,9 +52,10 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
 
 
     private void loadImg() {
-        File dir = new File(getDefLoadImgDir(getContext()));
-        if (dir.exists()) {
-            File[] images = dir.listFiles();
+        String path = getDefLoadLogoDir();
+        File f = new File(path);
+        if (f.exists() && f.isDirectory()) {
+            File[] images = f.listFiles();
             if (images != null && images.length > 0) {
                 for (File img : images) {
                     String name = img.getName().toLowerCase();
@@ -82,6 +65,8 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
                     }
                 }
             }
+            return;
         }
+        Glide.with(this).load(path).into(this);
     }
 }
