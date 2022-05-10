@@ -55,6 +55,11 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
     private void loadImg() {
         String path = getDefLoadLogoDir();
         File f = new File(path);
+        if (!f.exists()) {
+            f.mkdirs();
+            return;
+        }
+
         if (f.exists() && f.isDirectory()) {
             File[] images = f.listFiles();
             if (images == null || images.length == 0) {
