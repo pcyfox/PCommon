@@ -14,35 +14,35 @@ include ':app',
 
 
 static def execCmd(String cmd) {
-    println "---------execCmd() called with,cmd=$cmd -------------------"
-    Runtime run = Runtime.getRuntime()
-    try {
-        Process p = run.exec(cmd)
-        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
-        String lineMes
-        while ((lineMes = br.readLine()) != null)
-            System.out.println(lineMes);// 打印输出信息
-        //检查命令是否执行失败。
-        if (p.waitFor() != 0) {
-            //0表示正常结束，1：非正常结束
-            if (p.exitValue() == 1){
-                println"exec cmd fail!"
-            }else {
-                println "\n ---------------exec cmd success!!----------"
-            }
-        }
-        br.close()
-    } catch (Exception e) {
-        e.printStackTrace()
-    }
+//    println "---------execCmd() called with,cmd=$cmd -------------------"
+//    Runtime run = Runtime.getRuntime()
+//    try {
+//        Process p = run.exec(cmd)
+//        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
+//        String lineMes
+//        while ((lineMes = br.readLine()) != null)
+//            System.out.println(lineMes);// 打印输出信息
+//        //检查命令是否执行失败。
+//        if (p.waitFor() != 0) {
+//            //0表示正常结束，1：非正常结束
+//            if (p.exitValue() == 1){
+//                println"exec cmd fail!"
+//            }else {
+//                println "\n ---------------exec cmd success!!----------"
+//            }
+//        }
+//        br.close()
+//    } catch (Exception e) {
+//        e.printStackTrace()
+//    }
 
 }
 
 def initGradleEnvironment() {
-    println "..........initialize Gradle Environment ....."
-    //TODO doSomething you like
-    execCmd("git log ")
-    println "...initialize Gradle Environment completes..."
+//    println "..........initialize Gradle Environment ....."
+//    //TODO doSomething you like
+//    execCmd("git log ")
+//    println "...initialize Gradle Environment completes..."
 }
 //settings.gradle 加载的时候，会执行
 initGradleEnvironment()

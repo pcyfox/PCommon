@@ -163,7 +163,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
         boolean logHeaders = logBody || level == Level.HEADERS;
         if (logHeaders) {
             Headers headers = request.headers();
-           // Log.d(TAG, "intercept: headers  size=" + headers.size() + "--->" + headers);
+            // Log.d(TAG, "intercept: headers  size=" + headers.size() + "--->" + headers);
             StringBuilder headBuilder = new StringBuilder();
             for (int i = 0, count = headers.size(); i < count; i++) {
                 String name = headers.name(i);
@@ -278,11 +278,11 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
             if (mediaType != null) {
                 String subType = mediaType.subtype();
                 if (!"json".equals(subType) && !"text".equals(subType) && !"plain".equals(subType) && !"html".equals(subType)) {
-                    responseBodyString = "已忽略该类型日志！";
+                    responseBodyString = "已忽略该类型日志！mediaType:" + mediaType;
                 }
             }
         } else {
-            mediaTypeString = "unKnown";
+            mediaTypeString = "unknown";
         }
         String url = response.request().url().toString();
         logger.log(url, RESPONSE_MESSAGE_START +

@@ -144,7 +144,7 @@ dependencies {
     implementation project(path: ':lib_widget')
     implementation project(path: ':lib_utils')
     implementation project(path: ':lib_network')
-    implementation project(path: ':lib_third')
+    //implementation project(path: ':lib_third')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.4.1'
