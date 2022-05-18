@@ -90,13 +90,17 @@ public class DeskConfig {
 
             File oldConfigFile = new File(oldRootDir + configFileName);
             File newConfigFile = new File(newRootDir + configFileName);
-            if (oldConfigFile.exists() && !newConfigFile.exists()) {
-                copyFileUsingStream(oldConfigFile, newConfigFile);
+            if (oldConfigFile.exists()) {
+                if (!newConfigFile.exists() || newConfigFile.lastModified() < oldConfigFile.lastModified()) {
+                    copyFileUsingStream(oldConfigFile, newConfigFile);
+                }
             }
             File oldMappingFile = new File(oldRootDir + mappingFileName);
             File newMappingFile = new File(newRootDir + mappingFileName);
-            if (oldMappingFile.exists() && !newMappingFile.exists()) {
-                copyFileUsingStream(oldMappingFile, newMappingFile);
+            if (oldMappingFile.exists()) {
+                if (!newMappingFile.exists() || newMappingFile.lastModified() < oldMappingFile.lastModified()) {
+                    copyFileUsingStream(oldMappingFile, newMappingFile);
+                }
             }
             DESK_CONFIG_PATH = newRootDir + configFileName;
             DESK_NUMBER_MAPPING_DATA_PATH = newRootDir + mappingFileName;
