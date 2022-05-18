@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -71,31 +70,33 @@ public class DeskConfig {
     private final String configFileName = "DeskConfig.conf";
 
     @Expose(serialize = false, deserialize = false)
-    private final String mappingFileName = "DeskConfig.conf";
+    private final String mappingFileName = "DeskNumberMapping.conf";
 
     private DeskConfig() {
-        String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
+        String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
         DESK_CONFIG_PATH = rootDir + configFileName;
         DESK_NUMBER_MAPPING_DATA_PATH = rootDir + mappingFileName;
     }
 
-    private void copyOldConfigFile() {
+    private void copyOldConfigFileToNewDir() {
         //为了兼容老版本
         new Thread(() -> {
+            String oldRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
             String newRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
             File newDir = new File(newRootDir);
             if (!newDir.exists()) {
                 newDir.mkdirs();
             }
 
-            File oldConfigFile = new File(DESK_CONFIG_PATH);
-            if (oldConfigFile.exists()) {
-                copyFileUsingStream(oldConfigFile, new File(newRootDir + configFileName));
+            File oldConfigFile = new File(oldRootDir + configFileName);
+            File newConfigFile = new File(newRootDir + configFileName);
+            if (oldConfigFile.exists() && !newConfigFile.exists()) {
+                copyFileUsingStream(oldConfigFile, newConfigFile);
             }
-
-            File oldMappingFile = new File(DESK_NUMBER_MAPPING_DATA_PATH);
-            if (oldMappingFile.exists()) {
-                copyFileUsingStream(oldMappingFile, new File(newRootDir + mappingFileName));
+            File oldMappingFile = new File(oldRootDir + mappingFileName);
+            File newMappingFile = new File(newRootDir + mappingFileName);
+            if (oldMappingFile.exists() && !newMappingFile.exists()) {
+                copyFileUsingStream(oldMappingFile, newMappingFile);
             }
             DESK_CONFIG_PATH = newRootDir + configFileName;
             DESK_NUMBER_MAPPING_DATA_PATH = newRootDir + mappingFileName;
@@ -169,7 +170,7 @@ public class DeskConfig {
 
 
     public DeskConfig getLocalConfig(boolean isForceUpdate) {
-        copyOldConfigFile();
+        copyOldConfigFileToNewDir();
         if (localConfig == null || isForceUpdate) {
             localConfig = loadDeskConfig();
         }
