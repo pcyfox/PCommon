@@ -40,17 +40,17 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('taike.jks')
-            storePassword "dftk1689"
-            keyAlias "taike"
-            keyPassword "szyd2433"
+            storeFile file('PCY.jks')
+            storePassword "pcy@2022"
+            keyAlias "key0"
+            keyPassword "pcy@2022"
         }
 
         release {
-            storeFile file('taike.jks')
-            storePassword "dftk1689"
-            keyAlias "taike"
-            keyPassword "szyd2433"
+            storeFile file('PCY.jks')
+            storePassword "pcy@2022"
+            keyAlias "key0"
+            keyPassword "pcy@2022"
         }
     }
 

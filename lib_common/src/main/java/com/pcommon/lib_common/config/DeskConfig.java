@@ -13,10 +13,13 @@ import com.google.gson.annotations.Expose;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +36,10 @@ public class DeskConfig {
     private static final DeskConfig instance = new DeskConfig();
 
     @Expose(serialize = false, deserialize = false)
-    public final String DESK_CONFIG_PATH;
+    public String DESK_CONFIG_PATH;
 
     @Expose(serialize = false, deserialize = false)
-    public final String DESK_NUMBER_MAPPING_DATA_PATH;
+    public String DESK_NUMBER_MAPPING_DATA_PATH;
 
     @Expose
     private String deskNumber = "-1";
@@ -64,10 +67,68 @@ public class DeskConfig {
     public final DeskNumberMappingData mappingData = new DeskNumberMappingData();
 
 
+    @Expose(serialize = false, deserialize = false)
+    private final String configFileName = "DeskConfig.conf";
+
+    @Expose(serialize = false, deserialize = false)
+    private final String mappingFileName = "DeskConfig.conf";
+
     private DeskConfig() {
-        DESK_CONFIG_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DeskConfig.conf";
-        DESK_NUMBER_MAPPING_DATA_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DeskNumberMapping.conf";
+        String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
+        DESK_CONFIG_PATH = rootDir + configFileName;
+        DESK_NUMBER_MAPPING_DATA_PATH = rootDir + mappingFileName;
     }
+
+    private void copyOldConfigFile() {
+        //为了兼容老版本
+        new Thread(() -> {
+            String newRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
+            File newDir = new File(newRootDir);
+            if (!newDir.exists()) {
+                newDir.mkdirs();
+            }
+
+            File oldConfigFile = new File(DESK_CONFIG_PATH);
+            if (oldConfigFile.exists()) {
+                copyFileUsingStream(oldConfigFile, new File(newRootDir + configFileName));
+            }
+
+            File oldMappingFile = new File(DESK_NUMBER_MAPPING_DATA_PATH);
+            if (oldMappingFile.exists()) {
+                copyFileUsingStream(oldMappingFile, new File(newRootDir + mappingFileName));
+            }
+            DESK_CONFIG_PATH = newRootDir + configFileName;
+            DESK_NUMBER_MAPPING_DATA_PATH = newRootDir + mappingFileName;
+        }).start();
+    }
+
+    private boolean copyFileUsingStream(File source, File dest) {
+        Log.d(TAG, "copyFileUsingStream() called with: source = [" + source + "], dest = [" + dest + "]");
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(source);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (is != null) is.close();
+                if (os != null) os.close();
+            } catch (IOException e) {
+            }
+        }
+        return false;
+    }
+
 
     //检测桌号合法性
     public static boolean isDeskNumberRight(String deskNumber) {
@@ -108,6 +169,7 @@ public class DeskConfig {
 
 
     public DeskConfig getLocalConfig(boolean isForceUpdate) {
+        copyOldConfigFile();
         if (localConfig == null || isForceUpdate) {
             localConfig = loadDeskConfig();
         }
