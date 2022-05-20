@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class DeskConfig {
     private String location;
 
     @Expose
-    private String host;//如：192.168.2.3:8900
+    private String luaUrl;
 
     @Expose(serialize = false, deserialize = false)
     private DeskConfig localConfig;
@@ -71,6 +72,7 @@ public class DeskConfig {
 
     @Expose(serialize = false, deserialize = false)
     private final String mappingFileName = "DeskNumberMapping.conf";
+
 
     private DeskConfig() {
         String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
@@ -158,8 +160,8 @@ public class DeskConfig {
             if (!TextUtils.isEmpty(localConfig.location)) {
                 this.location = localConfig.location;
             }
-            if (!TextUtils.isEmpty(localConfig.host)) {
-                this.host = localConfig.host;
+            if (!TextUtils.isEmpty(localConfig.luaUrl)) {
+                this.luaUrl = localConfig.luaUrl;
             }
 
             if (!TextUtils.isEmpty(localConfig.deskColumn)) {
@@ -285,20 +287,20 @@ public class DeskConfig {
         }
     }
 
-    public String getHost() {
-        if (TextUtils.isEmpty(host)) {
+    public String getLuaUrl() {
+        if (TextUtils.isEmpty(luaUrl)) {
             localConfig = getLocalConfig(false);
             if (localConfig != null) {
-                host = localConfig.host;
+                luaUrl = localConfig.luaUrl;
             }
         }
-        return host;
+        return luaUrl;
     }
 
-    public void setHost(String host) {
-        if (!TextUtils.isEmpty(host)) {
+    public void setLuaUrl(String luaUrl) {
+        if (!TextUtils.isEmpty(luaUrl)) {
             copyLocationConfig();
-            this.host = host;
+            this.luaUrl = luaUrl;
             saveDeskConfig(this);
         }
     }
@@ -395,7 +397,7 @@ public class DeskConfig {
                 ", deskColumn='" + deskColumn + '\'' +
                 ", deviceId='" + deviceId + '\'' +
                 ", location='" + location + '\'' +
-                ", host='" + host + '\'' +
+                ", host='" + luaUrl + '\'' +
                 ", localConfig=" + localConfig +
                 '}';
     }
