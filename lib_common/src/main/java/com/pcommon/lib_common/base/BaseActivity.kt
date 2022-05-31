@@ -3,13 +3,11 @@ package com.pcommon.lib_common.base
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
+import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
-import androidx.core.view.isInvisible
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.FragmentActivity
@@ -23,7 +21,6 @@ import com.pcommon.lib_common.base.BaseActivity.Click.lastClickTime
 import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.toast
 import com.pcommon.lib_common.receiver.NetWorkChangEvent
-import com.pcommon.lib_common.receiver.NetWorkChangReceiver
 import com.pcommon.lib_common.utils.MaskProgressDialog
 import com.pcommon.lib_utils.CloseBarUtil
 import com.pcommon.lib_utils.EventDetector
@@ -38,7 +35,7 @@ import com.pcommon.lib_utils.MaskUtils
 
 @Keep
 abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
-        FragmentActivity() {
+    FragmentActivity() {
 
     private val TAG = "BaseActivity"
     protected var viewModel: VM? = null
@@ -54,6 +51,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open var mainViewModelId = -1
     open var isFullScreen = true
     open var isClickBack = true
+
+    open var isHideKeyboardWhenTouchOutside = true
+
     private var isBeenHiddenProgress = false
 
     private var progress: MaskProgressDialog? = null
@@ -74,8 +74,8 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             requestWindowFeature(Window.FEATURE_NO_TITLE)
             //全屏
             window.setFlags(
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
             hideNavigationBar()
         }
@@ -194,10 +194,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             eventDetector.addEvent()
             if (eventDetector.timesLack - 1 != 0) {
                 toast(
-                        String.format(
-                                getString(R.string.common_click_more_will_finish),
-                                eventDetector.timesLack - 1
-                        )
+                    String.format(
+                        getString(R.string.common_click_more_will_finish),
+                        eventDetector.timesLack - 1
+                    )
                 )
             } else if (eventDetector.timesLack == 1) {
                 if (!onDoubleClickOverIntercept()) {
@@ -228,13 +228,14 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             //让ViewModel拥有View的生命周期感应
             lifecycle.addObserver(this)
             //DataBindingUtil类需要在project的build中配置 dataBinding {enabled true }, 同步后会自动关联android.databinding包
-            viewDataBinding = DataBindingUtil.setContentView<VDB>(this@BaseActivity, layoutId).apply {
-                //注入Lifecycle生命周期
-                lifecycleOwner = this@BaseActivity
-                if (mainViewModelId != -1) {
-                    setVariable(mainViewModelId, this)
+            viewDataBinding =
+                DataBindingUtil.setContentView<VDB>(this@BaseActivity, layoutId).apply {
+                    //注入Lifecycle生命周期
+                    lifecycleOwner = this@BaseActivity
+                    if (mainViewModelId != -1) {
+                        setVariable(mainViewModelId, this)
+                    }
                 }
-            }
         }
     }
 
@@ -270,10 +271,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open fun observeData() {
         if (isShowNetWorkChangNotice) {
             LiveEventBus.get()
-                    .with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java)
-                    .observe(this) {
-                        onNetWorkChange(it.isAvailable)
-                    }
+                .with(NetWorkChangEvent::class.java.simpleName, NetWorkChangEvent::class.java)
+                .observe(this) {
+                    onNetWorkChange(it.isAvailable)
+                }
         }
     }
 
@@ -353,5 +354,56 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             MaskUtils.hide(this, this)
         }
     }
+
+
+    /**
+     * 重写dispatchTouchEvent
+     * 点击软键盘外面的区域关闭软键盘
+     *
+     * @param ev
+     * @return
+     */
+
+    @RequiresApi(Build.VERSION_CODES.CUPCAKE)
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (isHideKeyboardWhenTouchOutside && ev.action == MotionEvent.ACTION_DOWN) {
+            // 获得当前得到焦点的View，
+            currentFocus?.run {
+                if (isShouldHideInput(this, ev)) {
+                    hideSortKeyboard(this)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.CUPCAKE)
+    fun hideSortKeyboard(v: View) {
+        //根据判断关闭软键盘
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(v.windowToken, 0)
+    }
+
+    /**
+     * 判断用户点击的区域是否是输入框
+     *
+     * @param v
+     * @param event
+     * @return
+     */
+    private fun isShouldHideInput(v: View?, event: MotionEvent): Boolean {
+        if (v is EditText) {
+            val l = intArrayOf(0, 0)
+            v.getLocationInWindow(l)
+            val left = l[0]
+            val top = l[1]
+            val bottom = top + v.getHeight()
+            val right = (left + v.getWidth())
+            // 点击EditText的事件，忽略它。
+            return (event.x <= left || event.x >= right || event.y <= top || event.y >= bottom)
+        }
+        return false
+    }
+
 
 }
