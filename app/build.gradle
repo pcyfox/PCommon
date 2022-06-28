@@ -25,7 +25,7 @@ android {
         androidExtensions {//z支持动态添加控件（tip:LayoutContainer）
             experimental = true
         }
-        resConfigs('zh-rCN')
+        resConfigs 'zh-rCN'
 
 
         compileOptions {

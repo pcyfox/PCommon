@@ -6,7 +6,7 @@ android {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.androidTargetSdk
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs('zh-rCN')
+        resConfigs 'zh-rCN'
         ndk {
             abiFilters  'armeabi-v7a'
         }
