@@ -17,8 +17,9 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 
-public class IPutils {
-
+final public class IPUtils {
+    private IPUtils() {
+    }
 
     /**
      * 得到有限网关的IP地址
@@ -26,7 +27,6 @@ public class IPutils {
      * @return
      */
     private String getLocalIp() {
-
         try {
             // 获取本地设备的所有网络接口
             Enumeration<NetworkInterface> enumerationNi = NetworkInterface
@@ -62,7 +62,7 @@ public class IPutils {
     }
 
 
-    public static String getIpAdress(Context context) {
+    public static String getIpAddress(Context context) {
         if (context == null) {
             return null;
         }

@@ -21,12 +21,17 @@ import androidx.lifecycle.LifecycleOwner
  */
 
 @Keep
-open class BaseViewModel(application: Application) : AndroidViewModel(application), BaseLifecycleObserver, Observable {
+open class BaseViewModel(application: Application) : AndroidViewModel(application),
+    BaseLifecycleObserver, Observable {
     private lateinit var owner: LifecycleOwner
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
     override fun onAny(owner: LifecycleOwner, event: Lifecycle.Event) {
         this.owner = owner
     }
+
+
+    fun getLifecycleOwner() = owner
+
 
     override fun onCreate() {
 
@@ -78,8 +83,6 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     fun notifyPropertyChanged(fieldId: Int) {
         callbacks.notifyCallbacks(this, fieldId, null)
     }
-
-
 
 
 }

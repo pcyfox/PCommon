@@ -127,29 +127,22 @@ public class RequestManager extends AbsRequest {
         }
     }
 
-    private final MyHttpLoggingInterceptor loggingInterceptor = new MyHttpLoggingInterceptor(new HttpLogger() {
-        @Override
-        public void log(String url, String message) {
-            //将所有请求日志交给XLog处理
-            if (!TextUtils.isEmpty(message)) {
-                try {
-                    if (checkForUpload(url)) {
-                        XLog.i("XRetrofitLog: " + message);
-                    } else {
-                        Log.d("RetrofitLog: ", message);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+    //日志过滤处理
+    private final MyHttpLoggingInterceptor loggingInterceptor = new MyHttpLoggingInterceptor((url, message) -> {
+        //将所有请求日志交给XLog处理
+        if (!TextUtils.isEmpty(message)) {
+            try {
+                if (checkForUpload(url)) {
+                    XLog.i("XRetrofitLog: " + message);
+                } else {
+                    Log.d("RetrofitLog: ", message);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
-            , new LogFilter() {//日志过滤处理
-        @Override
-        public String filter(String url, String log) {
-            return log;
-        }
-    });
+            , (url, log) -> log);
 
     private boolean checkForUpload(String url) {
         String matchUrl = null;

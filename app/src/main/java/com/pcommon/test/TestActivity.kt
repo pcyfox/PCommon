@@ -47,6 +47,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
                 }
 
             }.request()
+        showProgress("正在搜索中，请稍等...")
     }
 
     fun test() {

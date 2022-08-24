@@ -11,7 +11,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class HeaderInterceptor implements Interceptor {
-    private Map<String, String> mHeadMap;
+    private final Map<String, String> mHeadMap;
     private Filter filter;
     private static final String TAG = "HeaderInterceptor";
 

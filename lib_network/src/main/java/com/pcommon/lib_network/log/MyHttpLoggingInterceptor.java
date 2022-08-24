@@ -163,7 +163,6 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
         boolean logHeaders = logBody || level == Level.HEADERS;
         if (logHeaders) {
             Headers headers = request.headers();
-            // Log.d(TAG, "intercept: headers  size=" + headers.size() + "--->" + headers);
             StringBuilder headBuilder = new StringBuilder();
             for (int i = 0, count = headers.size(); i < count; i++) {
                 String name = headers.name(i);
@@ -196,11 +195,11 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
 
             StringBuilder requestMessage = new StringBuilder(REQUEST_MESSAGE_START)
                     .append(request.method())
-                    .append(" url：")
+                    .append(" \n url：")
                     .append(url);
 
             if (headBuilder.length() > 0) {
-                requestMessage.append("\n header:").append(headBuilder.toString());
+                requestMessage.append("\n header:").append(headBuilder);
             }
 
             if (!TextUtils.isEmpty(requestBodyString)) {
@@ -288,7 +287,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
         logger.log(url, RESPONSE_MESSAGE_START +
                 "costTime:" + costTime + "ms" +
                 ",mediaType: " + mediaTypeString +
-                ",code: " + response.code() +
+                "\ncode: " + response.code() +
                 "\nurl: " + url +
                 "\nbody:\n" + (TextUtils.isEmpty(responseBodyString) ? "" : responseBodyString));
     }
