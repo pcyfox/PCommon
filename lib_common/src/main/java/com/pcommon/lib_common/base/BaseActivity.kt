@@ -90,7 +90,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    fun showProgress(delay: Long) {
+    open fun showProgress(delay: Long) {
         if (delay < 0) {
             return
         }
@@ -101,7 +101,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
-    fun hideProgress(delay: Long) {
+    open fun hideProgress(delay: Long) {
         postDelayed(delay) {
             isBeenHiddenProgress = true
             hideProgress()
