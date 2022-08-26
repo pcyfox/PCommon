@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.blankj.utilcode.util.ConvertUtils;
+import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
@@ -52,8 +54,8 @@ public class CloudLogPrinter implements Printer {
     private long lastAddTime;
     private boolean isTooFast = false;
     private int tooFastCount;//持续发生添加日志过快的次数
-    private int logSegmentSize = 4 * 1024 - 1;
-    private int maxLogSegmentCount = 3;
+    private int logSegmentSize = 2 * 1024;
+    private int maxLogSegmentCount = 30;
 
     public int getLogSegmentSize() {
         return logSegmentSize;
@@ -160,9 +162,9 @@ public class CloudLogPrinter implements Printer {
             Log.println(logLevel, tag, msg);
         } else {
             if (length > logSegmentSize * 3L) {
-                new Thread(() -> {
+                ThreadUtils.getCachedPool().submit(() -> {
                     printlnLarge(logLevel, tag, msg);
-                }).start();
+                });
             } else {
                 printlnLarge(logLevel, tag, msg);
             }
@@ -170,18 +172,20 @@ public class CloudLogPrinter implements Printer {
     }
 
     public void printlnLarge(int logLevel, String tag, String msg) {
-        Log.println(logLevel, tag, "---------------------------------------------------------->");
+        Log.println(logLevel, tag, "---------------------------large log start------------------------------->");
         int count = 0;
         while (msg.length() > logSegmentSize) {// 循环分段打印日志
             String logContent = msg.substring(0, logSegmentSize);
+            Log.println(logLevel, tag, logContent);
             msg = msg.replace(logContent, "");
-            Log.println(logLevel, tag, msg);
-            if (count++ >= maxLogSegmentCount) {
-                return;
+            if (++count >= maxLogSegmentCount) {
+                break;
             }
         }
-        Log.println(logLevel, tag, msg);
-        Log.println(logLevel, tag, "<----------------------------------------------------------");
+        if (!StringUtils.isEmpty(msg)) {
+            Log.println(logLevel, tag, msg);
+        }
+        Log.println(logLevel, tag, "<---------------------------large log end------------------------------");
     }
 
     @Override

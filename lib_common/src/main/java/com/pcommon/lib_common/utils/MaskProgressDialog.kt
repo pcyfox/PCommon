@@ -8,8 +8,12 @@ import com.pcommon.lib_common.ext.getColorExt
 import kotlinx.android.synthetic.main.common_layout_progress.*
 
 
-class MaskProgressDialog constructor(ct: Context, var listener: DialogListener?) :
-    BaseFragmentDialog(layoutId = R.layout.common_layout_progress, ct = ct) {
+class MaskProgressDialog constructor(
+    layoutId: Int = R.layout.common_layout_progress,
+    ct: Context,
+    var listener: DialogListener?
+) :
+    BaseFragmentDialog(layoutId = layoutId, ct = ct) {
 
     override fun initView() {
         avi_loading.setIndicatorColor(activity!!.getColorExt(R.color.common_colorPrimaryDark))

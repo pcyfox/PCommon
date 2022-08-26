@@ -53,10 +53,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open var isClickBack = true
 
     open var isHideKeyboardWhenTouchOutside = true
-
     private var isBeenHiddenProgress = false
 
-    private var progress: MaskProgressDialog? = null
+    private var progressDialog: MaskProgressDialog? = null
+    open var progressDialogLayoutId = -1
 
 
     open fun createViewModel(): VM {
@@ -108,40 +108,48 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
-
+    @Deprecated("use dismissProgress() instead")
     fun hideProgress() {
+        dismissProgress()
+    }
+
+    fun dismissProgress() {
         isBeenHiddenProgress = true
-        progress?.dismiss()
+        progressDialog?.dismiss()
     }
 
     fun isProgressCancelable(isCan: Boolean) {
-        progress?.isCancelable(isCan)
+        progressDialog?.isCancelable(isCan)
     }
 
     fun showProgress(tips: String? = "") {
-        if (!tips.isNullOrEmpty() && progress != null && progress!!.isShowing) {
-            progress!!.setTips(tips)
+        if (!tips.isNullOrEmpty() && progressDialog != null && progressDialog!!.isShowing) {
+            progressDialog!!.setTips(tips)
             return
         }
-        if (progress == null) {
+        if (progressDialog == null) {
             try {
-                progress = MaskProgressDialog(this, object : MaskProgressDialog.DialogListener {
-                    override fun onDismiss() {
-                        isBeenHiddenProgress = false
-                        onProgressClosed()
-                    }
+                progressDialog =
+                    MaskProgressDialog(
+                        layoutId = if (progressDialogLayoutId > 0) progressDialogLayoutId else R.layout.common_layout_progress,
+                        ct = this,
+                        listener = object : MaskProgressDialog.DialogListener {
+                            override fun onDismiss() {
+                                isBeenHiddenProgress = false
+                                onProgressClosed()
+                            }
 
-                    override fun onCancelClick() {
-                        isBeenHiddenProgress = false
-                        onProgressClosed()
-                    }
-                })
+                            override fun onCancelClick() {
+                                isBeenHiddenProgress = false
+                                onProgressClosed()
+                            }
+                        })
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-        progress?.show()
-        progress?.setTips(tips)
+        progressDialog?.show()
+        progressDialog?.setTips(tips)
         isBeenHiddenProgress = false
     }
 
@@ -169,9 +177,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             lifecycle.removeObserver(this)
         }
         onKeyDownListeners?.clear()
-        progress?.run {
+        progressDialog?.run {
             listener = null
-            progress?.dismiss()
+            progressDialog?.dismiss()
         }
     }
 

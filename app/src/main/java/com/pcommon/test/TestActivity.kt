@@ -3,6 +3,7 @@ package com.pcommon.test
 import android.util.Log
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.PermissionUtils
+import com.elvishew.xlog.LogLevel
 import com.elvishew.xlog.XLog
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
@@ -47,8 +48,9 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
                 }
 
             }.request()
-        showProgress("正在搜索中，请稍等...")
-      //  showProgress()
+        //showProgress("正在搜索中，请稍等...")
+        //  showProgress()
+
     }
 
     fun test() {

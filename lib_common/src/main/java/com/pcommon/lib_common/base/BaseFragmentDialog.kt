@@ -57,7 +57,6 @@ open class BaseFragmentDialog(
     }
     open fun onDismiss() {}
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun dismiss() {
         super.dismiss()
         onDismiss()
