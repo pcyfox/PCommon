@@ -11,99 +11,70 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.*/
+package com.pcommon.lib_common.base
 
-
-
-package com.pcommon.lib_common.base;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-
-import androidx.annotation.Keep;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.annotation.SuppressLint
+import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.RecyclerView
+import android.content.Context
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.databinding.DataBindingUtil
+import android.view.LayoutInflater
+import androidx.annotation.Keep
+import androidx.annotation.LayoutRes
+import java.util.ArrayList
 
 /**
  * @author KunMinX
  * Create at 2018/6/30
  */
-
 @Keep
-public abstract class BaseBindingAdapter<M, B extends ViewDataBinding> extends RecyclerView.Adapter {
+abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) :
 
-    protected Context mContext;
-    protected List<M> mList = new ArrayList<>();
+    RecyclerView.Adapter<BaseBindingAdapter.AdapterViewHolder>() {
 
-    public List<M> getList() {
-        return mList;
+    var list = ArrayList<M>()
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    override fun getItemCount(): Int {
+        return list.size
     }
 
-    public BaseBindingAdapter(Context context) {
-        this.mContext = context;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterViewHolder {
+        val binding = DataBindingUtil.inflate<B>(
+            LayoutInflater.from(context),
+            getLayoutResId(viewType),
+            parent,
+            false
+        )
+        return AdapterViewHolder(binding as ViewDataBinding)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void setList(List<M> list) {
-        this.mList = list;
-        notifyDataSetChanged();
+
+    override fun onBindViewHolder(holder: AdapterViewHolder, position: Int) {
+        DataBindingUtil.getBinding<B>(holder.itemView)?.run {
+            onBindItem(this, list[position], holder)
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return null == this.mList ? 0 : this.mList.size();
-    }
+    @LayoutRes
+    protected abstract fun getLayoutResId(viewType: Int): Int
 
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        B binding = DataBindingUtil.inflate(LayoutInflater.from(this.mContext), this.getLayoutResId(viewType), parent, false);
-        return new AdapterViewHolder(binding);
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        B binding = DataBindingUtil.getBinding(holder.itemView);
-        this.onBindItem(binding, this.mList.get(position), holder);
-    }
-
-    protected abstract @LayoutRes
-    int getLayoutResId(int viewType);
-
-/**
+    /**
      * 注意：
      * RecyclerView 中的数据有位置改变（比如删除）时一般不会重新调用 onBindViewHolder() 方法，除非这个元素不可用。
      * 为了实时获取元素的位置，我们通过 ViewHolder.getAdapterPosition() 方法。
      *
      * @param binding
      * @param item
-     * @param holder*/
+     * @param holder
+     */
+    protected abstract fun onBindItem(binding: B, item: M, holder: ViewHolder)
 
-
-    protected abstract void onBindItem(B binding, M item, RecyclerView.ViewHolder holder);
-
-
-    public static class AdapterViewHolder extends RecyclerView.ViewHolder {
-        private ViewDataBinding binding;
-
-        public AdapterViewHolder(ViewDataBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-
-        public ViewDataBinding getBinding() {
-            return binding;
-        }
-
-        public void setBinding(ViewDataBinding binding) {
-            this.binding = binding;
-        }
-    }
+    class AdapterViewHolder(val binding: ViewDataBinding) : ViewHolder(binding.root)
 }

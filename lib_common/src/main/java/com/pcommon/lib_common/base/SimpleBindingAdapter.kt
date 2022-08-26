@@ -1,38 +1,24 @@
-package com.pcommon.lib_common.base;
+package com.pcommon.lib_common.base
 
-import android.content.Context;
-
-import androidx.annotation.Keep;
-import androidx.annotation.LayoutRes;
-import androidx.databinding.ViewDataBinding;
-import androidx.recyclerview.widget.RecyclerView;
+import android.content.Context
+import androidx.annotation.Keep
+import androidx.annotation.LayoutRes
+import androidx.databinding.ViewDataBinding
+import com.pcommon.lib_common.base.BaseBindingAdapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
 @Keep
-public abstract class SimpleBindingAdapter<M, B extends ViewDataBinding> extends BaseBindingAdapter<M, B> {
+abstract class SimpleBindingAdapter<M, B : ViewDataBinding>(
+    context: Context,
+    private val layout: Int
+) : BaseBindingAdapter<M, B>(context) {
 
-    private final int layout;
+    @LayoutRes
+    override fun getLayoutResId(viewType: Int): Int = layout
 
-    public SimpleBindingAdapter(Context context, int layout) {
-        super(context);
-        this.layout = layout;
+    protected abstract fun onAdapterBindItem(binding: B, item: M, holder: ViewHolder)
+
+    override fun onBindItem(binding: B, item: M, holder: ViewHolder) {
+        onAdapterBindItem(binding, item, holder)
     }
-
-    protected @LayoutRes
-    int getLayoutResId(int viewType) {
-        return this.layout;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }
-
-    protected abstract void onAdapterBindItem(B binding, M item, RecyclerView.ViewHolder holder);
-
-    @Override
-    protected void onBindItem(ViewDataBinding binding, Object item, RecyclerView.ViewHolder holder) {
-        onAdapterBindItem((B) binding, (M) item, holder);
-    }
-
-
 }

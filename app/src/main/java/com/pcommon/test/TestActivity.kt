@@ -1,13 +1,16 @@
 package com.pcommon.test
 
 import android.util.Log
+import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.PermissionUtils
 import com.elvishew.xlog.LogLevel
 import com.elvishew.xlog.XLog
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
+import com.pcommon.edu.databinding.ItemSimpleBinding
 import com.pcommon.lib_common.base.BaseActivity
+import com.pcommon.lib_common.base.SimpleBindingAdapter
 import com.pcommon.lib_common.config.DeskConfig
 import com.pcommon.lib_common.manager.ConnectivityManagerHelper
 import com.pcommon.lib_log.LogCacheManager
@@ -48,8 +51,23 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
                 }
 
             }.request()
-        //showProgress("正在搜索中，请稍等...")
-        //  showProgress()
+
+
+
+
+        rvList.adapter =
+            object : SimpleBindingAdapter<String, ItemSimpleBinding>(this, R.layout.item_simple) {
+                override fun onAdapterBindItem(
+                    binding: ItemSimpleBinding,
+                    item: String,
+                    holder: RecyclerView.ViewHolder
+                ) {
+                    binding.tvText.text = item
+                }
+            }.apply {
+
+                list= arrayListOf("121312312l","ajfdklasdjfdlkasjkf","fjasdljdflasdj")
+            }
 
     }
 
