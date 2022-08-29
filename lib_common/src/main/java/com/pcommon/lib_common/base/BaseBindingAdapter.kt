@@ -14,16 +14,15 @@
 package com.pcommon.lib_common.base
 
 import android.annotation.SuppressLint
-import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.RecyclerView
 import android.content.Context
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.databinding.DataBindingUtil
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.annotation.Keep
 import androidx.annotation.LayoutRes
-import java.util.ArrayList
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
 /**
  * @author KunMinX
@@ -34,12 +33,23 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
 
     RecyclerView.Adapter<BaseBindingAdapter.AdapterViewHolder>() {
 
-    var list = ArrayList<M>()
+    var list = arrayListOf<M>()
         @SuppressLint("NotifyDataSetChanged")
         set(value) {
             field = value
             notifyDataSetChanged()
         }
+
+    fun addAll(c: Collection<M>, isClear: Boolean = true) {
+        list.addAll(c)
+        if (isClear) {
+            notifyDataSetChanged()
+        } else {
+            val start = list.size - c.size - 1
+            notifyItemRangeChanged(if (start < 0) 0 else start, c.size)
+        }
+    }
+
 
     override fun getItemCount(): Int {
         return list.size

@@ -65,8 +65,9 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
                     binding.tvText.text = item
                 }
             }.apply {
-
-                list= arrayListOf("121312312l","ajfdklasdjfdlkasjkf","fjasdljdflasdj")
+              addAll(
+                  arrayListOf("121312312l","ajfdklasdjfdlkasjkf","fjasdljdflasdj").filter { !it.contains("d") }
+              )
             }
 
     }
