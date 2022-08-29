@@ -41,6 +41,7 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         }
 
     fun addAll(c: Collection<M>, isClear: Boolean = true) {
+        if (isClear) list.clear()
         list.addAll(c)
         if (isClear) {
             notifyDataSetChanged()
