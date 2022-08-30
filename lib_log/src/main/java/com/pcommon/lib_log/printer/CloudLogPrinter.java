@@ -190,7 +190,7 @@ public class CloudLogPrinter implements Printer {
 
     @Override
     public void println(final int logLevel, final String tag, final String msg) {
-        if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(url)) {
+        if (TextUtils.isEmpty(msg)) {
             return;
         }
         //只有在debug模式下才会打印日志级别低于或等于debug的
@@ -202,6 +202,10 @@ public class CloudLogPrinter implements Printer {
         }
 
         printlnL(logLevel, tag, msg);
+
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
 
         Runnable worker = () -> {
             String logMsg = msg;
