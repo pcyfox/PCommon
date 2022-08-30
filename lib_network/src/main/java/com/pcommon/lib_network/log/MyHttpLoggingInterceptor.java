@@ -199,14 +199,14 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
                     .append(url);
 
             if (headBuilder.length() > 0) {
-                requestMessage.append("\n header:").append(headBuilder);
+                requestMessage.append("\n header:\n").append(headBuilder);
             }
 
             if (!TextUtils.isEmpty(requestBodyString)) {
                 if (filter != null) {
                     requestBodyString = filter.filter(url, requestBodyString);//过滤
                 }
-                requestMessage.append("\n body:").append(requestBodyString);
+                requestMessage.append("\n body:\n").append(requestBodyString);
             }
             logger.log(request.url().toString(), requestMessage.toString());
         }
