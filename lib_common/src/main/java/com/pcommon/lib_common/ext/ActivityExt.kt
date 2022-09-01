@@ -71,13 +71,13 @@ fun Activity.setViewsVisible(vararg views: View?) {
 
 @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
 fun Activity.setViewsAlpha(alpha: Float, vararg views: View?) {
-    views?.forEach {
+    views.forEach {
         it?.alpha = alpha
     }
 }
 
 fun Activity.setViewsClickable(isClickable: Boolean, vararg views: View?) {
-    views?.forEach {
+    views.forEach {
         it?.isClickable = isClickable
     }
 }

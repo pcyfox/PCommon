@@ -10,6 +10,7 @@
     <color name="common_textColorHint">#999999</color>
     <color name="common_textColorTip">#34404c</color>
     <color name="common_textColorBlue">#3A8DFF</color>
+    <color name="common_textColorRed">#ED3131</color>
     <color name="common_divider_color">#41999999</color>
     <color name="common_shadow_color">#12999999</color>
     <color name="common_red_text_color">#ED3131</color>
