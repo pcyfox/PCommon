@@ -101,6 +101,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
+    @Deprecated("use dismissProgress() instead")
     open fun hideProgress(delay: Long) {
         postDelayed(delay) {
             isBeenHiddenProgress = true
@@ -118,8 +119,22 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         progressDialog?.dismiss()
     }
 
+    open fun dismissProgress(delay: Long) {
+        postDelayed(delay) {
+            isBeenHiddenProgress = true
+            hideProgress()
+        }
+    }
+
     fun isProgressCancelable(isCan: Boolean) {
         progressDialog?.isCancelable(isCan)
+    }
+
+    fun isProgressDialogShowing(): Boolean {
+        progressDialog?.run {
+            return isShowing
+        }
+        return false
     }
 
     fun showProgress(tips: String? = "") {
