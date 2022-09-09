@@ -179,7 +179,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
             }
 
             String requestBodyString = "";
-            if (requestBody != null) {
+            if (requestBody != null && isTextType(requestBody.contentType())) {
                 Buffer buffer = new Buffer();
                 requestBody.writeTo(buffer);
                 Charset charset = UTF8;
@@ -267,6 +267,15 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
     }
 
 
+    public boolean isTextType(MediaType mediaType) {
+        if (mediaType == null) {
+            return false;
+        }
+        String subType = mediaType.subtype();
+        return "json".equals(subType) || "text".equals(subType) || "plain".equals(subType) || "html".equals(subType);
+    }
+
+
     private void logResponse(Response response, long costTime, String responseBodyString) {
         Objects.requireNonNull(logger, "logger is cannot be null");
         String mediaTypeString;
@@ -275,8 +284,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
             MediaType mediaType = body.contentType();
             mediaTypeString = "" + mediaType;
             if (mediaType != null) {
-                String subType = mediaType.subtype();
-                if (!"json".equals(subType) && !"text".equals(subType) && !"plain".equals(subType) && !"html".equals(subType)) {
+                if (!isTextType(mediaType)) {
                     responseBodyString = "已忽略该类型日志！mediaType:" + mediaType;
                 }
             }
