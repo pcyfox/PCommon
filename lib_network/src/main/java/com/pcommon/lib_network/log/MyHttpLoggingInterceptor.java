@@ -182,16 +182,12 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
             if (requestBody != null && isTextType(requestBody.contentType())) {
                 Buffer buffer = new Buffer();
                 requestBody.writeTo(buffer);
-                Charset charset = UTF8;
                 MediaType contentType = requestBody.contentType();
-                if (contentType != null) {
-                    charset = contentType.charset(UTF8);
-                }
+                Charset charset = contentType.charset(UTF8);
                 if (isPlaintext(buffer) && charset != null) {
                     requestBodyString = buffer.readString(charset);
                 }
             }
-
 
             StringBuilder requestMessage = new StringBuilder(REQUEST_MESSAGE_START)
                     .append(request.method())
