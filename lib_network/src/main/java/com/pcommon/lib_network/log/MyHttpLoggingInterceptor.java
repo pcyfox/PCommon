@@ -8,14 +8,17 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -158,10 +161,22 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
             return chain.proceed(request);
         }
         boolean logBody = level == Level.BODY;
+
         RequestBody requestBody = request.body();
+
+
         String url = request.url().toString();
         boolean logHeaders = logBody || level == Level.HEADERS;
         if (logHeaders) {
+
+//            List<Headers> bodyHeadersList = new ArrayList<>();
+//            if (requestBody instanceof MultipartBody) {
+//                List<MultipartBody.Part> partList = ((MultipartBody) requestBody).parts();
+//                for (MultipartBody.Part p : partList) {
+//                    p.headers();
+//                }
+//            }
+
             Headers headers = request.headers();
             StringBuilder headBuilder = new StringBuilder();
             for (int i = 0, count = headers.size(); i < count; i++) {
@@ -177,6 +192,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
                     }
                 }
             }
+
 
             String requestBodyString = "";
             if (requestBody != null && isTextType(requestBody.contentType())) {
@@ -267,6 +283,10 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
         if (mediaType == null) {
             return false;
         }
+        if ("multipart".equals(mediaType.type())) {
+            return false;
+        }
+
         String subType = mediaType.subtype();
         return "json".equals(subType) || "text".equals(subType) || "plain".equals(subType) || "html".equals(subType);
     }

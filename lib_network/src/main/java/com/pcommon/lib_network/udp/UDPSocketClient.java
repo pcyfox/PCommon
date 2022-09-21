@@ -1,10 +1,12 @@
 package com.pcommon.lib_network.udp;
 
+
 import android.util.Log;
 
 import androidx.annotation.Keep;
 
 import com.elvishew.xlog.XLog;
+import com.pcommon.lib_network.ThreadTool;
 import com.pcommon.lib_network.Utils;
 
 import java.io.IOException;
@@ -12,11 +14,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -29,7 +27,6 @@ public class UDPSocketClient {
     private static UDPSocketClient instance;
     private static final String TAG = "UDPSocketClient";
     // 单个CPU线程池大小
-    private static final int POOL_SIZE = 2;
     private static final int BUFFER_LENGTH = 8 * 1024;
     private final byte[] receiveByte = new byte[BUFFER_LENGTH];
     private static final String BROADCAST_IP = "255.255.255.255";
@@ -43,7 +40,6 @@ public class UDPSocketClient {
     private long lastReceiveTime = 0;
     private static final long TIME_OUT = 12 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
-    private final ExecutorService mThreadPool;
     private HeartbeatTimer timer;
     private static final Object lock = new Object();
 
@@ -56,9 +52,6 @@ public class UDPSocketClient {
     }
 
     private UDPSocketClient() {
-        int cpuNumbers = Runtime.getRuntime().availableProcessors();
-        // 根据CPU数目初始化线程池
-        mThreadPool = Executors.newFixedThreadPool(cpuNumbers * POOL_SIZE);
         // 记录创建对象时的时间
         lastReceiveTime = System.currentTimeMillis();
     }
@@ -75,6 +68,11 @@ public class UDPSocketClient {
             }
         }
         return instance;
+    }
+
+
+    public static UDPSocketClient newInstance(int port) {
+        return new UDPSocketClient(port);
     }
 
     public void setClientPort(int clientPort) {
@@ -254,44 +252,13 @@ public class UDPSocketClient {
         sendBroadcast(message, CLIENT_PORT);
     }
 
-    public void sendBroadcast(final String message, final String ip, final int port) {
-        //XLog.i(TAG + ":sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
-        mThreadPool.execute(() -> {
-            try {
-                //说明通过指定端口创建的socket失败
-                if (datagramSocket == null) {
-                    try {
-                        //使用系统分配端口创建socket，保证消息能正常发送
-                        datagramSocket = new DatagramSocket();
-                    } catch (SocketException e) {
-                        XLog.e(TAG + ";sendBroadcast() called with: message = [" + message + "], port = [" + port + "] create socket error:" + e.getMessage());
-                        e.printStackTrace();
-                        return;
-                    }
-                }
-                InetAddress targetAddress = InetAddress.getByName(ip);
-                DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, targetAddress, port);
-                try {
-                    datagramSocket.send(packet);
-                    XLog.d(TAG + ":sendBroadcast message:" + message);
-                } catch (IOException e) {
-                    XLog.e(TAG + "sendBroadcast error:" + e.getMessage());
-                    e.printStackTrace();
-                }
-            } catch (UnknownHostException e) {
-                XLog.e(TAG + "sendBroadcast error:" + e.getMessage());
-                e.printStackTrace();
-            }
-        });
-    }
-
     public void sendBroadcast(final String message, final int port) {
-        sendBroadcast(message, BROADCAST_IP, port);
+        UDPBroadcaster.sendBroadcast(datagramSocket, message, BROADCAST_IP, port);
     }
 
 
     public void sendMessage(final String message, final String Ip, final int port) {
-        mThreadPool.execute(() -> {
+        ThreadTool.getTreadPool().execute(() -> {
             try {
                 InetAddress targetAddress = InetAddress.getByName(Ip);
                 DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), targetAddress, port);
@@ -325,4 +292,12 @@ public class UDPSocketClient {
     }
 
 
+    @Override
+    public String toString() {
+        return "UDPSocketClient{" +
+                "CLIENT_PORT=" + CLIENT_PORT +
+                ", lastReceiveTime=" + lastReceiveTime +
+                ", timer=" + timer +
+                '}';
+    }
 }
