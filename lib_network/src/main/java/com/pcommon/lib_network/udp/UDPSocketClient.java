@@ -256,20 +256,8 @@ public class UDPSocketClient {
         UDPBroadcaster.sendBroadcast(datagramSocket, message, BROADCAST_IP, port);
     }
 
-
-    public void sendMessage(final String message, final String Ip, final int port) {
-        ThreadTool.getTreadPool().execute(() -> {
-            try {
-                InetAddress targetAddress = InetAddress.getByName(Ip);
-                DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), targetAddress, port);
-                datagramSocket.send(packet);
-                // 数据发送事件
-                XLog.d(TAG + ":client send to " + Ip + ":" + port + " over, msg:\n" + message);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        });
+    public void sendMessage(final String message, final String ip, final int port) {
+        UDPBroadcaster.sendBroadcast(datagramSocket, message, ip, port);
     }
 
     public OnStateChangeLister getOnStateChangeLister() {
