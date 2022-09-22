@@ -247,7 +247,10 @@ public class DeskConfig {
                 tryParseDeskNumberToXY(deskNumber);
             } else {
                 String rawDeskNumber = mappingData.findDeskLineAndColumn(deskNumber);
-                tryParseDeskNumberToXY(rawDeskNumber);
+                boolean isOk = tryParseDeskNumberToXY(rawDeskNumber);
+                if (!isOk) {
+                    deskColumn = deskLine = "";
+                }
             }
             saveDeskConfig(this);
         }
