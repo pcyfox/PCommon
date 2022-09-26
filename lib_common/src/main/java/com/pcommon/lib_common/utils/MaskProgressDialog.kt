@@ -16,9 +16,9 @@ class MaskProgressDialog constructor(
     BaseFragmentDialog(layoutId = layoutId, ct = ct) {
 
     override fun initView() {
-        avi_loading.setIndicatorColor(activity!!.getColorExt(R.color.common_colorPrimaryDark))
-        avi_loading.setIndicator("com.wang.avi.indicators.BallSpinFadeLoaderIndicator")
-        teach_close_progress.setOnClickListener {
+        avi_loading?.setIndicatorColor(activity!!.getColorExt(R.color.common_colorPrimaryDark))
+        avi_loading?.setIndicator("com.wang.avi.indicators.BallSpinFadeLoaderIndicator")
+        teach_close_progress?.setOnClickListener {
             listener?.onCancelClick()
             dismiss()
         }
@@ -38,13 +38,14 @@ class MaskProgressDialog constructor(
     }
 
 
-    fun isCancelable(isCan: Boolean) {
-        teach_close_progress.visibility = if (isCan) View.VISIBLE else View.GONE
+    override fun setCancelable(flag: Boolean) {
+        super.setCancelable(flag)
+        teach_close_progress?.visibility = if (flag) View.VISIBLE else View.GONE
     }
 
 
     fun setTips(tips: String?) {
-        tv_dialog_tips.run {
+        tv_dialog_tips?.run {
             visibility = if (tips.isNullOrEmpty()) {
                 View.GONE
             } else {
@@ -52,6 +53,14 @@ class MaskProgressDialog constructor(
             }
             text = tips
         }
+    }
+
+    fun show(tips: String?,isCancelable: Boolean=false) {
+        if (!isShowing) {
+            super.show()
+        }
+        setCancelable(isCancelable)
+        setTips(tips)
     }
 
     interface DialogListener {

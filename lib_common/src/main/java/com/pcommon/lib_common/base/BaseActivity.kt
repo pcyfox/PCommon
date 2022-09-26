@@ -90,17 +90,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    open fun showProgress(delay: Long) {
-        if (delay < 0) {
-            return
-        }
-        postDelayed(delay) {
-            if (!isBeenHiddenProgress) {
-                showProgress()
-            }
-        }
-    }
-
     @Deprecated("use dismissProgress() instead")
     open fun hideProgress(delay: Long) {
         postDelayed(delay) {
@@ -109,7 +98,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
-    @Deprecated("use dismissProgress() instead")
+    @Deprecated("use dismissProgress() instead", ReplaceWith("dismissProgress()"))
     fun hideProgress() {
         dismissProgress()
     }
@@ -122,12 +111,12 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open fun dismissProgress(delay: Long) {
         postDelayed(delay) {
             isBeenHiddenProgress = true
-            hideProgress()
+            dismissProgress()
         }
     }
 
     fun isProgressCancelable(isCan: Boolean) {
-        progressDialog?.isCancelable(isCan)
+        progressDialog?.setCancelable(isCan)
     }
 
     fun isProgressDialogShowing(): Boolean {
@@ -137,42 +126,50 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         return false
     }
 
-    fun showProgress(tips: String? = "") {
-        if (!tips.isNullOrEmpty() && progressDialog != null && progressDialog!!.isShowing) {
-            progressDialog!!.setTips(tips)
+    open fun showProgress(delay: Long, tips: String = "", isCancelable: Boolean = false) {
+        if (delay < 0) {
             return
         }
-        if (progressDialog == null) {
-            try {
-                progressDialog =
-                    MaskProgressDialog(
-                        layoutId = if (progressDialogLayoutId > 0) progressDialogLayoutId else R.layout.common_layout_progress,
-                        ct = this,
-                        listener = object : MaskProgressDialog.DialogListener {
-                            override fun onDismiss() {
-                                isBeenHiddenProgress = false
-                                onProgressClosed()
-                            }
-
-                            override fun onCancelClick() {
-                                isBeenHiddenProgress = false
-                                onProgressClosed()
-                            }
-                        })
-            } catch (e: Exception) {
-                e.printStackTrace()
+        postDelayed(delay) {
+            if (!isBeenHiddenProgress) {
+                showProgress(tips, isCancelable)
             }
         }
-        progressDialog?.show()
-        progressDialog?.setTips(tips)
+    }
+
+    fun showProgress(tips: String? = "", isCancelable: Boolean = false) {
+        progressDialog?.run {
+            if (isShowing) {
+                progressDialog!!.setTips(tips)
+                return
+            }
+        }
+        if (progressDialog == null) {
+            progressDialog =
+                MaskProgressDialog(
+                    layoutId = if (progressDialogLayoutId > 0) progressDialogLayoutId else R.layout.common_layout_progress,
+                    ct = this,
+                    listener = object : MaskProgressDialog.DialogListener {
+                        override fun onDismiss() {
+                            isBeenHiddenProgress = false
+                            onProgressClosed()
+                        }
+
+                        override fun onCancelClick() {
+                            isBeenHiddenProgress = false
+                            onProgressClosed()
+                        }
+                    })
+        }
+        progressDialog?.show(tips, isCancelable)
         isBeenHiddenProgress = false
     }
 
 
     fun startTimeOutTimer(time: Long) {
-        postDelayed(time, Runnable {
+        postDelayed(time) {
             onTimeOut(time)
-        })
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
