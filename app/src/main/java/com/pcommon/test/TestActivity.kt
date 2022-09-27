@@ -4,6 +4,8 @@ import android.util.Log
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
 import com.pcommon.lib_common.base.BaseActivity
+import com.pcommon.lib_common.config.DeskConfig
+import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_network.udp.UDPSocketClient
 import kotlinx.android.synthetic.main.activity_test.*
 
@@ -16,6 +18,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 
     override fun initData() {
         super.initData()
+        DeskConfig.getInstance().updateLocalData()
         udpSocketClient = UDPSocketClient.newInstance(9993)
         udpSocketClient?.setMsgArrivedListener { msg, ip, pot ->
             Log.d(TAG, "initData() called with: msg = $msg, ip = $ip, pot = $pot")
@@ -24,7 +27,9 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     }
 
     override fun initView() {
-
+        postDelayed(2000){
+            btnNum.text=DeskConfig.getInstance().deskNumber
+        }
     }
 
     override fun initListener() {

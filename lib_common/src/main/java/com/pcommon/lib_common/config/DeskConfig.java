@@ -33,7 +33,7 @@ public class DeskConfig {
     private static final String TAG = "DeskConfig";
 
     @Expose(serialize = false, deserialize = false)
-    private static final DeskConfig instance = new DeskConfig();
+    private static DeskConfig instance;
 
     @Expose(serialize = false, deserialize = false)
     public String DESK_CONFIG_PATH;
@@ -62,10 +62,8 @@ public class DeskConfig {
     @Expose(serialize = false, deserialize = false)
     private DeskConfig localConfig;
 
-
     @Expose(serialize = false, deserialize = false)
     public final DeskNumberMappingData mappingData = new DeskNumberMappingData();
-
 
     @Expose(serialize = false, deserialize = false)
     private final String configFileName = "DeskConfig.conf";
@@ -73,49 +71,57 @@ public class DeskConfig {
     @Expose(serialize = false, deserialize = false)
     private final String mappingFileName = "DeskNumberMapping.conf";
 
+    public static DeskConfig getInstance() {
+        if (instance == null) {
+            instance = new DeskConfig();
+        }
+        return instance;
+    }
 
     private DeskConfig() {
-        String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
+        String rootDir= Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
         DESK_CONFIG_PATH = rootDir + configFileName;
         DESK_NUMBER_MAPPING_DATA_PATH = rootDir + mappingFileName;
     }
 
+    //为了兼容老版本
     private void copyOldConfigFileToNewDir() {
-        //为了兼容老版本
-        new Thread(() -> {
-            String oldRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
-            String newRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
-            File newDir = new File(newRootDir);
-            if (!newDir.exists()) {
-                newDir.mkdirs();
-            }
-
-            File oldConfigFile = new File(oldRootDir + configFileName);
-            File newConfigFile = new File(newRootDir + configFileName);
-            if (oldConfigFile.exists()) {
-                if (!newConfigFile.exists() || newConfigFile.lastModified() < oldConfigFile.lastModified()) {
-                    copyFileUsingStream(oldConfigFile, newConfigFile);
-                }
-            }
-            File oldMappingFile = new File(oldRootDir + mappingFileName);
-            File newMappingFile = new File(newRootDir + mappingFileName);
-            if (oldMappingFile.exists()) {
-                if (!newMappingFile.exists() || newMappingFile.lastModified() < oldMappingFile.lastModified()) {
-                    copyFileUsingStream(oldMappingFile, newMappingFile);
-                }
-            }
-            DESK_CONFIG_PATH = newRootDir + configFileName;
-            DESK_NUMBER_MAPPING_DATA_PATH = newRootDir + mappingFileName;
-        }).start();
+//        String oldRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator;
+//        String newRootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/config/";
+//
+//        File newDir = new File(newRootDir);
+//        if (!newDir.exists()) {
+//            newDir.mkdirs();
+//        }
+//
+//        File oldConfigFile = new File(oldRootDir + configFileName);
+//        if (oldConfigFile.exists()) {
+//            File newConfigFile = new File(newRootDir + configFileName);
+//            if (!newConfigFile.exists() || newConfigFile.lastModified() < oldConfigFile.lastModified()) {
+//                boolean ret = copyFileUsingStream(oldConfigFile, newConfigFile);
+//                if (ret) {
+//                    oldConfigFile.delete();
+//                }
+//            }
+//        }
+//
+//        File oldMappingFile = new File(oldRootDir + mappingFileName);
+//        if (oldMappingFile.exists()) {
+//            File newMappingFile = new File(newRootDir + mappingFileName);
+//            if (!newMappingFile.exists() || newMappingFile.lastModified() < oldMappingFile.lastModified()) {
+//                boolean ret = copyFileUsingStream(oldMappingFile, newMappingFile);
+//                if (ret) {
+//                    oldConfigFile.delete();
+//                }
+//            }
+//        }
+//        DESK_CONFIG_PATH = newRootDir + configFileName;
+//        DESK_NUMBER_MAPPING_DATA_PATH = newRootDir + mappingFileName;
     }
 
     private boolean copyFileUsingStream(File source, File dest) {
         Log.d(TAG, "copyFileUsingStream() called with: source = [" + source + "], dest = [" + dest + "]");
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(source);
-            os = new FileOutputStream(dest);
+        try (InputStream is = new FileInputStream(source); OutputStream os = new FileOutputStream(dest)) {
             byte[] buffer = new byte[1024];
             int length;
             while ((length = is.read(buffer)) > 0) {
@@ -126,12 +132,6 @@ public class DeskConfig {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (is != null) is.close();
-                if (os != null) os.close();
-            } catch (IOException e) {
-            }
         }
         return false;
     }
@@ -143,6 +143,7 @@ public class DeskConfig {
     }
 
     public void updateLocalData() {
+        //copyOldConfigFileToNewDir();
         copyLocationConfig();
         loadLocalDeskNumberMappingData();
     }
@@ -176,7 +177,6 @@ public class DeskConfig {
 
 
     public DeskConfig getLocalConfig(boolean isForceUpdate) {
-        copyOldConfigFileToNewDir();
         if (localConfig == null || isForceUpdate) {
             localConfig = loadDeskConfig();
         }
@@ -316,9 +316,6 @@ public class DeskConfig {
         return deskLine;
     }
 
-    public static DeskConfig getInstance() {
-        return instance;
-    }
 
     private DeskConfig loadDeskConfig() {
         return loadDeskData(DeskConfig.class, DESK_CONFIG_PATH);

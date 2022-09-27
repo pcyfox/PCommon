@@ -20,7 +20,8 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="center"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ivCs">
 
@@ -28,6 +29,14 @@
                 android:id="@+id/btnSend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="send" />
+
+
+            <Button
+                android:id="@+id/btnNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:text="send" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
