@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 
 public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatImageView {
-    private static String defDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "CompanyLogo";
+    private static String defDir = "";
 
     public CustomSourceImageView(Context context) {
         super(context);
@@ -36,6 +36,9 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
 
 
     public static String getDefLoadLogoDir() {
+        if (TextUtils.isEmpty(defDir)) {
+            defDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "CompanyLogo";
+        }
         return defDir;
     }
 
