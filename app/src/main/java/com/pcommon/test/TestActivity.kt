@@ -24,12 +24,15 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
             Log.d(TAG, "initData() called with: msg = $msg, ip = $ip, pot = $pot")
         }
         udpSocketClient?.startUDPSocket()
+
     }
 
     override fun initView() {
-        postDelayed(2000){
-            btnNum.text=DeskConfig.getInstance().deskNumber
+        postDelayed(2000) {
+            btnNum.text = DeskConfig.getInstance().deskNumber
+            testCrash()
         }
+
     }
 
     override fun initListener() {
@@ -37,6 +40,9 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         btnSend.setOnClickListener {
             udpSocketClient?.sendBroadcast("{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}")
         }
+    }
+    private fun testCrash(){
+        btnSend.setText((1233 / 0).toString())
     }
 
 }

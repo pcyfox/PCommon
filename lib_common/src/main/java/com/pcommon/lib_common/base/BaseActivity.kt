@@ -137,7 +137,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
-    fun showProgress(tips: String? = "", isCancelable: Boolean = false) {
+    private fun showProgress(tips: String? = "", isCancelable: Boolean = false) {
         progressDialog?.run {
             if (isShowing) {
                 progressDialog!!.setTips(tips)

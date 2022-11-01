@@ -37,7 +37,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     private static final String TAG = "CrashHandler";
     private Context mContext;
     private static final String SDCARD_ROOT = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
-    private static CrashHandlerUtils mInstance = new CrashHandlerUtils();
+    private static final CrashHandlerUtils mInstance = new CrashHandlerUtils();
     private String path;
 
     private CrashHandlerUtils() {
@@ -118,17 +118,15 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
         PackageManager mPackageManager = context.getPackageManager();
         PackageInfo mPackageInfo = null;
         try {
-            mPackageInfo = mPackageManager.getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_ACTIVITIES);
+            mPackageInfo = mPackageManager.getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
 
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
         if (mPackageInfo == null) return map;
-        map.put("appCrash", "**---------------------------------Crash-----------------------------------**\n");
-        map.put("versionName", "" + mPackageInfo.versionName);
-        map.put("versionCode", "" + mPackageInfo.versionCode);
-        map.put("crashTime", "" + formatTime(System.currentTimeMillis()));
+        map.put("VersionName", "" + mPackageInfo.versionName);
+        map.put("VersionCode", "" + mPackageInfo.versionCode);
+        map.put("CrashTime", "" + formatTime(System.currentTimeMillis()));
         map.put("MODEL", "" + Build.MODEL);
         map.put("SDK_INT", "" + Build.VERSION.SDK_INT);
         map.put("PRODUCT", "" + Build.PRODUCT);
@@ -141,6 +139,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
         }
         map.put("BRAND ", "" + Build.BRAND);
         map.put("HARDWARE ", "" + Build.HARDWARE);
+
         return map;
     }
 
@@ -160,20 +159,33 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     }
 
 
+    private String getCrashHeader(Context context) {
+        Map<String, String> info = obtainSimpleInfo(context);
+        StringBuilder stringBuilder = new StringBuilder("*************************** Crash *******************************\n");
+        for (Map.Entry<String, String> header : info.entrySet()) {
+            stringBuilder.append(header.getKey()).append(":").append(header.getValue()).append("\n");
+        }
+        stringBuilder.append("**************************************************************\n");
+        return stringBuilder.toString();
+    }
+
     public String saveInfoToSD(Context context, Throwable ex) {
         String fileName = null;
-        Map<String, String> info = obtainSimpleInfo(context);
-        String crashLog = info.toString() + "-----Exception------>:" + obtainExceptionInfo(ex);
+        String crashLog = getCrashHeader(context) + obtainExceptionInfo(ex) + "\n\n";
         XLog.log(CRASH_LOG_LEVEL, crashLog);
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             FileOutputStream fos = null;
             try {
                 File dir = new File(path);
-                if (!dir.exists()) {
-                    dir.mkdir();
+                if (!dir.canRead()) {
+                    return "";
                 }
-                fileName = dir.toString() + File.separator
-                        + formatTime(System.currentTimeMillis()) + ".log";
+                if (!dir.exists()) {
+                    if (!dir.mkdir()) {
+                        return "";
+                    }
+                }
+                fileName = dir + File.separator + formatTime(System.currentTimeMillis()) + ".log";
                 fos = new FileOutputStream(fileName);
                 fos.write(crashLog.getBytes());
                 fos.flush();
