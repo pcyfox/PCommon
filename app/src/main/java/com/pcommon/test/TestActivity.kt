@@ -30,7 +30,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     override fun initView() {
         postDelayed(2000) {
             btnNum.text = DeskConfig.getInstance().deskNumber
-            testCrash()
+//            testCrash()
         }
 
     }

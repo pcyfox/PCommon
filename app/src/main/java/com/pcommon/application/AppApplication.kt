@@ -86,6 +86,7 @@ class AppApplication : BaseApplication() {
         RequestManager.get().setHeaderInterceptorFilter {
             //oss下载请求不能添加请求头
             it.toString().contains(".oss-cn")
+
         }
         RequestManager.get().addUpdateLogRequests(ELK_URL, false)
         //DownloadManager与RequestManager共享同一个okHttpClient，以优化APP性能
