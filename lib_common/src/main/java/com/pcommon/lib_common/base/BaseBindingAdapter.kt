@@ -30,17 +30,19 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
  */
 @Keep
 abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) :
-
     RecyclerView.Adapter<BaseBindingAdapter.AdapterViewHolder>() {
 
     var list = arrayListOf<M>()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
+        @SuppressLint("NotifyDataSetChanged") set(value) {
             field = value
             notifyDataSetChanged()
         }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun addAll(c: Collection<M>, isClear: Boolean = true) {
+        if (c.isEmpty()) {
+            return
+        }
         if (isClear) list.clear()
         list.addAll(c)
         if (isClear) {
@@ -51,6 +53,13 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun clear() {
+        list.clear()
+        notifyDataSetChanged()
+    }
+
+    fun isEmpty() = list.isEmpty()
 
     override fun getItemCount(): Int {
         return list.size
@@ -58,10 +67,7 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterViewHolder {
         val binding = DataBindingUtil.inflate<B>(
-            LayoutInflater.from(context),
-            getLayoutResId(viewType),
-            parent,
-            false
+            LayoutInflater.from(context), getLayoutResId(viewType), parent, false
         )
         return AdapterViewHolder(binding as ViewDataBinding)
     }

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.Keep;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.CrashUtils;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.XLog;
 
@@ -31,7 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+/**
+ * @see com.blankj.utilcode.util.CrashUtils
+ */
 @Keep
+@Deprecated()
 public class CrashHandlerUtils implements UncaughtExceptionHandler {
     public static final int CRASH_LOG_LEVEL = LogLevel.NONE;
     private static final String TAG = "CrashHandler";
@@ -41,6 +46,7 @@ public class CrashHandlerUtils implements UncaughtExceptionHandler {
     private String path;
 
     private CrashHandlerUtils() {
+
 
     }
 
