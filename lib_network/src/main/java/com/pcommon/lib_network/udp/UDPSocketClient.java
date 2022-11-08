@@ -105,6 +105,11 @@ public class UDPSocketClient {
         }
     }
 
+    public void start(OnSocketMsgArrivedListener listener) {
+        setMsgArrivedListener(listener);
+        startUDPSocket();
+    }
+
     public void startUDPSocket() {
         XLog.d(TAG + ":startUDPSocket() called  isThreadRunning=" + isThreadRunning);
         if (isThreadRunning) {
