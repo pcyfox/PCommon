@@ -126,7 +126,11 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         return false
     }
 
-    open fun showProgress(delay: Long, tips: String = "", isCancelable: Boolean = false) {
+    open fun showProgress() {
+        showProgress("", false)
+    }
+
+    open fun showProgress(delay: Long = 0, tips: String = "", isCancelable: Boolean = false) {
         if (delay < 0) {
             return
         }
@@ -146,8 +150,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
         if (progressDialog == null) {
             progressDialog =
-                MaskProgressDialog(
-                    layoutId = if (progressDialogLayoutId > 0) progressDialogLayoutId else R.layout.common_layout_progress,
+                MaskProgressDialog(layoutId = if (progressDialogLayoutId > 0) progressDialogLayoutId else R.layout.common_layout_progress,
                     ct = this,
                     listener = object : MaskProgressDialog.DialogListener {
                         override fun onDismiss() {
@@ -322,12 +325,8 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             v.systemUiVisibility = View.GONE
         } else if (Build.VERSION.SDK_INT >= 19) {
             //for new api versions.
-            val uiOptions = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN)
+            val uiOptions =
+                (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN)
             window.decorView.systemUiVisibility = uiOptions
         }
         CloseBarUtil.hideBottomUIMenu(window);
