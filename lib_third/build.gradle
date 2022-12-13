@@ -8,7 +8,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs 'zh-rCN'
         ndk {
-            abiFilters  'armeabi-v7a'
+            abiFilters 'armeabi-v7a'
         }
 
         consumerProguardFiles 'proguard-rules.pro'
@@ -38,7 +38,6 @@ dependencies {
     api rootDependencies.appcompat
     api rootDependencies.annotation
     api rootDependencies.liveEvent
-
     api rootDependencies.gson
 
     //--------------kotlin---------------------
@@ -48,7 +47,6 @@ dependencies {
     api(rootDependencies.lifecycle) {
         exclude group: 'com.android.support'
     }
-
     api rootDependencies.rxjava
     api rootDependencies.rxandroid
 

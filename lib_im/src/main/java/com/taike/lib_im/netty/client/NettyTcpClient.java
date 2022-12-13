@@ -168,7 +168,6 @@ public class NettyTcpClient {
                                 if (isSendHeartBeat) {
                                     ch.pipeline().addLast("ping", new IdleStateHandler(0, heartBeatInterval, 0, TimeUnit.SECONDS));//5s未发送数据，回调userEventTriggered
                                 }
-
                                 //黏包处理,需要客户端、服务端配合
                                 if (!TextUtils.isEmpty(packetSeparator)) {
                                     ByteBuf delimiter = Unpooled.buffer();
@@ -210,7 +209,7 @@ public class NettyTcpClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                     isConnect = false;
-                    XLog.d(TAG + "netty客户端----> connectServer   Exception 连接失败");
+                    XLog.d(TAG + "connectServer fail, Exception:" + e);
                     listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_CLOSED, mIndex);
                     if (null != channelFuture) {
                         if (channelFuture.channel() != null && channelFuture.channel().isOpen()) {
@@ -219,13 +218,11 @@ public class NettyTcpClient {
                     }
                     group.shutdownGracefully();
                     try {
-                        XLog.d(TAG + "netty客户端----> connectServer    Thread.sleep ");
                         Thread.sleep(5000);
                     } catch (Exception ex) {
                         isConnect = false;
                         //不会调用
                     }
-                    XLog.d(TAG + "netty客户端----> connectServer    Thread.sleep +");
                     reconnect();
                 }
             }
