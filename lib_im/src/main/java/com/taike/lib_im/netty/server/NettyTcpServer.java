@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
+import com.elvishew.xlog.XLog;
 import com.taike.lib_im.netty.Constant;
 
 import java.net.InetSocketAddress;
@@ -37,9 +38,8 @@ import io.netty.util.NetUtil;
 public class NettyTcpServer {
 
     private static final String TAG = "NettyTcpServer";
-    private final int port = 1098;
+    private int port = 1098;
 
-    private static NettyTcpServer instance = null;
     private NettyServerListener<String> listener;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -56,18 +56,19 @@ public class NettyTcpServer {
     }
 
 
+    private static final class InstanceHolder {
+        private static final NettyTcpServer instance = new NettyTcpServer();
+    }
+
     public static NettyTcpServer getInstance() {
-        if (instance == null) {
-            synchronized (NettyTcpServer.class) {
-                if (instance == null) {
-                    instance = new NettyTcpServer();
-                }
-            }
-        }
-        return instance;
+        return InstanceHolder.instance;
     }
 
     private NettyTcpServer() {
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public void start() {
@@ -105,13 +106,12 @@ public class NettyTcpServer {
                                         ch.pipeline().addLast(new EchoServerHandler(listener));
                                         ch.pipeline().addLast(new TimeoutServerHandler(listener));
                                     }
-
                                 }
                             });
 
                     // Bind and start to accept incoming connections.
                     ChannelFuture f = b.bind().sync(); // 8
-                    Log.e(TAG, NettyTcpServer.class.getName() + " started and listen on " + f.channel().localAddress());
+                    XLog.i(TAG + ",started and listen on localAddress:" + f.channel().localAddress());
                     isServerStart = true;
                     if (listener != null) {
                         listener.onStartServer();
@@ -121,7 +121,7 @@ public class NettyTcpServer {
                     // shut down your server.
                     f.channel().closeFuture().sync(); // 9
                 } catch (Exception e) {
-                    Log.e(TAG, e.getLocalizedMessage());
+                    XLog.e(TAG, "start server error!,Exception:" + e);
                     e.printStackTrace();
                 } finally {
                     isServerStart = false;
