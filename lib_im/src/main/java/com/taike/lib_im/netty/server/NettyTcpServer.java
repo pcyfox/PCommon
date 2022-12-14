@@ -36,24 +36,16 @@ import io.netty.util.NetUtil;
  * 目前服务端支持连接多个客户端
  */
 public class NettyTcpServer {
-
     private static final String TAG = "NettyTcpServer";
     private int port = 1098;
 
     private NettyServerListener<String> listener;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+
     private volatile boolean isServerStart;
     private String packetSeparator = Constant.PACKET_SEPARATOR;//防粘包分割符
     private int maxPacketLong = 1024 * 1024 * 3;
-
-    public void setPacketSeparator(String separator) {
-        this.packetSeparator = separator;
-    }
-
-    public void setMaxPacketLong(int maxPacketLong) {
-        this.maxPacketLong = maxPacketLong;
-    }
 
 
     private static final class InstanceHolder {
@@ -69,6 +61,19 @@ public class NettyTcpServer {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+
+    public void setPacketSeparator(String separator) {
+        this.packetSeparator = separator;
+    }
+
+    public void setMaxPacketLong(int maxPacketLong) {
+        this.maxPacketLong = maxPacketLong;
     }
 
     public void start() {
@@ -171,5 +176,4 @@ public class NettyTcpServer {
         }
         return false;
     }
-
 }
