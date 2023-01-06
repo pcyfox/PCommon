@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,14 +40,18 @@ fun Activity.autoScaleViewOnFocus(
 }
 
 
-fun Activity.startActivityExt(activity: Class<out Activity>) {
-    startActivity(Intent(this, activity))
-}
-
-fun Activity.startActivityExt(activity: Class<out Activity>, isFinishCurrentActivity: Boolean) {
-    startActivityExt(activity)
+fun Activity.startActivityExt(
+    activity: Class<out Activity>,
+    isFinishCurrentActivity: Boolean = false,
+    bundle: Bundle? = null
+) {
+    startActivity(Intent(this, activity).apply {
+        if (bundle != null)
+            putExtras(bundle)
+    })
     if (isFinishCurrentActivity) finish()
 }
+
 
 fun Activity.defaultScaleViewOnFocus(ratio: Float, @NonNull vararg views: View) {
     autoScaleViewOnFocus(1 + ratio, 1 + ratio, 200, *views)
