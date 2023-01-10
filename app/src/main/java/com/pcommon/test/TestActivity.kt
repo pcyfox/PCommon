@@ -38,7 +38,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     }
 
     private fun testCrash() {
-        btnSend.setText((1233 / 0).toString())
+        btnSend.text = (1233 / 0).toString()
     }
 
     private fun testUDP() {

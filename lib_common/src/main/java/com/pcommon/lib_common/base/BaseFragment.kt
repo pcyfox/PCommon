@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.annotation.Keep
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.pcommon.lib_common.application.BaseAbstractApplication.Companion.application
 
 
 /**
@@ -20,11 +21,13 @@ import androidx.lifecycle.ViewModelProvider
 @Keep
 abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
     Fragment(), OnKeyDownListener {
+
     protected var viewModel: VM? = null
+    protected var contentView: View? = null
+
     private var viewDataBinding: VDB? = null
     protected abstract val fragmentLayoutId: Int
     open var mainViewModelId = -1
-    protected var contentView: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +100,9 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         return getViewModel(clazz)
     }
 
-    protected abstract fun createViewModel(): VM
+    open fun createViewModel(): VM {
+        return BaseViewModel(requireActivity().application) as VM
+    }
 
     open fun loadData() {
 
