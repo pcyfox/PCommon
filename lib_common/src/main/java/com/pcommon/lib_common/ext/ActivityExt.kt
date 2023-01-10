@@ -170,43 +170,58 @@ fun Activity.toastLong(@StringRes textRes: Int) {
     }
 }
 
-fun Activity.toastNormal(text: String?, isLong: Boolean = true) {
+fun Activity.toastNormal(
+    text: String?,
+    isLong: Boolean = true,
+    layoutId: Int = R.layout.common_layout_toast_normal
+) {
     if (text.isNullOrEmpty()) {
         return
     }
     val view =
-        LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_normal, null)
+        LayoutInflater.from(applicationContext).inflate(layoutId, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
     ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
-fun Activity.toastTip(text: String? = "", isLong: Boolean = true) {
+fun Activity.toastTip(
+    text: String? = "", isLong: Boolean = true,
+    layoutId: Int = R.layout.common_layout_toast_normal
+) {
     if (text.isNullOrEmpty()) {
         return
     }
     val view =
-        LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_tip, null)
+        LayoutInflater.from(applicationContext).inflate(layoutId, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
 
     ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
-fun Activity.toastOk(text: String? = "", isLong: Boolean = true) {
+fun Activity.toastOk(
+    text: String? = "",
+    isLong: Boolean = true,
+    layoutId: Int = R.layout.common_layout_toast_ok
+) {
     if (text.isNullOrEmpty()) {
         return
     }
     val view =
-        LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_ok, null)
+        LayoutInflater.from(applicationContext).inflate(layoutId, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
     ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
 
-fun Activity.toastFail(text: String? = "", isLong: Boolean = true) {
+fun Activity.toastFail(
+    text: String? = "",
+    isLong: Boolean = true,
+    layoutId: Int = R.layout.common_layout_toast_fail
+) {
     if (text.isNullOrEmpty()) {
         return
     }
     val view =
-        LayoutInflater.from(applicationContext).inflate(R.layout.common_layout_toast_fail, null)
+        LayoutInflater.from(applicationContext).inflate(layoutId, null)
     view.findViewById<TextView>(R.id.view_toast_tip).text = text
     ToastUtils.make().setDurationIsLong(isLong).show(view)
 }
