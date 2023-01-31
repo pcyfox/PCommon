@@ -6,10 +6,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.blankj.utilcode.util.AppUtils;
+import com.df.lib_config.DeskConfig;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.pcommon.AppConfig;
 import com.pcommon.lib_common.BuildConfig;
-import com.pcommon.lib_common.config.DeskConfig;
 import com.pcommon.lib_log.XLogHelper;
 import com.pcommon.lib_log.printer.CloudLogPrinter;
 import com.pcommon.lib_log.printer.PrintLogReq;
