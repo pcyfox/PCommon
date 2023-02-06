@@ -58,7 +58,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     private var progressDialog: MaskProgressDialog? = null
     open var progressDialogLayoutId = -1
 
-
     open fun createViewModel(): VM {
         return BaseViewModel(application) as VM
     }
@@ -71,13 +70,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     override fun onCreate(savedInstanceState: Bundle?) {
         if (isFullScreen) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            //全屏
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-            hideNavigationBar()
+            fullScreen()
         }
         super.onCreate(savedInstanceState)
 
@@ -87,6 +80,49 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         initView()
         initListener()
         request()
+    }
+
+    /**
+     * 注入绑定
+     */
+    private fun initViewDataBinding() {
+        viewDataBinding = DataBindingUtil.setContentView<VDB>(this, layoutId).apply {
+            lifecycleOwner = this@BaseActivity
+            if (mainViewModelId != -1) {
+                setVariable(mainViewModelId, this)
+            }
+        }
+
+        viewModel = if (vmClass != null) createViewModel(vmClass!!) else {
+            createViewModel()
+        }.apply {
+            lifecycle.addObserver(this)
+        }
+
+
+    }
+
+
+    fun <T : BaseViewModel> getViewModel(clazz: Class<T>): T {
+        return ViewModelProvider(this).get(clazz)
+    }
+
+
+  fun bindView(){
+      viewDataBinding?.run {  }
+  }
+
+
+
+    @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
+    private fun fullScreen() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        //全屏
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+        hideNavigationBar()
     }
 
 
@@ -236,44 +272,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         if (onKeyDownListeners == null) {
             onKeyDownListeners = ArrayList()
         }
-        onKeyDownListeners!!.addAll(listener)
-    }
-
-    /**
-     * 注入绑定
-     */
-    private fun initViewDataBinding() {
-        viewModel = if (vmClass != null) {
-            createViewModel(vmClass!!)
-        } else {
-            createViewModel()
-        }.apply {
-            //让ViewModel拥有View的生命周期感应
-            lifecycle.addObserver(this)
-            //DataBindingUtil类需要在project的build中配置 dataBinding {enabled true }, 同步后会自动关联android.databinding包
-            viewDataBinding =
-                DataBindingUtil.setContentView<VDB>(this@BaseActivity, layoutId).apply {
-                    //注入Lifecycle生命周期
-                    lifecycleOwner = this@BaseActivity
-                    if (mainViewModelId != -1) {
-                        setVariable(mainViewModelId, this)
-                    }
-                }
-        }
-    }
-
-
-    fun <T : BaseViewModel> getViewModel(clazz: Class<T>): T {
-        return ViewModelProvider(this).get(clazz)
-    }
-
-
-    fun addVariable(wm: VM?, vararg ids: Int) {
-        wm?.let {
-            for (id in ids) {
-                viewDataBinding?.setVariable(id, wm)
-            }
-        }
+        onKeyDownListeners?.addAll(listener)
     }
 
     open fun onDoubleClickOverIntercept(): Boolean {

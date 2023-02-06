@@ -1,15 +1,10 @@
 package com.pcommon.lib_common.base
 
-import android.app.Activity
 import android.app.Application
-import android.content.Context
-import android.content.Intent
 import androidx.annotation.Keep
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.*
 
 
 /**
@@ -22,39 +17,15 @@ import androidx.lifecycle.LifecycleOwner
 
 @Keep
 open class BaseViewModel(application: Application) : AndroidViewModel(application),
-    BaseLifecycleObserver, Observable {
-    private lateinit var owner: LifecycleOwner
+    DefaultLifecycleObserver, Observable {
+    lateinit var owner: LifecycleOwner
+        private set
+
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
-    override fun onAny(owner: LifecycleOwner, event: Lifecycle.Event) {
+
+    override fun onCreate(owner: LifecycleOwner) {
         this.owner = owner
-    }
-
-
-    fun getLifecycleOwner() = owner
-
-
-    override fun onCreate() {
-
-    }
-
-    override fun onDestroy() {
-
-    }
-
-    override fun onStart() {
-
-    }
-
-    override fun onStop() {
-
-    }
-
-    override fun onResume() {
-
-    }
-
-    override fun onPause() {
-
+        super.onCreate(owner)
     }
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {

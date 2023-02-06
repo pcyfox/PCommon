@@ -31,6 +31,7 @@ android {
 
 //较为通用的才放在这里,供业务类型模块使用
 dependencies {
+
     api fileTree(dir: 'libs', include: ['*.jar'])
 
     api rootDependencies.recyclerview
