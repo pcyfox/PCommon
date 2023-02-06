@@ -53,9 +53,9 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         }
     }
 
-    fun add(item: M) {
+    fun add(index: Int = list.size - 1, item: M) {
         list.add(item)
-        notifyItemInserted(list.size - 1)
+        notifyItemInserted(index)
     }
 
     @SuppressLint("NotifyDataSetChanged")
