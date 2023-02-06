@@ -53,6 +53,11 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         }
     }
 
+    fun add(item: M) {
+        list.add(item)
+        notifyItemInserted(list.size - 1)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun clear() {
         list.clear()
@@ -93,7 +98,7 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
      */
     protected abstract fun onBindItem(binding: B, item: M, holder: ViewHolder)
 
-    class AdapterViewHolder(val binding: ViewDataBinding) : ViewHolder(binding.root){
+    class AdapterViewHolder(val binding: ViewDataBinding) : ViewHolder(binding.root) {
 
     }
 }
