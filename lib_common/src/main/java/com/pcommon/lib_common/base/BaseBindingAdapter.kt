@@ -54,7 +54,7 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
     }
 
     fun add(item: M, index: Int = list.size - 1) {
-        list.add(index, item)
+        list.add(if (index < 0) 0 else index, item)
         notifyItemInserted(index)
     }
 
