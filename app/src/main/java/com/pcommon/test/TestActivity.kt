@@ -7,7 +7,6 @@ import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
 import com.pcommon.lib_common.base.BaseActivity
 import com.pcommon.lib_common.ext.postDelayed
-import com.pcommon.lib_common.ext.startActivityExt
 import com.pcommon.lib_network.udp.UDPSocketClient
 import kotlinx.android.synthetic.main.activity_test.*
 

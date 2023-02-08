@@ -7,17 +7,14 @@ import io.netty.channel.Channel;
 public interface NettyServerListener<T> {
 
     public final static byte STATUS_CONNECT_SUCCESS = 1;
-
     public final static byte STATUS_CONNECT_CLOSED = 0;
-
     public final static byte STATUS_CONNECT_ERROR = -1;
 
     /**
      *
      * @param msg
-     * @param channelId unique id
      */
-    void onMessageResponseServer(T msg, String channelId);
+    void onMessageResponseServer(T msg, Channel channel);
 
     /**
      * server开启成功

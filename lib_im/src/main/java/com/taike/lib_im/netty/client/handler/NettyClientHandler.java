@@ -73,9 +73,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        //    Log.e(TAG, "------->channelActive");
-//        NettyTcpClient.getInstance().setConnectStatus(true);
-        XLog.d("netty客户端---->channelActive");
         if (nettyClientCallback != null) {
             nettyClientCallback.onConnect();
         }
@@ -89,8 +86,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        //    Log.e(TAG, "------->channelInactive");
-        XLog.d("netty客户端---->channelInactive");
         if (nettyClientCallback != null) {
             nettyClientCallback.onDisconnect();
         }
@@ -114,7 +109,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        XLog.e("netty客户端---->exceptionCaught:" + cause.getMessage());
         listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, index);
         cause.printStackTrace();
         ctx.close();

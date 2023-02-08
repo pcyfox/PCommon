@@ -206,10 +206,10 @@ public class UDPSocketClient {
                 // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。
                 if (receivePacket != null) {
                     receivePacket.setLength(BUFFER_LENGTH);
-                    XLog.d(TAG + "接收到广播数据 form:" + host + ":" + receivePacket.getPort() + "\ncontent:" + strReceive);
+                    XLog.d(TAG + ",接收到广播数据:\n form:" + host + ":" + receivePacket.getPort() + "\n content:\n" + strReceive);
                 }
             } catch (Exception e) {
-                XLog.i(TAG + ":receiveMessage() e:" + e.getMessage());
+                XLog.i(TAG + ",receiveMessage() error:" + e.getMessage());
                 e.printStackTrace();
             }
         }

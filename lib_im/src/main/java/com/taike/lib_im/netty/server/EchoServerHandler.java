@@ -18,26 +18,24 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(ChannelHandlerContext ctx) {
 //    	System.out.println("channelReadComplete");
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx,
-                                Throwable cause) {
-        cause.printStackTrace();                //5
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
         ctx.close();
-        //6
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) {
         if (msg.equals("Heartbeat")) {
             Log.d(TAG, "Heartbeat");
             return; //客户端发送来的心跳数据
         }
-        if( mListener != null){
-            mListener.onMessageResponseServer(msg, ctx.channel().id().asShortText());
+        if (mListener != null) {
+            mListener.onMessageResponseServer(msg, ctx.channel());
         }
     }
 
@@ -45,15 +43,14 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
      * 连接成功
      *
      * @param ctx
-     * @throws Exception
      */
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         mListener.onChannelConnect(ctx.channel());
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         mListener.onChannelDisConnect(ctx.channel());
     }
 }
