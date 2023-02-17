@@ -259,7 +259,7 @@ public class NettyTcpClient {
         if (flag) {
             String separator = TextUtils.isEmpty(packetSeparator) ? System.getProperty("line.separator") : packetSeparator;
             channel.pipeline().addLast(new LengthFieldPrepender(4));
-            ChannelFuture channelFuture = channel.writeAndFlush(data + separator).addListener((ChannelFutureListener) channelFuture1 -> listener.isSendSuccss(channelFuture1.isSuccess()));
+            channel.writeAndFlush(data + separator).addListener((ChannelFutureListener) channelFuture -> listener.isSendSuccss(channelFuture.isSuccess()));
         }
         return flag;
     }

@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) :
     RecyclerView.Adapter<BaseBindingAdapter.AdapterViewHolder>() {
 
+    var isAutoNotifyChange = true
     var list = arrayListOf<M>()
         @SuppressLint("NotifyDataSetChanged") set(value) {
             field = value
@@ -45,23 +46,37 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         }
         if (isClear) list.clear()
         list.addAll(c)
-        if (isClear) {
+        if (isClear && isAutoNotifyChange) {
             notifyDataSetChanged()
         } else {
             val start = list.size - c.size - 1
-            notifyItemRangeChanged(if (start < 0) 0 else start, c.size)
+
+            if (isAutoNotifyChange) notifyItemRangeChanged(if (start < 0) 0 else start, c.size)
         }
     }
 
     fun add(item: M, index: Int = list.size - 1) {
         list.add(if (index < 0) 0 else index, item)
-        notifyItemInserted(index)
+        if (isAutoNotifyChange) notifyItemInserted(index)
     }
+
+    fun remove(item: M): Boolean {
+        val index = list.indexOf(item)
+        return remove(index)
+    }
+
+    fun remove(index: Int): Boolean {
+        if (index < 0 || index >= list.size) return false
+        list.removeAt(index)
+        if (isAutoNotifyChange) notifyItemRemoved(index)
+        return true
+    }
+
 
     @SuppressLint("NotifyDataSetChanged")
     fun clear() {
         list.clear()
-        notifyDataSetChanged()
+        if (isAutoNotifyChange) notifyDataSetChanged()
     }
 
     fun isEmpty() = list.isEmpty()

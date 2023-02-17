@@ -36,26 +36,25 @@ import com.pcommon.lib_utils.MaskUtils
 @Keep
 abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
     FragmentActivity() {
-
     private val TAG = "BaseActivity"
-    protected var viewModel: VM? = null
+
+    var viewModel: VM? = null
         private set
-    protected var viewDataBinding: VDB? = null
-        private set
+    private var viewDataBinding: VDB? = null
 
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
-    protected abstract val layoutId: Int
     private val eventDetector by lazy { EventDetector(3, 1800) }
+    private var isBeenHiddenProgress = false
+    private var progressDialog: MaskProgressDialog? = null
+
+    protected abstract val layoutId: Int
+
     open var isShowNetWorkChangNotice = true
     open var isDoubleClickExit = false
     open var mainViewModelId = -1
     open var isFullScreen = true
     open var isClickBack = true
-
     open var isHideKeyboardWhenTouchOutside = true
-    private var isBeenHiddenProgress = false
-
-    private var progressDialog: MaskProgressDialog? = null
     open var progressDialogLayoutId = -1
 
     open fun createViewModel(): VM {
@@ -108,10 +107,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-  fun bindView(){
-      viewDataBinding?.run {  }
-  }
-
+    fun bindView() {
+        viewDataBinding?.run { }
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
