@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 @Keep
 abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) :
     RecyclerView.Adapter<BaseBindingAdapter.AdapterViewHolder>() {
-
     var isAutoNotifyChange = true
     var list = arrayListOf<M>()
         @SuppressLint("NotifyDataSetChanged") set(value) {
@@ -55,7 +54,7 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         }
     }
 
-    fun add(item: M, index: Int = list.size - 1) {
+    fun add(item: M, index: Int = list.size) {
         list.add(if (index < 0) 0 else index, item)
         if (isAutoNotifyChange) notifyItemInserted(index)
     }
@@ -80,6 +79,8 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
     }
 
     fun isEmpty() = list.isEmpty()
+
+    fun size() = list.size
 
     override fun getItemCount(): Int {
         return list.size
