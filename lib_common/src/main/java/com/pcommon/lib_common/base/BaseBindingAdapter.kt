@@ -25,8 +25,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
 /**
- * @author KunMinX
- * Create at 2018/6/30
  */
 @Keep
 abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) :
@@ -69,6 +67,10 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
         list.removeAt(index)
         if (isAutoNotifyChange) notifyItemRemoved(index)
         return true
+    }
+
+    fun contains(m: M): Boolean {
+        return list.contains(m)
     }
 
 
