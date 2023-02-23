@@ -40,7 +40,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     var viewModel: VM? = null
         private set
-    private var viewDataBinding: VDB? = null
+
+    var viewDataBinding: VDB? = null
+        private set
+
 
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
     private val eventDetector by lazy { EventDetector(3, 1800) }
