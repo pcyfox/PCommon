@@ -1,8 +1,6 @@
 package com.pcommon.test
 
 import android.util.Log
-import com.df.lib_config.DeskConfig
-import com.df.lib_config.DeskConfigManager
 import com.pcommon.edu.R
 import com.pcommon.edu.databinding.ActivityTestBinding
 import com.pcommon.lib_common.base.BaseActivity
@@ -18,13 +16,11 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 
     override fun initData() {
         super.initData()
-        DeskConfigManager.getInstance().updateData()
         testUDP()
     }
 
     override fun initView() {
         postDelayed(2000) {
-            btnNum.text = DeskConfig.getInstance().deskNumber
 //            testCrash()
         }
     }

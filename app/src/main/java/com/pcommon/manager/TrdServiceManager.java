@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.blankj.utilcode.util.AppUtils;
-import com.df.lib_config.DeskConfig;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.pcommon.AppConfig;
 import com.pcommon.lib_common.BuildConfig;
@@ -77,33 +76,6 @@ public final class TrdServiceManager {
     }
 
     public static void initLog(String clientName, String ELKUrl) {
-        PrintLogReq printLogReq = new PrintLogReq();
-        CloudLogPrinter cloudLogPrinter = CloudLogPrinter.getInstance();
-        Map<String, String> header = cloudLogPrinter.getHeader();
-        header.put("display", Build.DISPLAY);
-        header.put("manufacturer", Build.MANUFACTURER);
-        header.put("model", Build.MODEL);
-
-        String deviceId = DeskConfig.getInstance().getDeviceId();
-
-        if (TextUtils.isEmpty(deviceId)) {
-            deviceId = Util.genClientId();
-            DeskConfig.getInstance().setDeviceId(deviceId);
-        }
-        String location = DeskConfig.getInstance().getLocation();
-        if (!TextUtils.isEmpty(location)) {
-            try {
-                header.put("device_location", URLEncoder.encode(location,"utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        header.put("device_id", deviceId);
-        header.put("app_version_code", "" + AppUtils.getAppVersionCode());
-        header.put("app_version_name", "" + AppUtils.getAppVersionName());
-        header.put("is_debug", "" + BuildConfig.DEBUG);
-        cloudLogPrinter.init(printLogReq, ELKUrl, clientName);
-        XLogHelper.initLog(cloudLogPrinter, AppConfig.getLogPath(), clientName, clientName);
     }
 
     public static void initCrashHandler(Context context) {

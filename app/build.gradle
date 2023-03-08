@@ -10,6 +10,7 @@ kapt {
     }
 }
 
+def rootDependencies = rootProject.ext.dependencies
 android {
     compileSdkVersion project.compileSdkVersion
     defaultConfig {
@@ -147,9 +148,9 @@ dependencies {
     //implementation project(path: ':lib_third')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation rootDependencies.appcompat
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'me.jessyan:autosize:1.2.0'
 
-    implementation 'com.github.pcyfox:DeskConfigManager:V1.0.0'
+   // implementation 'com.github.pcyfox:DeskConfigManager:V1.0.1'
 }

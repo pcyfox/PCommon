@@ -17,16 +17,10 @@ import androidx.lifecycle.*
 
 @Keep
 open class BaseViewModel(application: Application) : AndroidViewModel(application),
-    DefaultLifecycleObserver, Observable {
-    lateinit var owner: LifecycleOwner
-        private set
+    LifecycleObserver, Observable {
+    var owner: LifecycleOwner? = null
 
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
-
-    override fun onCreate(owner: LifecycleOwner) {
-        this.owner = owner
-        super.onCreate(owner)
-    }
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {
         callbacks.add(callback)
