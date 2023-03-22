@@ -97,8 +97,9 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
 
 
     override fun onBindViewHolder(holder: AdapterViewHolder, position: Int) {
+        val item = list[if (position >= list.size) list.size - 1 else position]
         DataBindingUtil.getBinding<B>(holder.itemView)?.run {
-            onBindItem(this, list[position], holder)
+            onBindItem(this, item, holder)
         }
     }
 

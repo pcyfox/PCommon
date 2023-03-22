@@ -92,6 +92,19 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
+    fun showProgress(delay: Long = 0, tips: String = "", isCancelable: Boolean = false) {
+        if (activity is BaseActivity<*, *>) {
+            (activity as BaseActivity<*, *>).showProgress(delay, tips, isCancelable)
+        }
+    }
+
+    fun dismissProgress(delay: Long = 0) {
+        if (activity is BaseActivity<*, *>) {
+            (activity as BaseActivity<*, *>).dismissProgress(delay)
+        }
+    }
+
+
     fun <T : BaseViewModel> getViewModel(clazz: Class<T>): T {
         return ViewModelProvider(this).get(clazz)
 
