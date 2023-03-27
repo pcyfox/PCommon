@@ -162,13 +162,13 @@ public class NettyTcpClient {
             group = new NioEventLoopGroup();
             Bootstrap bootstrap = new Bootstrap().group(group)
                     .option(ChannelOption.TCP_NODELAY, true)//屏蔽Nagle算法
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
                             if (isSendHeartBeat) {
-                                ch.pipeline().addLast("ping", new IdleStateHandler(0, heartBeatInterval, 0, TimeUnit.SECONDS));//5s未发送数据，回调userEventTriggered
+                                ch.pipeline().addLast("ping", new IdleStateHandler(0, heartBeatInterval, 0, TimeUnit.SECONDS));//3s未发送数据，回调userEventTriggered
                             }
 
                             //黏包处理,需要客户端、服务端配合

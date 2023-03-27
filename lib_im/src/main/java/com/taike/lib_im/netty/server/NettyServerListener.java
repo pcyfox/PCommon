@@ -2,6 +2,7 @@ package com.taike.lib_im.netty.server;
 
 
 import io.netty.channel.Channel;
+import io.netty.handler.timeout.IdleStateEvent;
 
 
 public interface NettyServerListener<T> {
@@ -38,5 +39,8 @@ public interface NettyServerListener<T> {
      * @param
      */
     void onChannelDisConnect(Channel channel);
+
+
+    void onIdleEventTriggered(Channel channel, IdleStateEvent event);
 
 }

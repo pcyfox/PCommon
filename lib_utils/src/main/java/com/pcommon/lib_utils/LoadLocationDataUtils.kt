@@ -1,6 +1,7 @@
 package com.pcommon.lib_utils
 
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.ZipUtils
 import com.google.gson.Gson
 import java.io.*
 
@@ -31,8 +32,12 @@ object LoadLocationDataUtils {
         return null
     }
 
-    fun saveObjectToSD(data: Any?, path: String): Boolean {
-        val file = File(path)
+    fun saveObjectToSD(data: Any?, path: String, isZipFile: Boolean = false): Boolean {
+        var file = File(path)
+        if (isZipFile && file.parentFile != null) {
+            file = File(file.parentFile.absolutePath + "/temp.bak")
+        }
+
         if (file.exists() && file.canRead()) {
             file.delete()
         }
@@ -42,6 +47,10 @@ object LoadLocationDataUtils {
             val json = GsonUtils.toJson(data)
             fWriter.write(json)
             fWriter.flush()
+            if (isZipFile) {
+                ZipUtils.zipFile(file, File(path))
+                file.delete()
+            }
             return true
         } catch (ex: IOException) {
             ex.printStackTrace()

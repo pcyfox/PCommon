@@ -46,6 +46,7 @@ public class NettyTcpServer {
     private volatile boolean isServerStart;
     private String packetSeparator = Constant.PACKET_SEPARATOR;//防粘包分割符
     private int maxPacketLong = 1024 * 1024 * 3;
+    private int idleTimeSeconds = 20;
 
 
     private static final class InstanceHolder {
@@ -94,8 +95,7 @@ public class NettyTcpServer {
                             .childHandler(new ChannelInitializer<SocketChannel>() { // 7
 
                                 @Override
-                                public void initChannel(SocketChannel ch) throws Exception {
-                                    ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
+                                public void initChannel(SocketChannel ch) {
                                     if (!TextUtils.isEmpty(packetSeparator)) {
                                         ByteBuf delimiter = Unpooled.buffer();
                                         delimiter.writeBytes(packetSeparator.getBytes());
@@ -103,10 +103,14 @@ public class NettyTcpServer {
                                     } else {
                                         ch.pipeline().addLast(new LineBasedFrameDecoder(maxPacketLong));
                                     }
+
                                     ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
                                     ch.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8));
-                                    ch.pipeline().addLast(new IdleStateHandler(20, 20, 30));
+
                                     ch.pipeline().addLast(new LengthFieldPrepender(4/*表示数据长度所占的字节数*/));
+
+                                    ch.pipeline().addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds));
+
                                     if (listener != null) {
                                         ch.pipeline().addLast(new EchoServerHandler(listener));
                                         ch.pipeline().addLast(new TimeoutServerHandler(listener));
@@ -155,6 +159,9 @@ public class NettyTcpServer {
         return isServerStart;
     }
 
+    public void setIdleTimeSeconds(int idleTimeSeconds) {
+        this.idleTimeSeconds = idleTimeSeconds;
+    }
 
     // 异步发送消息
     public boolean sendMsgToChannel(String data, Channel channel, ChannelFutureListener listener) {
