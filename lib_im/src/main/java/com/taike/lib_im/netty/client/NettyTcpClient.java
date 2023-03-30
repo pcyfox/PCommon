@@ -1,11 +1,13 @@
 package com.taike.lib_im.netty.client;
 
-import android.os.SystemClock;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.elvishew.xlog.XLog;
-import com.taike.lib_im.netty.client.handler.NettyClientCallback;
+import com.taike.lib_im.BuildConfig;
+import com.taike.lib_im.netty.MessageType;
+import com.taike.lib_im.netty.NettyConfig;
+import com.taike.lib_im.netty.NettyUtils;
+import com.taike.lib_im.netty.ProtocolDecoder;
 import com.taike.lib_im.netty.client.handler.NettyClientHandler;
 import com.taike.lib_im.netty.client.listener.MessageStateListener;
 import com.taike.lib_im.netty.client.listener.NettyClientListener;
@@ -14,25 +16,17 @@ import com.taike.lib_im.netty.client.status.ConnectState;
 import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.CharsetUtil;
 
 /**
  * Created by littleGreens on 2018-11-10.
@@ -40,33 +34,32 @@ import io.netty.util.CharsetUtil;
  */
 public class NettyTcpClient {
     private static final String TAG = "NettyTcpClient";
-
     private EventLoopGroup group;
-
-    private NettyClientListener<String> listener;
-
     private Channel channel;
 
     private volatile boolean isConnect = false;
+    private volatile boolean isConnecting = false;
+
+    private volatile boolean isAutoReconnecting = true;
+
+    private final String host;
+    private final int tcpPort;
+    private final String mIndex;
+
+    private int reConnectTimes = 0;
 
     /**
      * 最大重连次数
      */
-    private int MAX_CONNECT_TIMES = Integer.MAX_VALUE;
+    private int maxConnectTimes = NettyConfig.MAX_CONNECT_TIMES;
 
-    private int reconnectNum = MAX_CONNECT_TIMES;
+    private long reconnectIntervalTime = NettyConfig.RE_CONNECT_INTERVAL_TIME;
+    private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
 
-    private boolean isNeedReconnect = true;
-
-    private long reconnectIntervalTime = 5000;
-
-    private final String host;
-    private final int tcp_port;
-    private final String mIndex;
     /**
      * 心跳间隔时间
      */
-    private long heartBeatInterval = 3;//单位秒
+    private long heartBeatInterval = NettyConfig.CLIENT_IDLE_TIME_SECONDS;//单位秒
 
     /**
      * 是否发送心跳
@@ -76,27 +69,21 @@ public class NettyTcpClient {
     /**
      * 心跳数据，可以是String类型，也可以是byte[].
      */
-    private Object heartBeatData;
+    private String heartBeatData;
 
-    private String packetSeparator;
-    private int maxPacketLong = 1024;
 
-    private void setPacketSeparator(String separator) {
-        this.packetSeparator = separator;
-    }
-
-    private void setMaxPacketLong(int maxPacketLong) {
-        this.maxPacketLong = maxPacketLong;
+    public void setMaxFrameLength(int maxFrameLength) {
+        this.maxFrameLength = maxFrameLength;
     }
 
     private NettyTcpClient(String host, int tcp_port, String index) {
         this.host = host;
-        this.tcp_port = tcp_port;
+        this.tcpPort = tcp_port;
         this.mIndex = index;
     }
 
-    public int getMaxConnectTimes() {
-        return MAX_CONNECT_TIMES;
+    public int getReConnectTimes() {
+        return maxFrameLength;
     }
 
     public long getReconnectIntervalTime() {
@@ -107,8 +94,8 @@ public class NettyTcpClient {
         return host;
     }
 
-    public int getTcp_port() {
-        return tcp_port;
+    public int getTcpPort() {
+        return tcpPort;
     }
 
     public String getIndex() {
@@ -123,6 +110,13 @@ public class NettyTcpClient {
         return isSendHeartBeat;
     }
 
+    public void setAutoReconnecting(boolean autoReconnecting) {
+        isAutoReconnecting = autoReconnecting;
+    }
+
+    private NettyClientListener<String> listener;
+
+
     public void connect() {
         if (isConnect) {
             return;
@@ -131,8 +125,6 @@ public class NettyTcpClient {
             @Override
             public void run() {
                 super.run();
-                isNeedReconnect = true;
-                reconnectNum = MAX_CONNECT_TIMES;
                 connectServer();
             }
         };
@@ -140,90 +132,81 @@ public class NettyTcpClient {
     }
 
 
-    private final NettyClientCallback nettyClientCallback = new NettyClientCallback() {
-
-        @Override
-        public void onConnect() {
-            isConnect = true;
-        }
-
-        @Override
-        public void onDisconnect() {
-            isConnect = false;
-        }
-    };
-
     private void connectServer() {
         synchronized (NettyTcpClient.this) {
             if (isConnect) {
                 return;
             }
+            isConnecting = true;
             ChannelFuture channelFuture = null;
             group = new NioEventLoopGroup();
-            Bootstrap bootstrap = new Bootstrap().group(group)
-                    .option(ChannelOption.TCP_NODELAY, true)//屏蔽Nagle算法
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
+            Bootstrap bootstrap = new Bootstrap().group(group).option(ChannelOption.TCP_NODELAY, true)//屏蔽Nagle算法
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
+                            isConnecting = false;
+                            if (BuildConfig.DEBUG)
+                                Log.d(TAG, "initChannel() called with: ch = [" + ch + "]");
+                            ChannelPipeline pipeline = ch.pipeline();
+                            //解析报文
+                            pipeline.addLast(new ProtocolDecoder(maxFrameLength));
                             if (isSendHeartBeat) {
-                                ch.pipeline().addLast("ping", new IdleStateHandler(0, heartBeatInterval, 0, TimeUnit.SECONDS));//3s未发送数据，回调userEventTriggered
-                            }
+                                pipeline.addLast("ping", new IdleStateHandler(heartBeatInterval, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS));//3s未发送数据，回调userEventTriggered
+                                pipeline.addLast(new NettyClientHandler(mIndex, heartBeatData, new NettyClientListener<>() {
+                                    @Override
+                                    public void onMessageResponseClient(String msg, String index) {
+                                        if (listener != null)
+                                            listener.onMessageResponseClient(msg, index);
+                                    }
 
-                            //黏包处理,需要客户端、服务端配合
-                            if (!TextUtils.isEmpty(packetSeparator)) {
-                                ByteBuf delimiter = Unpooled.buffer();
-                                delimiter.writeBytes(packetSeparator.getBytes());
-                                ch.pipeline().addLast(new DelimiterBasedFrameDecoder(maxPacketLong, delimiter));
-                            } else {
-                                ch.pipeline().addLast(new LineBasedFrameDecoder(maxPacketLong));
+                                    @Override
+                                    public void onClientStatusConnectChanged(ConnectState statusCode, String index) {
+                                        isConnect = statusCode == ConnectState.STATUS_CONNECT_SUCCESS;
+                                        if (!isConnect && isAutoReconnecting) connect();
+                                        if (listener != null)
+                                            listener.onClientStatusConnectChanged(statusCode, index);
+                                    }
+                                }));
                             }
-
-                            ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
-                            ch.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8));
-                            // 定义一个发送消息协议格式：|--header:4 byte--|--content:3MB--|
-                            ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024 * 3, 0, 4, 0, 4));
-                            ch.pipeline().addLast(new NettyClientHandler(listener, mIndex, isSendHeartBeat, heartBeatData, packetSeparator, nettyClientCallback));
                         }
                     });
-
             try {
-                channelFuture = bootstrap.connect(host, tcp_port).addListener((ChannelFutureListener) channelFuture1 -> {
+                channelFuture = bootstrap.connect(host, tcpPort).addListener((ChannelFutureListener) channelFuture1 -> {
+                    isConnecting = false;
                     if (channelFuture1.isSuccess()) {
                         isConnect = true;
-                        XLog.i(TAG + "connectServer():连接成功!");
-                        reconnectNum = MAX_CONNECT_TIMES;
+                        XLog.i(TAG + ",connectServer():连接成功!");
                         channel = channelFuture1.channel();
-                        listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_SUCCESS, mIndex);
+                        if (listener != null)
+                            listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_SUCCESS, mIndex);
                     } else {
-                        XLog.w(TAG + "connectServer():连接失败!");
-                        listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, mIndex);
+                        XLog.w(TAG + ",connectServer():连接失败!");
                         isConnect = false;
+                        if (listener != null)
+                            listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, mIndex);
+                        if (isAutoReconnecting) reconnect();
                     }
                 }).sync();
                 // Wait until the connection is closed.
                 channelFuture.channel().closeFuture().sync();
             } catch (Exception e) {
-                e.printStackTrace();
+                XLog.e(TAG + ",connectServer() fail, Exception:" + e);
+                isConnecting = false;
                 isConnect = false;
-                XLog.e(TAG + "connectServer() fail, Exception:" + e);
-                listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_CLOSED, mIndex);
-
+                if (listener != null)
+                    listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_CLOSED, mIndex);
                 if (null != channelFuture) {
                     if (channelFuture.channel() != null && channelFuture.channel().isOpen()) {
                         channelFuture.channel().close();
                     }
                 }
                 group.shutdownGracefully();
-
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(reconnectIntervalTime);
                 } catch (Exception ex) {
                     isConnect = false;
                 }
-
-                reconnect();
+                if (isAutoReconnecting) reconnect();
             }
         }
     }
@@ -231,21 +214,19 @@ public class NettyTcpClient {
 
     public void disconnect() {
         XLog.w(TAG, "disconnect() called!");
-        isNeedReconnect = false;
         isConnect = false;
         group.shutdownGracefully();
     }
 
     public void reconnect() {
-        if (isNeedReconnect && reconnectNum > 0 && !isConnect) {
-            reconnectNum--;
-            SystemClock.sleep(reconnectIntervalTime);
-            if (isNeedReconnect && reconnectNum > 0 && !isConnect) {
-                XLog.w(TAG + ":reconnect(),重新连接,第%d次", reconnectNum);
-                connectServer();
-            }
+        if (isConnecting || reConnectTimes >= maxConnectTimes || isConnect) {
+            return;
         }
+        reConnectTimes++;
+        XLog.w(TAG + ":reconnect(),重新连接,第%d次", reConnectTimes);
+        connectServer();
     }
+
 
     /**
      * 异步发送
@@ -254,14 +235,13 @@ public class NettyTcpClient {
      * @param listener 发送结果回调
      * @return 方法执行结果
      */
-    public boolean sendMsgToServer(String data, final MessageStateListener listener) {
-        boolean flag = channel != null && isConnect;
-        if (flag) {
-            String separator = TextUtils.isEmpty(packetSeparator) ? System.getProperty("line.separator") : packetSeparator;
-            channel.pipeline().addLast(new LengthFieldPrepender(4));
-            channel.writeAndFlush(data + separator).addListener((ChannelFutureListener) channelFuture -> listener.isSendSuccss(channelFuture.isSuccess()));
+    public void sendMsgToServer(String data, final MessageStateListener listener) {
+        boolean isOk = channel != null && isConnect;
+        if (!isOk) {
+            listener.isSendSuccss(false);
+            return;
         }
-        return flag;
+        NettyUtils.writeAndFlush(data, channel, MessageType.CUSTOM_MSG).addListener((ChannelFutureListener) channelFuture -> listener.isSendSuccss(channelFuture.isSuccess()));
     }
 
     /**
@@ -271,23 +251,14 @@ public class NettyTcpClient {
      * @return 方法执行结果
      */
     public boolean sendMsgToServer(String data) {
-        boolean flag = channel != null && isConnect;
-        if (flag) {
-            String separator = TextUtils.isEmpty(packetSeparator) ? System.getProperty("line.separator") : packetSeparator;
-            ChannelFuture channelFuture = channel.writeAndFlush(data + separator).awaitUninterruptibly();
-            return channelFuture.isSuccess();
-        }
-        return false;
+        boolean isOk = channel != null && isConnect;
+        if (!isOk) return false;
+        return NettyUtils.writeAndFlush(data, channel, MessageType.CUSTOM_MSG).isSuccess();
     }
 
 
-    public boolean sendMsgToServer(byte[] data, final MessageStateListener listener) {
-        boolean flag = channel != null && isConnect;
-        if (flag) {
-            ByteBuf buf = Unpooled.copiedBuffer(data);
-            channel.writeAndFlush(buf).addListener((ChannelFutureListener) channelFuture -> listener.isSendSuccss(channelFuture.isSuccess()));
-        }
-        return flag;
+    public void sendMsgToServer(byte[] data, final MessageStateListener listener) {
+        sendMsgToServer(new String(data), listener);
     }
 
     /**
@@ -307,28 +278,21 @@ public class NettyTcpClient {
         this.isConnect = status;
     }
 
-    public void setListener(NettyClientListener listener) {
+    public void setListener(NettyClientListener<String> listener) {
         this.listener = listener;
     }
 
-    public byte[] strToByteArray(String str) {
-        if (str == null) {
-            return null;
-        }
-        byte[] byteArray = str.getBytes();
-        return byteArray;
-
-    }
 
     /**
      * 构建者，创建NettyTcpClient
      */
     public static class Builder {
 
+
         /**
          * 最大重连次数
          */
-        private int MAX_CONNECT_TIMES = Integer.MAX_VALUE;
+        private int maxConnectTimes = NettyConfig.MAX_CONNECT_TIMES;
 
         /**
          * 重连间隔
@@ -350,37 +314,38 @@ public class NettyTcpClient {
         /**
          * 是否发送心跳
          */
-        private boolean isSendHeartBeat;
+        private boolean isSendHeartBeat = true;
         /**
          * 心跳时间间隔
          */
-        private long heartBeatInterval = 5;
+        private long heartBeatInterval = NettyConfig.CLIENT_IDLE_TIME_SECONDS;
 
         /**
          * 心跳数据，可以是String类型，也可以是byte[].
          */
-        private Object heartBeatData;
+        private String heartBeatData;
 
-        private String packetSeparator;
-        private int maxPacketLong = 1024;
+        private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
+
+        private boolean isAutoReconnecting = true;
+
+        private NettyClientListener<String> listener;
 
         public Builder() {
-            this.maxPacketLong = 1024;
         }
 
-
-        public Builder setPacketSeparator(String packetSeparator) {
-            this.packetSeparator = packetSeparator;
+        public Builder setAutoReconnecting(boolean autoReconnecting) {
+            isAutoReconnecting = autoReconnecting;
             return this;
         }
 
-        public Builder setMaxPacketLong(int maxPacketLong) {
-            this.maxPacketLong = maxPacketLong;
+        public Builder setMaxFrameLength(int maxFrameLength) {
+            this.maxFrameLength = maxFrameLength;
             return this;
         }
 
-        public Builder setMaxReconnectTimes(int reConnectTimes) {
-            this.MAX_CONNECT_TIMES = reConnectTimes;
+        public Builder setMaxReconnectTimes(int maxFrameLength) {
+            this.maxFrameLength = maxFrameLength;
             return this;
         }
 
@@ -411,25 +376,31 @@ public class NettyTcpClient {
             return this;
         }
 
-        public Builder setSendHeartBeat(boolean isSendheartBeat) {
-            this.isSendHeartBeat = isSendheartBeat;
+        public Builder setSendHeartBeat(boolean isSendHeartBeat) {
+            this.isSendHeartBeat = isSendHeartBeat;
             return this;
         }
 
-        public Builder setHeartBeatData(Object heartBeatData) {
+        public Builder setHeartBeatData(String heartBeatData) {
             this.heartBeatData = heartBeatData;
+            return this;
+        }
+
+        public Builder setListener(NettyClientListener<String> listener) {
+            this.listener = listener;
             return this;
         }
 
         public NettyTcpClient build() {
             NettyTcpClient nettyTcpClient = new NettyTcpClient(host, tcp_port, mIndex);
-            nettyTcpClient.MAX_CONNECT_TIMES = this.MAX_CONNECT_TIMES;
             nettyTcpClient.reconnectIntervalTime = this.reconnectIntervalTime;
             nettyTcpClient.heartBeatInterval = this.heartBeatInterval;
             nettyTcpClient.isSendHeartBeat = this.isSendHeartBeat;
             nettyTcpClient.heartBeatData = this.heartBeatData;
-            nettyTcpClient.packetSeparator = this.packetSeparator;
-            nettyTcpClient.maxPacketLong = this.maxPacketLong;
+            nettyTcpClient.maxFrameLength = this.maxFrameLength;
+            nettyTcpClient.maxConnectTimes = this.maxConnectTimes;
+            nettyTcpClient.isAutoReconnecting = this.isAutoReconnecting;
+            nettyTcpClient.listener = this.listener;
             return nettyTcpClient;
         }
     }

@@ -1,0 +1,116 @@
+package com.taike.lib_im.netty;
+
+import static com.taike.lib_im.netty.MessageType.PING_MSG;
+import static com.taike.lib_im.netty.MessageType.PONG_MSG;
+
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.taike.lib_im.BuildConfig;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
+
+/**
+ * @author xiongyongshun
+ * @version 1.0
+ */
+public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler<NettyProtocolBean> {
+    private static final String TAG = "CustomHeartbeatHandler";
+    protected String name;
+    private int heartbeatCount = 0;
+
+    public CustomHeartbeatHandler(String name) {
+        this.name = name;
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyProtocolBean nettyProtocolBean) throws Exception {
+        Log.d(TAG, "channelRead0() called with: channelHandlerContext = [" + channelHandlerContext + "], nettyProtocolBean = [" + nettyProtocolBean + "]");
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+        if (msg instanceof NettyProtocolBean) {
+            NettyProtocolBean bean = (NettyProtocolBean) msg;
+            MessageType type = bean.getType();
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, "channelRead0() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
+            switch (type) {
+                case PING_MSG:
+                    sendPongMsg(ctx);
+                    break;
+                case PONG_MSG:
+                    if (BuildConfig.DEBUG)
+                        Log.d(TAG, "channelRead0():" + name + " get pong msg from " + ctx.channel().remoteAddress());
+                    break;
+                case CUSTOM_MSG:
+                    handleData(ctx, bean);
+                    break;
+                default:
+                    Log.w(TAG, "channelRead0() called with:  unknown type = [" + type + "]");
+            }
+        }
+    }
+
+
+    protected void sendPingMsg(ChannelHandlerContext context) {
+        sendPingMsg(context, name + heartbeatCount);
+    }
+
+    public void sendPingMsg(ChannelHandlerContext ctx, String heartBeatData) {
+        if (TextUtils.isEmpty(heartBeatData)) {
+            sendPingMsg(ctx);
+            return;
+        }
+        NettyUtils.writeAndFlush(heartBeatData, ctx.channel(), PING_MSG);
+        heartbeatCount++;
+    }
+
+    private void sendPongMsg(ChannelHandlerContext context) {
+        NettyUtils.writeAndFlush(name, context.channel(), PONG_MSG);
+        heartbeatCount++;
+    }
+
+    protected abstract void handleData(ChannelHandlerContext channelHandlerContext, NettyProtocolBean data);
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+        // IdleStateHandler 所产生的 IdleStateEvent 的处理逻辑.
+        String idleEvent = "";
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            switch (e.state()) {
+                case READER_IDLE:
+                    idleEvent = "读超时";
+                    handleReaderIdle(ctx);
+                    break;
+                case WRITER_IDLE:
+                    idleEvent = "写超时";
+                    handleWriterIdle(ctx);
+                    break;
+                case ALL_IDLE:
+                    idleEvent = "读、写超时";
+                    handleAllIdle(ctx);
+                    break;
+                default:
+                    break;
+            }
+
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, "userEventTriggered() called with: ctx = [" + ctx + "], idleEvent= [" + idleEvent + "]");
+        }
+    }
+
+    protected void handleReaderIdle(ChannelHandlerContext ctx) {
+    }
+
+    protected void handleWriterIdle(ChannelHandlerContext ctx) {
+    }
+
+    protected void handleAllIdle(ChannelHandlerContext ctx) {
+    }
+
+}

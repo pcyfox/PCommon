@@ -1,34 +1,30 @@
 package com.taike.lib_im.netty.server;
 
-import android.text.TextUtils;
 import android.util.Log;
 
-
 import com.elvishew.xlog.XLog;
-import com.taike.lib_im.netty.Constant;
+import com.taike.lib_im.BuildConfig;
+import com.taike.lib_im.netty.MessageType;
+import com.taike.lib_im.netty.NettyConfig;
+import com.taike.lib_im.netty.NettyUtils;
+import com.taike.lib_im.netty.ProtocolDecoder;
+import com.taike.lib_im.netty.server.handler.NettyServerHandler;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.CharsetUtil;
-import io.netty.util.NetUtil;
 
 
 /**
@@ -44,9 +40,10 @@ public class NettyTcpServer {
     private EventLoopGroup workerGroup;
 
     private volatile boolean isServerStart;
-    private String packetSeparator = Constant.PACKET_SEPARATOR;//防粘包分割符
-    private int maxPacketLong = 1024 * 1024 * 3;
-    private int idleTimeSeconds = 20;
+
+    private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
+
+    private int idleTimeSeconds = NettyConfig.SERVER_IDLE_TIME_SECONDS;
 
 
     private static final class InstanceHolder {
@@ -68,89 +65,68 @@ public class NettyTcpServer {
         return port;
     }
 
-
-    public void setPacketSeparator(String separator) {
-        this.packetSeparator = separator;
+    public void setMaxFrameLength(int maxFrameLength) {
+        this.maxFrameLength = maxFrameLength;
     }
 
-    public void setMaxPacketLong(int maxPacketLong) {
-        this.maxPacketLong = maxPacketLong;
+    public void start(int port) {
+        this.port = port;
+        start();
     }
+
 
     public void start() {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                bossGroup = new NioEventLoopGroup(1);
-                workerGroup = new NioEventLoopGroup();
-                try {
-                    ServerBootstrap b = new ServerBootstrap();
-                    b.group(bossGroup, workerGroup)
-                            .channel(NioServerSocketChannel.class) // 5
-                            .localAddress(new InetSocketAddress(port)) // 6
-                            .childOption(ChannelOption.SO_KEEPALIVE, true)
-                            .childOption(ChannelOption.SO_REUSEADDR, true)
-                            .childOption(ChannelOption.TCP_NODELAY, true)
-                            .childHandler(new ChannelInitializer<SocketChannel>() { // 7
+        new Thread(this::startServer).start();
+    }
 
-                                @Override
-                                public void initChannel(SocketChannel ch) {
-                                    if (!TextUtils.isEmpty(packetSeparator)) {
-                                        ByteBuf delimiter = Unpooled.buffer();
-                                        delimiter.writeBytes(packetSeparator.getBytes());
-                                        ch.pipeline().addLast(new DelimiterBasedFrameDecoder(maxPacketLong, delimiter));
-                                    } else {
-                                        ch.pipeline().addLast(new LineBasedFrameDecoder(maxPacketLong));
-                                    }
+    private void startServer() {
+        if (bossGroup != null) return;
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup(4);
+        ServerBootstrap bootstrap = new ServerBootstrap();
 
-                                    ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
-                                    ch.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8));
-
-                                    ch.pipeline().addLast(new LengthFieldPrepender(4/*表示数据长度所占的字节数*/));
-
-                                    ch.pipeline().addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds));
-
-                                    if (listener != null) {
-                                        ch.pipeline().addLast(new EchoServerHandler(listener));
-                                        ch.pipeline().addLast(new TimeoutServerHandler(listener));
-                                    }
-                                }
-                            });
-
-                    // Bind and start to accept incoming connections.
-                    ChannelFuture f = b.bind().sync(); // 8
-                    XLog.i(TAG + ",started and listen on localAddress:" + f.channel().localAddress());
-                    isServerStart = true;
-                    if (listener != null) {
-                        listener.onStartServer();
+        bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class) // 5
+                .localAddress(new InetSocketAddress(port)) // 6
+                .childOption(ChannelOption.SO_KEEPALIVE, true).childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.TCP_NODELAY, true).childHandler(new ChannelInitializer<SocketChannel>() { // 7
+                    @Override
+                    public void initChannel(SocketChannel ch) {
+                        if (BuildConfig.DEBUG)
+                            Log.d(TAG, "initChannel() called with: ch = [" + ch + "]");
+                        ChannelPipeline pipeline = ch.pipeline();
+                        //解析报文
+                        pipeline.addLast(new ProtocolDecoder(maxFrameLength));
+                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 3L, TimeUnit.SECONDS));
+                        pipeline.addLast(new NettyServerHandler(listener));
                     }
-                    // Wait until the server socket is closed.
-                    // In this example, this does not happen, but you can do that to gracefully
-                    // shut down your server.
-                    f.channel().closeFuture().sync(); // 9
-                } catch (Exception e) {
-                    XLog.e(TAG, "start server error!,Exception:" + e);
-                    e.printStackTrace();
-                } finally {
-                    isServerStart = false;
-                    if (listener != null) {
-                        listener.onStopServer();
-                    }
-                    workerGroup.shutdownGracefully();
-                    bossGroup.shutdownGracefully();
-                }
-            }
-        }.start();
-
+                });
+        try {
+            // Bind and start to accept incoming connections.
+            ChannelFuture future = bootstrap.bind().sync(); // 8
+            XLog.i(TAG + ",started and listen on localAddress:" + future.channel().localAddress());
+            isServerStart = true;
+            if (listener != null) listener.onStartServer();
+            // Wait until the server socket is closed.
+            // In this example, this does not happen, but you can do that to gracefully
+            // shut down your server.
+            future.channel().closeFuture().sync(); // 9
+        } catch (Exception e) {
+            XLog.e(TAG, "start server error!,Exception:" + e);
+            e.printStackTrace();
+        } finally {
+            disconnect();
+        }
     }
 
     public void disconnect() {
-        workerGroup.shutdownGracefully();
-        bossGroup.shutdownGracefully();
+        if (workerGroup != null) workerGroup.shutdownGracefully();
+        if (bossGroup != null) bossGroup.shutdownGracefully();
+        isServerStart = false;
+        workerGroup = null;
+        bossGroup = null;
+        if (listener != null) listener.onStopServer();
     }
 
-    public void setListener(NettyServerListener listener) {
+    public void setListener(NettyServerListener<String> listener) {
         this.listener = listener;
     }
 
@@ -166,9 +142,8 @@ public class NettyTcpServer {
     // 异步发送消息
     public boolean sendMsgToChannel(String data, Channel channel, ChannelFutureListener listener) {
         boolean flag = channel != null && channel.isActive();
-        String separator = TextUtils.isEmpty(packetSeparator) ? System.getProperty("line.separator") : packetSeparator;
         if (flag) {
-            channel.writeAndFlush(data + separator).addListener(listener);
+            NettyUtils.writeAndFlush(data, channel, MessageType.CUSTOM_MSG).addListener(listener);
         }
         return flag;
     }
@@ -177,10 +152,9 @@ public class NettyTcpServer {
     public boolean sendMsgToChannel(String data, Channel channel) {
         boolean flag = channel != null && channel.isActive();
         if (flag) {
-            String separator = TextUtils.isEmpty(packetSeparator) ? System.getProperty("line.separator") : packetSeparator;
-            ChannelFuture channelFuture = channel.writeAndFlush(data + separator).awaitUninterruptibly();
-            return channelFuture.isSuccess();
+            return NettyUtils.writeAndFlush(data, channel, MessageType.CUSTOM_MSG).isSuccess();
         }
         return false;
     }
+
 }

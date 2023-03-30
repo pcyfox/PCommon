@@ -3,11 +3,11 @@ package com.pcommon.test
 import android.util.Log
 import com.df.lib_config.DeskConfig
 import com.df.lib_config.DeskConfigManager
-import com.pcommon.edu.R
-import com.pcommon.edu.databinding.ActivityTestBinding
 import com.pcommon.lib_common.base.BaseActivity
 import com.pcommon.lib_common.ext.postDelayed
+import com.pcommon.lib_common.ext.startActivityExt
 import com.pcommon.lib_network.udp.UDPSocketClient
+import com.pcommon.test.databinding.ActivityTestBinding
 import kotlinx.android.synthetic.main.activity_test.*
 
 
@@ -18,13 +18,13 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
 
     override fun initData() {
         super.initData()
-        DeskConfigManager.getInstance().updateData()
+        //DeskConfigManager.getInstance().updateData()
         testUDP()
     }
 
     override fun initView() {
         postDelayed(2000) {
-            btnNum.text = DeskConfig.getInstance().deskNumber
+            //btnNum.text = DeskConfig.getInstance().deskNumber
 //            testCrash()
         }
     }
@@ -34,6 +34,8 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         btnSend.setOnClickListener {
             udpSocketClient?.sendBroadcast("{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}")
         }
+        btnNettyClient.setOnClickListener {  startActivityExt(NettyClientActivity::class.java)}
+        btnNettyServer.setOnClickListener {   startActivityExt(NettyServerActivity::class.java) }
     }
 
     private fun testCrash() {

@@ -66,15 +66,6 @@ android {
             dirs 'libs'
         }
     }
-    signingConfigs {
-        debug {
-
-        }
-
-        release {
-
-        }
-    }
 
     buildTypes {
         release {
@@ -152,4 +143,5 @@ dependencies {
     implementation 'me.jessyan:autosize:1.2.0'
 
     implementation 'com.github.pcyfox:DeskConfigManager:V1.0.0'
+    implementation 'com.google.android.material:material:1.4.+'
 }
