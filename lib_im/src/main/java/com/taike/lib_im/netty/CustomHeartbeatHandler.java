@@ -35,8 +35,8 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
         if (msg instanceof NettyProtocolBean) {
             NettyProtocolBean bean = (NettyProtocolBean) msg;
             MessageType type = bean.getType();
-            if (BuildConfig.DEBUG)
-                Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
+//            if (BuildConfig.DEBUG)
+//                Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
             switch (type) {
                 case PING_MSG:
                     sendPongMsg(ctx);
