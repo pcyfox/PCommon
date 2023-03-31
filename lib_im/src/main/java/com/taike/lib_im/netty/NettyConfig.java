@@ -4,7 +4,7 @@ final public class NettyConfig {
     private NettyConfig() {
     }
 
-    public static int CLIENT_IDLE_TIME_SECONDS = 3;
+    public static int CLIENT_IDLE_TIME_SECONDS = 6;
     public static int SERVER_IDLE_TIME_SECONDS = CLIENT_IDLE_TIME_SECONDS * 2;
 
     public static final int MAX_FRAME_LENGTH = 1024 * 1024;  //最大长度
