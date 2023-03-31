@@ -1,21 +1,22 @@
 package com.pcommon.test
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import com.pcommon.lib_common.base.BaseActivity
+import com.pcommon.test.databinding.ActivityNettyClientBinding
 import com.taike.lib_im.netty.client.NettyTcpClient
 import com.taike.lib_im.netty.client.listener.NettyClientListener
 import com.taike.lib_im.netty.client.status.ConnectState
 import kotlinx.android.synthetic.main.activity_netty_client.*
-import kotlin.math.log
 
-class NettyClientActivity : AppCompatActivity() {
+class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_client) :
+    BaseActivity<ActivityNettyClientBinding, TestViewModel>(TestViewModel::class.java) {
+
     private val TAG = "NettyClientActivity"
     private lateinit var client: NettyTcpClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_netty_client)
         client =
             NettyTcpClient.Builder().setHost("192.168.1.24").setTcpPort(9527).setListener(object :
                 NettyClientListener<String> {

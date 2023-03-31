@@ -15,12 +15,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.elvishew.xlog.XLog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.pcommon.lib_common.R
-import com.pcommon.lib_common.base.BaseActivity.Click.SPACE_TIME
-import com.pcommon.lib_common.base.BaseActivity.Click.hash
-import com.pcommon.lib_common.base.BaseActivity.Click.lastClickTime
 import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.toast
 import com.pcommon.lib_common.receiver.NetWorkChangEvent
+import com.pcommon.lib_common.receiver.NetWorkChangReceiver
 import com.pcommon.lib_common.utils.MaskProgressDialog
 import com.pcommon.lib_utils.CloseBarUtil
 import com.pcommon.lib_utils.EventDetector
@@ -43,7 +41,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     var viewDataBinding: VDB? = null
         private set
-
 
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
     private val eventDetector by lazy { EventDetector(3, 1800) }
@@ -118,7 +115,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     private fun fullScreen() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        //全屏
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -206,12 +202,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-    fun startTimeOutTimer(time: Long) {
-        postDelayed(time) {
-            onTimeOut(time)
-        }
-    }
-
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         onCreateOver()
@@ -233,6 +223,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
             listener = null
             progressDialog?.dismiss()
         }
+        NetWorkChangReceiver.Helper.getInstance().unregister()
     }
 
 
@@ -269,6 +260,14 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
+    open fun beforeDoubleClickToFinish() {}
+    open fun initListener() {}
+    open fun initView() {}
+    open fun initData() {}
+    open fun request() {}
+    open fun onResumeOver() {}
+    open fun onProgressClosed() {}
+
     fun registerOnKeyDownListener(vararg listener: OnKeyDownListener) {
         if (onKeyDownListeners == null) {
             onKeyDownListeners = ArrayList()
@@ -280,15 +279,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         return false
     }
 
-    open fun beforeDoubleClickToFinish() {}
-
-
-    open fun initData() {
-
-    }
-
-    open fun request() {
-
+    open fun onCreateOver() {
+        if (isShowNetWorkChangNotice) {
+            NetWorkChangReceiver.Helper.getInstance().register(this)
+        }
     }
 
     open fun observeData() {
@@ -301,22 +295,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
     }
 
-    open fun initListener() {
-
-    }
-
-    open fun onTimeOut(time: Long) {}
-
-
-    open fun initView() {}
-
-    open fun onCreateOver() {
-    }
-
-    open fun onResumeOver() {
-    }
-
-    open fun onProgressClosed() {}
 
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     protected fun hideNavigationBar() {
@@ -332,29 +310,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         CloseBarUtil.hideBottomUIMenu(window);
     }
 
-
-    object Click {
-        var hash: Int = 0
-        var lastClickTime: Long = 0
-        const val SPACE_TIME: Long = 900
-    }
-
-    infix fun safeClick(clickAction: () -> Unit): Boolean {
-        if (this.hashCode() != hash) {
-            hash = this.hashCode()
-            lastClickTime = System.currentTimeMillis()
-            clickAction()
-            return true
-        } else {
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastClickTime > SPACE_TIME) {
-                lastClickTime = System.currentTimeMillis()
-                clickAction()
-                return true
-            }
-        }
-        return false
-    }
 
     open fun getContext(): Context {
         return this
@@ -423,6 +378,5 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }
         return false
     }
-
 
 }

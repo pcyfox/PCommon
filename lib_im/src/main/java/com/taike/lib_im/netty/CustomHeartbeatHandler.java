@@ -13,7 +13,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
- * @author xiongyongshun
  * @version 1.0
  */
 public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler<NettyProtocolBean> {
@@ -37,20 +36,20 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
             NettyProtocolBean bean = (NettyProtocolBean) msg;
             MessageType type = bean.getType();
             if (BuildConfig.DEBUG)
-                Log.d(TAG, "channelRead0() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
+                Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
             switch (type) {
                 case PING_MSG:
                     sendPongMsg(ctx);
                     break;
                 case PONG_MSG:
                     if (BuildConfig.DEBUG)
-                        Log.d(TAG, "channelRead0():" + name + " get pong msg from " + ctx.channel().remoteAddress());
+                        Log.d(TAG, "channelRead():" + name + " get pong msg from " + ctx.channel().remoteAddress());
                     break;
                 case CUSTOM_MSG:
                     handleData(ctx, bean);
                     break;
                 default:
-                    Log.w(TAG, "channelRead0() called with:  unknown type = [" + type + "]");
+                    Log.w(TAG, "channelRead() called with:  unknown type = [" + type + "]");
             }
         }
     }

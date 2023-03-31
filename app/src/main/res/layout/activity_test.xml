@@ -27,6 +27,13 @@
             app:layout_constraintTop_toBottomOf="@id/ivCs">
 
             <Button
+                android:id="@+id/btnSHowProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="progress" />
+
+            <Button
+                android:layout_marginTop="20dp"
                 android:id="@+id/btnSend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:alpha="0.7"
-        android:background="@drawable/shape_solid_corners20_black"
+        android:background="@drawable/common_shape_solid_corners20_black"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingStart="20dp"
@@ -20,18 +20,18 @@
         android:paddingBottom="6dp">
 
         <ImageView
-            android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_no_avaliable_network" />
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/common_ic_no_avaliable_network" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="网络连接异常"
+            android:text="网络连接异常!"
             android:textColor="@color/common_activityBgColor"
-            android:textSize="18dp" />
+            android:textSize="14dp" />
     </LinearLayout>
 
 </RelativeLayout>

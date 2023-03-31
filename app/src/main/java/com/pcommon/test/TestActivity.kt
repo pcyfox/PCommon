@@ -15,6 +15,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     BaseActivity<ActivityTestBinding, TestViewModel>(TestViewModel::class.java) {
     private val TAG = "TestActivity"
     private var udpSocketClient: UDPSocketClient? = null
+    override var isShowNetWorkChangNotice: Boolean = true
 
     override fun initData() {
         super.initData()
@@ -34,8 +35,9 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         btnSend.setOnClickListener {
             udpSocketClient?.sendBroadcast("{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}")
         }
-        btnNettyClient.setOnClickListener {  startActivityExt(NettyClientActivity::class.java)}
-        btnNettyServer.setOnClickListener {   startActivityExt(NettyServerActivity::class.java) }
+        btnNettyClient.setOnClickListener { startActivityExt(NettyClientActivity::class.java) }
+        btnNettyServer.setOnClickListener { startActivityExt(NettyServerActivity::class.java) }
+        btnSHowProgress.setOnClickListener { showProgress("x系统正在启动中！",true) }
     }
 
     private fun testCrash() {

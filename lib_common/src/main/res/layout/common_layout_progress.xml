@@ -10,33 +10,23 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:background="@drawable/common_rectangle_corners_14_color_white"
+            android:minWidth="100dp"
+            android:minHeight="100dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-            android:minWidth="90dp"
-            android:minHeight="90dp"
-            android:padding="6dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/teach_close_progress"
-                android:layout_width="24dp"
-                android:paddingStart="10dp"
-                android:paddingBottom="10dp"
-                android:layout_height="24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/common_ic_pop_close" />
 
 
             <com.wang.avi.AVLoadingIndicatorView
                 android:id="@+id/avi_loading"
                 style="@style/AVLoadingIndicatorView"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:button="@null"
                 app:indicatorColor="@color/common_colorPrimaryDark"
                 app:indicatorName="BallSpinFadeLoaderIndicator"
@@ -45,21 +35,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/teach_close_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/common_ic_close_red" />
+
             <TextView
-                tools:visibility="visible"
-                android:visibility="gone"
                 android:id="@+id/tv_dialog_tips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:padding="4dp"
+                android:paddingHorizontal="12dp"
                 android:textColor="@color/common_textColorPrimary"
                 android:textSize="@dimen/common_sub_content_text"
-                app:layout_constraintEnd_toEndOf="@+id/avi_loading"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/avi_loading"
                 app:layout_constraintStart_toStartOf="@+id/avi_loading"
                 app:layout_constraintTop_toBottomOf="@+id/avi_loading"
-                tools:text="78%" />
+                tools:text="78%"
+                tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -23,27 +23,25 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            System.out.println("-----------网络状态发生变化----------");
+            Log.i(TAG, "-----------网络状态发生变化----------");
             NetworkInfo info = connectivityManager.getActiveNetworkInfo();
             if (info != null) {
-                Log.d(TAG, "onReceive() called with: info =" + info.toString());
+                int d = Log.d(TAG, "onReceive() called with: info =" + info.toString());
             }
             if (info != null && info.isAvailable()) {
                 isNetWorkConnect = true;
                 event = new NetWorkChangEvent(true, getType(info));
                 sendEvent(event);
                 Helper.getInstance().setConnectionType(info.getType());
-                System.out.println(TAG + "NetworkInfo State: 网络已连接,type:" + Helper.getConnectionType(info.getType()));
+                Log.i(TAG, "NetworkInfo State: 网络已连接,type:" + Helper.getConnectionTypeName(info.getType()));
             } else {
                 isNetWorkConnect = false;
                 event = new NetWorkChangEvent(false, getType(info));
                 sendEvent(event);
                 Helper.getInstance().setConnectionType(-1);
-                System.out.println(TAG + "NetworkInfo State: 网络已断开");
+                Log.i(TAG, "NetworkInfo: 网络已断开!");
             }
-
         }
-
     }
 
 
@@ -80,8 +78,8 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
         }
 
         private static Helper helper;
-
         private boolean isWifiConnect;
+        private Context context;
 
         public static Helper getInstance() {
             if (helper == null) {
@@ -97,8 +95,7 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
         /**
          * 获取连接类型
          */
-        public static String getConnectionType(int type) {
-
+        public static String getConnectionTypeName(int type) {
             Log.d(TAG, "getConnectionType() called with: type = [" + type + "]");
             String connType = "其它";
             switch (type) {
@@ -116,11 +113,7 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
         public void setConnectionType(int type) {
             if (type == ConnectivityManager.TYPE_MOBILE) {
                 isWifiConnect = false;
-            } else if (type == ConnectivityManager.TYPE_WIFI) {
-                isWifiConnect = true;
-            } else {
-                isWifiConnect = false;
-            }
+            } else isWifiConnect = type == ConnectivityManager.TYPE_WIFI;
         }
 
         public boolean isWifiConnect() {
@@ -131,9 +124,12 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
             return netWorkChangReceiver != null && netWorkChangReceiver.getEvent().isAvailable();
         }
 
+
         public void register(Context context) {
-            if (isRegistered || context == null) return;
+            if (context == null) return;
             context = context.getApplicationContext();
+            if (isRegistered || context == this.context) return;
+            this.context = context;
             if (netWorkChangReceiver == null) {
                 netWorkChangReceiver = new NetWorkChangReceiver();
             }
@@ -147,9 +143,19 @@ public class NetWorkChangReceiver extends BroadcastReceiver {
 
         public void unregister(Context context) {
             if (!isRegistered || context == null) return;
-            context.unregisterReceiver(netWorkChangReceiver);
+            try {
+                context = context.getApplicationContext();
+                context.unregisterReceiver(netWorkChangReceiver);
+            } catch (Exception e) {
+                Log.d(TAG, "unregister() called with: context = [" + context.getClass().getSimpleName() + "],e=" + e.getMessage());
+            }
             isRegistered = false;
         }
+
+        public void unregister() {
+            if (context != null) unregister(context);
+        }
+
     }
 
 

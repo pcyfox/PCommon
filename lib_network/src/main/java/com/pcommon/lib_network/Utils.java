@@ -43,8 +43,8 @@ final public class Utils {
         FileChannel output = null;
 
         try {
-            input = new FileInputStream(new File(source)).getChannel();
-            output = new FileOutputStream(new File(dest)).getChannel();
+            input = new FileInputStream(source).getChannel();
+            output = new FileOutputStream(dest).getChannel();
             output.transferFrom(input, 0, input.size());
         } catch (Exception e) {
             Log.w(TAG + "copyNio", "error occur while copy", e);
