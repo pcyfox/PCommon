@@ -45,8 +45,9 @@ public class NettyTcpClient {
     private final String host;
     private final int tcpPort;
     private final String mIndex;
-
     private int reConnectTimes = 0;
+
+    private boolean isNeedSendPong = false;
 
     /**
      * 最大重连次数
@@ -114,6 +115,10 @@ public class NettyTcpClient {
         isAutoReconnecting = autoReconnecting;
     }
 
+    public void setNeedSendPong(boolean needSendPong) {
+        isNeedSendPong = needSendPong;
+    }
+
     private NettyClientListener<String> listener;
 
 
@@ -152,7 +157,7 @@ public class NettyTcpClient {
                             pipeline.addLast(new ProtocolDecoder(maxFrameLength));
                             if (isSendHeartBeat) {
                                 pipeline.addLast("ping", new IdleStateHandler(heartBeatInterval, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS));//3s未发送数据，回调userEventTriggered
-                                pipeline.addLast(new NettyClientHandler(mIndex, heartBeatData, new NettyClientListener<>() {
+                                pipeline.addLast(new NettyClientHandler(mIndex, heartBeatData, isNeedSendPong, new NettyClientListener<>() {
                                     @Override
                                     public void onMessageResponseClient(String msg, String index) {
                                         if (listener != null)
@@ -289,6 +294,7 @@ public class NettyTcpClient {
     public static class Builder {
 
 
+        private boolean isNeedSendPong = false;
         /**
          * 最大重连次数
          */
@@ -332,6 +338,16 @@ public class NettyTcpClient {
         private NettyClientListener<String> listener;
 
         public Builder() {
+        }
+
+        public Builder setNeedSendPong(boolean needSendPong) {
+            isNeedSendPong = needSendPong;
+            return this;
+        }
+
+        public Builder setMaxConnectTimes(int maxConnectTimes) {
+            this.maxConnectTimes = maxConnectTimes;
+            return this;
         }
 
         public Builder setAutoReconnecting(boolean autoReconnecting) {
@@ -401,6 +417,7 @@ public class NettyTcpClient {
             nettyTcpClient.maxConnectTimes = this.maxConnectTimes;
             nettyTcpClient.isAutoReconnecting = this.isAutoReconnecting;
             nettyTcpClient.listener = this.listener;
+            nettyTcpClient.isNeedSendPong = this.isNeedSendPong;
             return nettyTcpClient;
         }
     }

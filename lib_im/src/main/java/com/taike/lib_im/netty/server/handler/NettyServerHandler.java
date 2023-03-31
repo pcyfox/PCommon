@@ -14,8 +14,8 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
     private static final String TAG = "EchoServerHandler";
     private final NettyServerListener<String> listener;
 
-    public NettyServerHandler(NettyServerListener<String> listener) {
-        super("server");
+    public NettyServerHandler(NettyServerListener<String> listener, boolean isNeedSendPong) {
+        super("server", isNeedSendPong);
         this.listener = listener;
     }
 
@@ -51,4 +51,5 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
     public void channelInactive(ChannelHandlerContext ctx) {
         if (listener != null) listener.onChannelDisConnect(ctx.channel());
     }
+
 }

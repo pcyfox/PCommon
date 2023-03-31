@@ -19,8 +19,8 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
     private int count = 0;
 
 
-    public NettyClientHandler(String index, String heartBeatData, NettyClientListener<String> listener) {
-        super(index);
+    public NettyClientHandler(String index, String heartBeatData, boolean isNeedSendPong , NettyClientListener<String> listener) {
+        super(index, isNeedSendPong);
         this.listener = listener;
         this.index = index;
         this.heartBeatData = heartBeatData;

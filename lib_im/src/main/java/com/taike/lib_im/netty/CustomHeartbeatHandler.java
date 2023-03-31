@@ -19,14 +19,15 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
     private static final String TAG = "CustomHeartbeatHandler";
     protected String name;
     private int heartbeatCount = 0;
+    private boolean isNeedSendPong = true;
 
-    public CustomHeartbeatHandler(String name) {
+    public CustomHeartbeatHandler(String name, boolean isNeedSendPong) {
         this.name = name;
+        this.isNeedSendPong = isNeedSendPong;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyProtocolBean nettyProtocolBean) throws Exception {
-        Log.d(TAG, "channelRead0() called with: channelHandlerContext = [" + channelHandlerContext + "], nettyProtocolBean = [" + nettyProtocolBean + "]");
     }
 
     @Override
@@ -35,11 +36,11 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
         if (msg instanceof NettyProtocolBean) {
             NettyProtocolBean bean = (NettyProtocolBean) msg;
             MessageType type = bean.getType();
-//            if (BuildConfig.DEBUG)
-//                Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
             switch (type) {
                 case PING_MSG:
-                    sendPongMsg(ctx);
+                    if (isNeedSendPong) sendPongMsg(ctx);
                     break;
                 case PONG_MSG:
                     if (BuildConfig.DEBUG)

@@ -90,7 +90,8 @@ public class UDPSocketClient {
         isThreadRunning = false;
         if (datagramSocket != null) {
             //datagramSocket.disconnect();
-            datagramSocket.close();
+            if (!datagramSocket.isClosed())
+                datagramSocket.close();
             XLog.d(TAG + ";stopUDPSocket() called socket closed");
             datagramSocket = null;
         }
