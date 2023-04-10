@@ -1,6 +1,7 @@
 package com.pcommon.lib_common.base
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.view.*
@@ -19,6 +20,7 @@ import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.toast
 import com.pcommon.lib_common.receiver.NetWorkChangEvent
 import com.pcommon.lib_common.receiver.NetWorkChangReceiver
+import com.pcommon.lib_common.utils.DisplayUtil
 import com.pcommon.lib_common.utils.MaskProgressDialog
 import com.pcommon.lib_utils.CloseBarUtil
 import com.pcommon.lib_utils.EventDetector
@@ -56,6 +58,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open var isClickBack = true
     open var isHideKeyboardWhenTouchOutside = true
     open var progressDialogLayoutId = -1
+    private var fontScale = 1f
 
     open fun createViewModel(): VM {
         return BaseViewModel(application) as VM
@@ -63,6 +66,20 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     private fun createViewModel(clazz: Class<VM>): VM {
         return getViewModel(clazz)
+    }
+
+    override fun getResources(): Resources {
+        val resources = super.getResources()
+        return DisplayUtil.getResources(this, resources, fontScale)
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(DisplayUtil.attachBaseContext(newBase, fontScale))
+    }
+
+    open fun setFontScale(fontScale: Float) {
+        this.fontScale = fontScale
+        DisplayUtil.recreate(this)
     }
 
 
@@ -97,8 +114,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         }.apply {
             lifecycle.addObserver(this)
         }
-
-
     }
 
 

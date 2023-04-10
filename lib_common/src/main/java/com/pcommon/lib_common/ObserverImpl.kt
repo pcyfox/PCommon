@@ -1,15 +1,11 @@
 package com.pcommon.lib_common
 
 
-import android.accounts.NetworkErrorException
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import com.blankj.utilcode.util.GsonUtils
 import com.elvishew.xlog.XLog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.pcommon.lib_network.entity.BaseRespEntity
-import com.pcommon.lib_utils.Util
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import retrofit2.HttpException
@@ -24,16 +20,10 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
 
     override fun onNext(t: T) {
         liveData?.postValue(t)
-
     }
 
     override fun onError(e: Throwable) {
-        //  e.printStackTrace()
-        XLog.e(
-            "ObserverImpl onError() called:" + genName() + "\n Exception:" + Util.getExceptionContent(
-                e
-            )
-        )
+        XLog.e(TAG + ",onError(),Exception:\n " + e.message)
         if (checkAuth(e)) {
             liveData?.postValue(buildErrorData(e, clazz))
         }
@@ -42,10 +32,6 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
     override fun onComplete() {}
 
     override fun onSubscribe(d: Disposable) {}
-
-    private fun genName(): String {
-        return javaClass.name + hashCode()
-    }
 
 
     private fun checkAuth(e: Throwable): Boolean {
@@ -63,7 +49,6 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
         var cont = 0
         const val AUTHORIZATION_EXPIRED = "AUTHORIZATION_EXPIRED"
 
-        @RequiresApi(Build.VERSION_CODES.ECLAIR)
         private fun <T> buildErrorData(e: Throwable, clazz: Class<T>): T {
             var code = -200
             val tip = when (e) {
@@ -91,7 +76,7 @@ open class ObserverImpl<T>(data: MutableLiveData<T>, private var clazz: Class<T>
             val baseEntity = BaseRespEntity<T>()
             baseEntity.message = tip
             baseEntity.resultCode = code
-            return GsonUtils.fromJson<T>(GsonUtils.toJson(baseEntity), clazz)
+            return GsonUtils.fromJson(GsonUtils.toJson(baseEntity), clazz)
         }
     }
 

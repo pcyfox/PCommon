@@ -8,6 +8,15 @@
         android:layout_height="match_parent"
         tools:context="com.pcommon.test.TestActivity">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Test"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <com.pcommon.lib_vidget.widget.CustomSourceImageView
             android:id="@+id/ivCs"
@@ -18,51 +27,60 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivCs">
+            app:layout_constraintTop_toBottomOf="@+id/ivCs">
 
-            <Button
-                android:id="@+id/btnSHowProgress"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="progress" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingBottom="20dp">
 
-            <Button
-                android:layout_marginTop="20dp"
-                android:id="@+id/btnSend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="send" />
+                <Button
+                    android:id="@+id/btnSHowProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="progress" />
+
+                <Button
+                    android:id="@+id/btnSend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="send" />
 
 
-            <Button
-                android:id="@+id/btnNum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="send" />
+                <Button
+                    android:id="@+id/btnNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="num" />
 
 
-            <Button
-                android:id="@+id/btnNettyClient"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Netty-Client" />
+                <Button
+                    android:id="@+id/btnNettyClient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Netty-Client" />
 
-            <Button
-                android:id="@+id/btnNettyServer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Netty-Server" />
+                <Button
+                    android:id="@+id/btnNettyServer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Netty-Server" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        </androidx.core.widget.NestedScrollView>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

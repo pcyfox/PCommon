@@ -79,7 +79,7 @@ public class Util {
     }
 
     public static String getExceptionContent(Throwable e) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(e.toString());
         StackTraceElement[] stackArray = e.getStackTrace();
         for (StackTraceElement element : stackArray) {

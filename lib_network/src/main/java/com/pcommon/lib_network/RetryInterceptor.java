@@ -24,17 +24,14 @@ public class RetryInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         Response response = doRequest(chain, request);
-        if (maxRetry <= 1) {
-            return response;
-        }
+        if (maxRetry <= 1) return response;
         int tryCount = 1;
         while (response == null && tryCount <= maxRetry) {
             tryCount++;
-            Log.d(TAG, "http重试次数:" + tryCount + ",url:" + chain.request().url());
+            Log.w(TAG, "http重试次数:" + tryCount + ",url:" + chain.request().url());
             try {
                 Thread.sleep(200L * tryCount);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
             }
             response = doRequest(chain, request);
         }
@@ -50,9 +47,8 @@ public class RetryInterceptor implements Interceptor {
         try {
             response = chain.proceed(request);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "doRequest() called fail,exception:" + e.getMessage());
         }
         return response;
     }
-
 }

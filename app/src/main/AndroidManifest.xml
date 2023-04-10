@@ -26,6 +26,11 @@
         android:theme="@style/CommonAppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
+
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="540" />
+
         <activity
             android:name=".NettyServerActivity"
             android:exported="false">
@@ -41,9 +46,6 @@
                 android:value="" />
         </activity> <!-- 屏幕适配配置参数 -->
 
-        <meta-data
-            android:name="design_width_in_dp"
-            android:value="1920" />
 
         <activity android:name=".TestActivity">
             <intent-filter>
