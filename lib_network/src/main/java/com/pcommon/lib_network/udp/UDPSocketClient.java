@@ -6,13 +6,11 @@ import android.util.Log;
 import androidx.annotation.Keep;
 
 import com.elvishew.xlog.XLog;
-import com.pcommon.lib_network.ThreadTool;
 import com.pcommon.lib_network.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
@@ -207,10 +205,10 @@ public class UDPSocketClient {
                 // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。
                 if (receivePacket != null) {
                     receivePacket.setLength(BUFFER_LENGTH);
-                    XLog.d(TAG + ",接收到广播数据:\n form:" + host + ":" + receivePacket.getPort() + "\n content:\n" + strReceive);
+                    //XLog.d(TAG + ",接收到广播数据:\n form:" + host + ":" + receivePacket.getPort() + "\n content:\n" + strReceive);
                 }
             } catch (Exception e) {
-                XLog.i(TAG + ",receiveMessage() error:" + e.getMessage());
+                XLog.e(TAG + ",receiveMessage() error:" + e.getMessage());
                 e.printStackTrace();
             }
         }

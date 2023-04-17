@@ -107,7 +107,6 @@ android {
                     if (desFilePath.exists()) {
                         desFilePath.deleteDir()
                     }
-
                     File out = new File("${rootDir}/app/build/outputs")
                     copy {
                         from out

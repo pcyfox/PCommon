@@ -97,8 +97,8 @@ public class Util {
                 .getClassName();
     }
 
-    private static SimpleDateFormat DateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static SimpleDateFormat DateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat DateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public static <T> T checkNull(T object, String msg) {
