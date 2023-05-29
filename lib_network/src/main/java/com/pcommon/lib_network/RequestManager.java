@@ -74,7 +74,7 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
 
-        loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token","authorization");
+        loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token", "authorization");
 
         clearInterceptor();
         addInterceptor(new RetryInterceptor(retryTime), loggingInterceptor, headerInterceptor);
@@ -142,8 +142,7 @@ public class RequestManager extends AbsRequest {
                 e.printStackTrace();
             }
         }
-    }
-            , (url, log) -> log);
+    }, (url, log) -> log);
 
     private boolean checkForUpload(String url) {
         String matchUrl = null;
