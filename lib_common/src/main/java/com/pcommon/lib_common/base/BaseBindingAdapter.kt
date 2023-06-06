@@ -39,6 +39,8 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
     @SuppressLint("NotifyDataSetChanged")
     fun addAll(c: Collection<M>, isClear: Boolean = true) {
         if (c.isEmpty()) {
+            list.clear()
+            if (isAutoNotifyChange) notifyDataSetChanged()
             return
         }
         if (isClear) list.clear()
@@ -47,7 +49,6 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
             notifyDataSetChanged()
         } else {
             val start = list.size - c.size - 1
-
             if (isAutoNotifyChange) notifyItemRangeChanged(if (start < 0) 0 else start, c.size)
         }
     }

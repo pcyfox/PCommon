@@ -180,12 +180,12 @@ public class NettyTcpClient {
                     isConnecting = false;
                     if (channelFuture1.isSuccess()) {
                         isConnect = true;
-                        XLog.i(TAG + ",connectServer():连接成功!");
+                        XLog.i(TAG + ",connectServer():连接成功! ip:" + host + ",port:" + tcpPort);
                         channel = channelFuture1.channel();
                         if (listener != null)
                             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_SUCCESS, mIndex);
                     } else {
-                        XLog.w(TAG + ",connectServer():连接失败!");
+                        XLog.w(TAG + ",connectServer():连接失败! ip:" + host + ",port:" + tcpPort);
                         isConnect = false;
                         if (listener != null)
                             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, mIndex);
