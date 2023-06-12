@@ -122,21 +122,6 @@ public class NettyTcpClient {
     private NettyClientListener<String> listener;
 
 
-    public void connect() {
-        if (isConnect) {
-            return;
-        }
-        Thread clientThread = new Thread("client-Netty") {
-            @Override
-            public void run() {
-                super.run();
-                connectServer();
-            }
-        };
-        clientThread.start();
-    }
-
-
     private void connectServer() {
         synchronized (NettyTcpClient.this) {
             if (isConnect) {
@@ -179,6 +164,7 @@ public class NettyTcpClient {
                 channelFuture = bootstrap.connect(host, tcpPort).addListener((ChannelFutureListener) channelFuture1 -> {
                     isConnecting = false;
                     if (channelFuture1.isSuccess()) {
+                        reConnectTimes = 0;
                         isConnect = true;
                         XLog.i(TAG + ",connectServer():连接成功! ip:" + host + ",port:" + tcpPort);
                         channel = channelFuture1.channel();
@@ -216,20 +202,38 @@ public class NettyTcpClient {
         }
     }
 
+    public void connect() {
+        if (isConnect) {
+            return;
+        }
+        Thread clientThread = new Thread("client-Netty") {
+            @Override
+            public void run() {
+                super.run();
+                reConnectTimes = 0;
+                connectServer();
+            }
+        };
+        clientThread.start();
+    }
+
 
     public void disconnect() {
         XLog.w(TAG, "disconnect() called!");
         isConnect = false;
+        reConnectTimes = Integer.MAX_VALUE;
         group.shutdownGracefully();
     }
 
     public void reconnect() {
-        if (isConnecting || reConnectTimes >= maxConnectTimes || isConnect) {
-            return;
+        synchronized (NettyTcpClient.this) {
+            if (isConnecting || reConnectTimes >= maxConnectTimes || isConnect) {
+                return;
+            }
+            reConnectTimes++;
+            XLog.w(TAG + ":reconnect(),重新连接,第%d次", reConnectTimes);
+            connectServer();
         }
-        reConnectTimes++;
-        XLog.w(TAG + ":reconnect(),重新连接,第%d次", reConnectTimes);
-        connectServer();
     }
 
 
@@ -292,7 +296,6 @@ public class NettyTcpClient {
      * 构建者，创建NettyTcpClient
      */
     public static class Builder {
-
 
         private boolean isNeedSendPong = false;
         /**
