@@ -27,6 +27,10 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
 
+        <activity
+            android:name=".TestWhiteBoardActivity"
+            android:exported="false" />
+
         <meta-data
             android:name="design_width_in_dp"
             android:value="540" />
@@ -45,8 +49,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity> <!-- 屏幕适配配置参数 -->
-
-
         <activity android:name=".TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

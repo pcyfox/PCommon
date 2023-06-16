@@ -251,6 +251,7 @@ public class DrawMarkView extends View {
             mCanvas = canvas;
         }
     }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -349,21 +350,18 @@ public class DrawMarkView extends View {
     public void saveTest() {
         final String filepath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "aaa" + ".jpg";
         final Bitmap bitmap = getBitmapFromView();
-        if (bitmap != null) {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        saveToLocal(bitmap, filepath);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-            thread.start();
-        } else {
+        if (bitmap == null) {
+            return;
         }
+        Thread thread = new Thread(() -> {
+            try {
+                saveToLocal(bitmap, filepath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+        thread.start();
     }
 
     @WorkerThread
@@ -429,15 +427,7 @@ public class DrawMarkView extends View {
     }
 
     public void deleteMarkView() {
-       /* if (selectMarkInfo != null) {
-            list.remove(selectMarkInfo);
-            selectMarkInfo = null;
-            postInvalidate();
-        } else {
-
-        }*/
         cancelStep();
-
     }
 
     public void restartMarkView() {
@@ -478,43 +468,6 @@ public class DrawMarkView extends View {
 
     public void setOnMarkInfoCallback(OnMarkInfoCallback callback) {
         this.callback = callback;
-    }
-
-
-    public void loadImage(String url, boolean isLocal) {
-        this.isLocal = isLocal;
-     /*   BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 2;*/
-        Bitmap bm = BitmapFactory.decodeFile(url);
-        mBitmap = bm;
-        invalidate();
-
-    /*    Glide.with(getContext())
-                .asBitmap()
-                .load(url)
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                        //Drawable drawable = new BitmapDrawable(resource);
-                        mBitmap = resource;
-                        ViewGroup mViewGroup = (ViewGroup) getParent();
-                        if (null != mViewGroup) {
-                            parentWidth = mViewGroup.getWidth();
-                            parentHight = mViewGroup.getHeight();
-
-                      *//*      ViewGroup.LayoutParams layoutParams = getLayoutParams();
-                            if (layoutParams != null) {
-                                layoutParams.height = mParentHeight;
-                                layoutParams.width = mParentHeight;
-                                setLayoutParams(layoutParams);
-                            }
-*//*
-                        }
-                        // setBackground(drawable);
-                        invalidate();
-                    }
-
-                });*/
     }
 
 }

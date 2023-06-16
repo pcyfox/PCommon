@@ -52,9 +52,9 @@ public class NettyTcpClient {
     /**
      * 最大重连次数
      */
-    private int maxConnectTimes = NettyConfig.MAX_CONNECT_TIMES;
+    private int maxConnectTimes = NettyConfig.MAX_RECONNECT_TIMES;
 
-    private long reconnectIntervalTime = NettyConfig.RE_CONNECT_INTERVAL_TIME;
+    private long reconnectIntervalTime = NettyConfig.RECONNECT_INTERVAL_TIME;
     private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
 
     /**
@@ -175,7 +175,14 @@ public class NettyTcpClient {
                         isConnect = false;
                         if (listener != null)
                             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, mIndex);
-                        if (isAutoReconnecting) reconnect();
+
+                        try {
+                            bootstrap.clone();
+                            Thread.sleep(reconnectIntervalTime);
+                            if (isAutoReconnecting) reconnect();
+                        } catch (Exception ex) {
+                            isConnect = false;
+                        }
                     }
                 }).sync();
                 // Wait until the connection is closed.
@@ -193,11 +200,12 @@ public class NettyTcpClient {
                 }
                 group.shutdownGracefully();
                 try {
+                    bootstrap.clone();
                     Thread.sleep(reconnectIntervalTime);
+                    if (isAutoReconnecting) reconnect();
                 } catch (Exception ex) {
                     isConnect = false;
                 }
-                if (isAutoReconnecting) reconnect();
             }
         }
     }
@@ -301,7 +309,7 @@ public class NettyTcpClient {
         /**
          * 最大重连次数
          */
-        private int maxConnectTimes = NettyConfig.MAX_CONNECT_TIMES;
+        private int maxConnectTimes = NettyConfig.MAX_RECONNECT_TIMES;
 
         /**
          * 重连间隔
