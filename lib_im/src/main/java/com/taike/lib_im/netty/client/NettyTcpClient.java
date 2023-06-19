@@ -13,6 +13,8 @@ import com.taike.lib_im.netty.client.listener.MessageStateListener;
 import com.taike.lib_im.netty.client.listener.NettyClientListener;
 import com.taike.lib_im.netty.client.status.ConnectState;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
@@ -49,6 +51,7 @@ public class NettyTcpClient {
 
     private boolean isNeedSendPong = false;
     private Bootstrap bootstrap;
+    private final ExecutorService threadPool;
     /**
      * 最大重连次数
      */
@@ -81,6 +84,7 @@ public class NettyTcpClient {
         this.host = host;
         this.tcpPort = tcp_port;
         this.mIndex = index;
+        threadPool = Executors.newSingleThreadExecutor();
     }
 
     public int getReConnectTimes() {
@@ -146,7 +150,7 @@ public class NettyTcpClient {
                                 @Override
                                 public void onClientStatusConnectChanged(ConnectState statusCode, String index) {
                                     isConnected = statusCode == ConnectState.STATUS_CONNECT_SUCCESS;
-                                    if (!isConnected && isAutoReconnecting) connect();
+                                    if (!isConnected && isAutoReconnecting) reconnect();
                                     if (listener != null)
                                         listener.onClientStatusConnectChanged(statusCode, index);
                                 }
@@ -180,12 +184,7 @@ public class NettyTcpClient {
                         if (listener != null)
                             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, mIndex);
 
-                        try {
-                            Thread.sleep(reconnectIntervalTime);
-                            if (isAutoReconnecting) reconnect();
-                        } catch (Exception ex) {
-                            isConnected = false;
-                        }
+                        if (isAutoReconnecting) connect();
                     }
                 }).sync();
                 // Wait until the connection is closed.
@@ -202,30 +201,21 @@ public class NettyTcpClient {
                     }
                 }
                 group.shutdownGracefully();
-                try {
-                    Thread.sleep(reconnectIntervalTime);
-                    if (isAutoReconnecting) reconnect();
-                } catch (Exception ex) {
-                    isConnected = false;
-                }
+                if (isAutoReconnecting) reconnect();
             }
         }
     }
 
     public void connect() {
+        Log.d(TAG, "connect() called");
         synchronized (NettyTcpClient.this) {
             if (isConnected || isConnecting) {
                 return;
             }
-            Thread clientThread = new Thread("client-Netty") {
-                @Override
-                public void run() {
-                    super.run();
-                    reConnectTimes = 0;
-                    connectServer();
-                }
-            };
-            clientThread.start();
+            threadPool.submit(() -> {
+                reConnectTimes = 0;
+                connectServer();
+            });
         }
     }
 
@@ -239,8 +229,13 @@ public class NettyTcpClient {
 
     public void reconnect() {
         synchronized (NettyTcpClient.this) {
-            if (isConnecting || reConnectTimes >= maxConnectTimes || isConnected) {
+            if (isConnected || isConnecting || reConnectTimes >= maxConnectTimes) {
                 return;
+            }
+            try {
+                Thread.sleep(reconnectIntervalTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             reConnectTimes++;
             XLog.w(TAG + ":reconnect(),重新连接,第%d次", reConnectTimes);
