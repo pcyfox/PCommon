@@ -7,7 +7,6 @@ import android.util.Log;
 import com.elvishew.xlog.XLog;
 import com.pcommon.lib_network.log.Filter;
 import com.pcommon.lib_network.log.HeaderInterceptor;
-import com.pcommon.lib_network.log.HttpLogger;
 import com.pcommon.lib_network.log.LogFilter;
 import com.pcommon.lib_network.log.MyHttpLoggingInterceptor;
 
@@ -35,19 +34,13 @@ public class RequestManager extends AbsRequest {
         if (timeOuts == null || timeOuts.length < 4) {
             throw new IllegalArgumentException("time out params error");
         }
-        return new OkHttpClient().newBuilder()
-                .retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
-                .dns(new OkHttpDns(timeOuts[0]))
-                .connectTimeout(timeOuts[1], TimeUnit.SECONDS)
-                .readTimeout(timeOuts[2], TimeUnit.SECONDS)
-                .writeTimeout(timeOuts[3], TimeUnit.SECONDS);
+        return new OkHttpClient().newBuilder().retryOnConnectionFailure(false)//默认重试一次，若需要重试N次，则要实现拦截器。
+                .dns(new OkHttpDns(timeOuts[0])).connectTimeout(timeOuts[1], TimeUnit.SECONDS).readTimeout(timeOuts[2], TimeUnit.SECONDS).writeTimeout(timeOuts[3], TimeUnit.SECONDS);
     }
 
     @Override
     public Retrofit.Builder createRetrofitBuilder() {
-        return new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
+        return new Retrofit.Builder().baseUrl(baseUrl).addCallAdapterFactory(RxJava2CallAdapterFactory.create());
     }
 
     public static RequestManager get() {
@@ -73,14 +66,46 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.setAppVersionName(appVersionName);
         headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
-
         loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token", "authorization");
+        iniRetrofit(baseUrl, retryTime, timeOuts, headerInterceptor, loggingInterceptor);
+    }
 
+    public void iniRetrofit(String baseUrl, int retryTime) {
+        iniRetrofit(baseUrl, retryTime, null);
+    }
+
+    public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts) {
+        iniRetrofit(baseUrl, retryTime, timeOuts, null, null);
+    }
+
+    public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts, HeaderInterceptor headerInterceptor, MyHttpLoggingInterceptor loggingInterceptor) {
+        Log.d(TAG, "iniRetrofit() called with: baseUrl = [" + baseUrl + "], retryTime = [" + retryTime + "], timeOuts = [" + timeOuts + "], headerInterceptor = [" + headerInterceptor + "], loggingInterceptor = [" + loggingInterceptor + "]");
+        if (TextUtils.isEmpty(baseUrl)) {
+            Log.e(TAG, "iniRetrofit() called fail!,with: baseUrl = [" + baseUrl + "]");
+            return;
+        }
+        this.baseUrl = baseUrl;
+        if (null != timeOuts) {
+            this.timeOuts = timeOuts;
+        }
+        retrofit = null;
         clearInterceptor();
-        addInterceptor(new RetryInterceptor(retryTime), loggingInterceptor, headerInterceptor);
+        if (retryTime > 0) addInterceptor(new RetryInterceptor(retryTime));
+
+        if (null != headerInterceptor) {
+            this.headerInterceptor = headerInterceptor;
+            addInterceptor(headerInterceptor);
+        }
+        if (null != loggingInterceptor) addInterceptor(loggingInterceptor);
+
         cleaConverterFactories();
         addConverterFactory(GsonConverterFactory.create());
         buildHttpClient();
+    }
+
+
+    public boolean isInitOver() {
+        return !TextUtils.isEmpty(baseUrl) && null != retrofit;
     }
 
     public void setAuthorization(String authorization) {
