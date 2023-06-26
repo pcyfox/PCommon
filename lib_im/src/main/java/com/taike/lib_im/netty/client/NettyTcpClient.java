@@ -126,7 +126,7 @@ public class NettyTcpClient {
     private NettyClientListener<String> listener;
 
     private void buildBootstrap() {
-        if (bootstrap != null) return;
+        if (bootstrap != null && group != null) return;
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap().group(group).option(ChannelOption.TCP_NODELAY, true)//屏蔽Nagle算法
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
@@ -224,7 +224,9 @@ public class NettyTcpClient {
         XLog.w(TAG, "disconnect() called!");
         isConnected = false;
         reConnectTimes = Integer.MAX_VALUE;
-        group.shutdownGracefully();
+        if (group != null) {
+            group.shutdownGracefully();
+        }
     }
 
     public void reconnect() {
