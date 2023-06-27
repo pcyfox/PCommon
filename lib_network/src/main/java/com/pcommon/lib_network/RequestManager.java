@@ -148,9 +148,7 @@ public class RequestManager extends AbsRequest {
 
 
     public void setHttpLoggingInterceptor(LogFilter filter) {
-        if (loggingInterceptor != null) {
-            loggingInterceptor.setFilter(filter);
-        }
+        loggingInterceptor.setFilter(filter);
     }
 
     //日志过滤处理

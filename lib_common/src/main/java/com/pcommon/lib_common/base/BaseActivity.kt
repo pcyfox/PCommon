@@ -45,12 +45,13 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     var viewDataBinding: VDB? = null
         private set
 
+    protected abstract val layoutId: Int
+
     private var onKeyDownListeners: ArrayList<OnKeyDownListener>? = null
     private val eventDetector by lazy { EventDetector(3, 1800) }
-    private var isBeenHiddenProgress = false
+    private var isNeedHiddenProgress = false
     private var progressDialog: MaskProgressDialog? = null
 
-    protected abstract val layoutId: Int
 
     open var isShowNetWorkChangNotice = true
     open var isDoubleClickExit = false
@@ -59,7 +60,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     open var isClickBack = true
     open var isHideKeyboardWhenTouchOutside = true
     open var progressDialogLayoutId = -1
+
     private var fontScale = 1f
+    private var showProgressDelay = 0L
 
     open fun createViewModel(): VM {
         return BaseViewModel(application) as VM
@@ -126,7 +129,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.HONEYCOMB)
     private fun fullScreen() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -141,7 +143,7 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     @Deprecated("use dismissProgress() instead")
     open fun hideProgress(delay: Long) {
         postDelayed(delay) {
-            isBeenHiddenProgress = true
+            isNeedHiddenProgress = true
             hideProgress()
         }
     }
@@ -149,18 +151,6 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     @Deprecated("use dismissProgress() instead", ReplaceWith("dismissProgress()"))
     fun hideProgress() {
         dismissProgress()
-    }
-
-    fun dismissProgress() {
-        isBeenHiddenProgress = true
-        progressDialog?.dismiss()
-    }
-
-    open fun dismissProgress(delay: Long) {
-        postDelayed(delay) {
-            isBeenHiddenProgress = true
-            dismissProgress()
-        }
     }
 
     fun isProgressCancelable(isCan: Boolean) {
@@ -174,6 +164,25 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         return false
     }
 
+    open fun dismissProgress() {
+        isNeedHiddenProgress = true
+        if (showProgressDelay > 0) {
+            postDelayed(showProgressDelay + 80) {
+                progressDialog?.dismiss()
+            }
+            showProgressDelay = 0
+            return
+        }
+        progressDialog?.dismiss()
+    }
+
+    open fun dismissProgress(delay: Long) {
+        postDelayed(delay) {
+            dismissProgress()
+        }
+    }
+
+
     open fun showProgress() {
         showProgress("", false)
     }
@@ -182,8 +191,9 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         if (delay < 0) {
             return
         }
+        showProgressDelay = delay
         postDelayed(delay) {
-            if (!isBeenHiddenProgress) {
+            if (!isNeedHiddenProgress) {
                 showProgress(tips, isCancelable)
             }
         }
@@ -202,18 +212,19 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
                     ct = this,
                     listener = object : MaskProgressDialog.DialogListener {
                         override fun onDismiss() {
-                            isBeenHiddenProgress = false
+                            isNeedHiddenProgress = false
                             onProgressClosed()
                         }
 
                         override fun onCancelClick() {
-                            isBeenHiddenProgress = false
+                            isNeedHiddenProgress = false
                             onProgressClosed()
                         }
                     })
         }
+        if (isNeedHiddenProgress) return
         progressDialog?.show(tips, isCancelable)
-        isBeenHiddenProgress = false
+        isNeedHiddenProgress = false
     }
 
 
@@ -236,8 +247,10 @@ abstract class BaseActivity<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
         onKeyDownListeners?.clear()
         progressDialog?.run {
             listener = null
-            progressDialog?.dismiss()
+            dismiss()
         }
+        progressDialog = null
+
         NetWorkChangReceiver.Helper.getInstance().unregister()
     }
 
