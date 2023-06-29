@@ -41,6 +41,7 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
             switch (type) {
                 case PING_MSG:
                     if (isNeedSendPong) sendPongMsg(ctx);
+                    ctx.flush();
                     break;
                 case PONG_MSG:
                     ctx.flush();

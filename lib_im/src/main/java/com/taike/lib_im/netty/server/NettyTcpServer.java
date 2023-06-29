@@ -93,7 +93,7 @@ public class NettyTcpServer {
                         ChannelPipeline pipeline = ch.pipeline();
                         //解析报文
                         pipeline.addLast(new ProtocolDecoder(maxFrameLength));
-                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 3L, TimeUnit.SECONDS));
+                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds , idleTimeSeconds, idleTimeSeconds * 2L, TimeUnit.SECONDS));
                         pipeline.addLast(new NettyServerHandler(listener, isNeedSendPong));
                     }
                 });

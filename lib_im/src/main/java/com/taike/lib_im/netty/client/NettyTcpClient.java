@@ -137,7 +137,6 @@ public class NettyTcpClient {
         if (bootstrap != null) {
             return;
         }
-        IdleStateHandler idleStateHandler = new MyIdleStateHandler(heartBeatInterval * 2, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS);
         NettyClientHandler nettyClientHandler = new NettyClientHandler(mIndex, heartBeatData, isNeedSendPing, new NettyClientListener<>() {
             @Override
             public void onMessageResponseClient(String msg, String index) {
@@ -166,9 +165,10 @@ public class NettyTcpClient {
                 //解析报文
                 pipeline.addLast(new ProtocolDecoder(maxFrameLength));
                 if (isSendHeartBeat) {
-                    pipeline.addLast("ping", idleStateHandler);//3s未发送数据，回调userEventTriggered
-                    pipeline.addLast(nettyClientHandler);
+                    IdleStateHandler idleStateHandler = new MyIdleStateHandler(heartBeatInterval , heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS);
+                    pipeline.addLast("idle", idleStateHandler);//3s未发送数据，回调userEventTriggered
                 }
+                pipeline.addLast("handler", nettyClientHandler);
             }
         });
     }
