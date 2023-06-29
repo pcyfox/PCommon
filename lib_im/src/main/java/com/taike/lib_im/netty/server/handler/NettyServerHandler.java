@@ -19,7 +19,6 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
         this.listener = listener;
     }
 
-
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
@@ -36,6 +35,7 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
         super.handleAllIdle(ctx);
         ctx.close();
     }
+
 
     /**
      * 连接成功

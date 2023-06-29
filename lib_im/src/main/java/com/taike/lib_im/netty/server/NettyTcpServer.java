@@ -43,7 +43,7 @@ public class NettyTcpServer {
 
     private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
     private int idleTimeSeconds = NettyConfig.SERVER_IDLE_TIME_SECONDS;
-    private boolean isNeedSendPong=false;
+    private boolean isNeedSendPong = true;
 
     private static final class InstanceHolder {
         private static final NettyTcpServer instance = new NettyTcpServer();
@@ -83,7 +83,6 @@ public class NettyTcpServer {
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup(4);
         ServerBootstrap bootstrap = new ServerBootstrap();
-
         bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class) // 5
                 .localAddress(new InetSocketAddress(port)) // 6
                 .childOption(ChannelOption.SO_KEEPALIVE, true).childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.TCP_NODELAY, true).childHandler(new ChannelInitializer<SocketChannel>() { // 7
@@ -94,8 +93,8 @@ public class NettyTcpServer {
                         ChannelPipeline pipeline = ch.pipeline();
                         //解析报文
                         pipeline.addLast(new ProtocolDecoder(maxFrameLength));
-                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 2L, TimeUnit.SECONDS));
-                        pipeline.addLast(new NettyServerHandler(listener,isNeedSendPong));
+                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 3L, TimeUnit.SECONDS));
+                        pipeline.addLast(new NettyServerHandler(listener, isNeedSendPong));
                     }
                 });
         try {
@@ -119,6 +118,7 @@ public class NettyTcpServer {
     public void disconnect() {
         if (workerGroup != null) workerGroup.shutdownGracefully();
         if (bossGroup != null) bossGroup.shutdownGracefully();
+
         isServerStart = false;
         workerGroup = null;
         bossGroup = null;

@@ -39,8 +39,6 @@ abstract class BaseBindingAdapter<M, B : ViewDataBinding>(val context: Context) 
     @SuppressLint("NotifyDataSetChanged")
     fun addAll(c: Collection<M>, isClear: Boolean = true) {
         if (c.isEmpty()) {
-            list.clear()
-            if (isAutoNotifyChange) notifyDataSetChanged()
             return
         }
         if (isClear) list.clear()

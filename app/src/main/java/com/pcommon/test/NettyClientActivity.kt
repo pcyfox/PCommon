@@ -18,7 +18,7 @@ class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_c
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         client =
-            NettyTcpClient.Builder().setHost("192.168.1.24").setTcpPort(9527).setListener(object :
+            NettyTcpClient.Builder().setListener(object :
                 NettyClientListener<String> {
                 override fun onMessageResponseClient(msg: String?, index: String?) {
                     Log.d(TAG, "onMessageResponseClient() called with: msg = $msg, index = $index")
@@ -38,7 +38,7 @@ class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_c
     }
 
     fun onStart(view: View) {
-        client.connect()
+        client.connect(etHost.text.toString(), 9527)
     }
 
     fun onSend(view: View) {

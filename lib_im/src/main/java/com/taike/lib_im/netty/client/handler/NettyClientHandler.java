@@ -17,14 +17,23 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
     private final String index;
     private String heartBeatData;
     private int count = 0;
+    private final boolean isNeedSendPing;
+    private int readerIdleCount = 0;
 
 
-    public NettyClientHandler(String index, String heartBeatData, boolean isNeedSendPong , NettyClientListener<String> listener) {
-        super(index, isNeedSendPong);
+    public NettyClientHandler(String index, String heartBeatData, boolean isNeedSendPing, NettyClientListener<String> listener) {
+        super(index, false);
+        this.isNeedSendPing = isNeedSendPing;
         this.listener = listener;
         this.index = index;
         this.heartBeatData = heartBeatData;
     }
+
+    public void reset() {
+        count = 0;
+        readerIdleCount = 0;
+    }
+
 
     @Override
     protected void handleData(ChannelHandlerContext channelHandlerContext, NettyProtocolBean data) {
@@ -32,10 +41,20 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
     }
 
     @Override
-    protected void handleAllIdle(ChannelHandlerContext ctx) {
-        super.handleAllIdle(ctx);
+    protected void handleWriterIdle(ChannelHandlerContext ctx) {
+        super.handleWriterIdle(ctx);
+        if (!isNeedSendPing) return;
         if (TextUtils.isEmpty(heartBeatData)) heartBeatData = "" + count++;
         sendPingMsg(ctx, heartBeatData);
+    }
+
+    @Override
+    protected void handleReaderIdle(ChannelHandlerContext ctx) {
+        super.handleReaderIdle(ctx);
+        readerIdleCount++;
+        if (readerIdleCount >= 3) {//you are out
+            ctx.channel().close();
+        }
     }
 
     /**

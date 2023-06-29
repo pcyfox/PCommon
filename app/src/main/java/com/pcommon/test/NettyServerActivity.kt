@@ -5,11 +5,13 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.elvishew.xlog.XLog
+import com.pcommon.lib_utils.IPUtils
 import com.taike.lib_im.netty.server.NettyServerListener
 import com.taike.lib_im.netty.server.NettyTcpServer
 import io.netty.channel.Channel
 import io.netty.handler.timeout.IdleState
 import io.netty.handler.timeout.IdleStateEvent
+import kotlinx.android.synthetic.main.activity_netty_server.*
 
 class NettyServerActivity : AppCompatActivity() {
     private val TAG = "NettyServerActivity"
@@ -17,6 +19,8 @@ class NettyServerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_netty_server)
         startServer()
+
+
     }
 
 
@@ -65,11 +69,11 @@ class NettyServerActivity : AppCompatActivity() {
 
             start(9527)
         }
+        tvHost.text = IPUtils.getIpAddress(this) + ":9527"
     }
 
     fun onStop(view: View) {
         NettyTcpServer.getInstance().disconnect()
-
     }
 
     fun onStart(view: View) {
