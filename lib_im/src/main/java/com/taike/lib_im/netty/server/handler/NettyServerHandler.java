@@ -10,9 +10,9 @@ import io.netty.channel.ChannelHandlerContext;
 
 @ChannelHandler.Sharable
 public class NettyServerHandler extends CustomHeartbeatHandler {
-
     private static final String TAG = "EchoServerHandler";
     private final NettyServerListener<String> listener;
+    private int allIdleTimes = 0;
 
     public NettyServerHandler(NettyServerListener<String> listener, boolean isNeedSendPong) {
         super("server", isNeedSendPong);
@@ -33,9 +33,9 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
     @Override
     protected void handleAllIdle(ChannelHandlerContext ctx) {
         super.handleAllIdle(ctx);
-        ctx.close();
+        if (++allIdleTimes >= 2)
+            ctx.close();
     }
-
 
     /**
      * 连接成功

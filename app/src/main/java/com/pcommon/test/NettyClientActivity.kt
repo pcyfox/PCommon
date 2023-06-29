@@ -18,7 +18,7 @@ class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_c
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         client =
-            NettyTcpClient.Builder().setListener(object :
+            NettyTcpClient.Builder().setMaxReconnectTimes(3).setListener(object :
                 NettyClientListener<String> {
                 override fun onMessageResponseClient(msg: String?, index: String?) {
                     Log.d(TAG, "onMessageResponseClient() called with: msg = $msg, index = $index")
@@ -32,7 +32,7 @@ class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_c
                         TAG,
                         "onClientStatusConnectChanged() called with: state = $state, index = $index"
                     )
-                    if (state != ConnectState.STATUS_CONNECT_SUCCESS) client.connect()
+                   // if (state != ConnectState.STATUS_CONNECT_SUCCESS) client.connect()
                 }
             }).setHeartBeatData("test").setIndex("A1").build()
     }
