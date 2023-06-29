@@ -6,6 +6,7 @@ import android.util.Log;
 import com.elvishew.xlog.XLog;
 import com.taike.lib_im.BuildConfig;
 import com.taike.lib_im.netty.MessageType;
+import com.taike.lib_im.netty.MyIdleStateHandler;
 import com.taike.lib_im.netty.NettyConfig;
 import com.taike.lib_im.netty.NettyUtils;
 import com.taike.lib_im.netty.ProtocolDecoder;
@@ -133,7 +134,10 @@ public class NettyTcpClient {
     private NettyClientListener<String> listener;
 
     private void buildBootstrap() {
-        IdleStateHandler idleStateHandler = new IdleStateHandler(heartBeatInterval * 2, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS);
+        if (bootstrap != null) {
+            return;
+        }
+        IdleStateHandler idleStateHandler = new MyIdleStateHandler(heartBeatInterval * 2, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS);
         NettyClientHandler nettyClientHandler = new NettyClientHandler(mIndex, heartBeatData, isNeedSendPing, new NettyClientListener<>() {
             @Override
             public void onMessageResponseClient(String msg, String index) {
@@ -149,17 +153,7 @@ public class NettyTcpClient {
                     listener.onClientStatusConnectChanged(statusCode, index);
             }
         });
-        if (group != null) group.terminationFuture();
         group = new NioEventLoopGroup();
-
-        if (bootstrap != null) {
-            try {
-                System.gc();
-                bootstrap.validate();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         bootstrap = new Bootstrap();
         bootstrap.group(group).option(ChannelOption.TCP_NODELAY, true);//屏蔽Nagle算法
         bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
@@ -180,10 +174,10 @@ public class NettyTcpClient {
     }
 
     private void connectServer() {
-        buildBootstrap();
-        if (isConnected) {
+        if (isConnected || isConnecting) {
             return;
         }
+        buildBootstrap();
         try {
             isConnecting = true;
             Log.d(TAG, "connectServer() called,isConnected=" + isConnected);
@@ -210,17 +204,22 @@ public class NettyTcpClient {
             XLog.e(TAG + ",connectServer() fail, Exception:\n" + e);
             isConnecting = false;
             isConnected = false;
-
-            if (null != channelFuture) {
-                if (channelFuture.channel() != null && channelFuture.channel().isOpen()) {
-                    channelFuture.channel().close();
+            if (isAutoReconnecting) {
+                reconnect();
+            } else {
+                bootstrap.validate();
+                if (null != channelFuture) {
+                    if (channelFuture.channel() != null && channelFuture.channel().isOpen()) {
+                        channelFuture.channel().close();
+                    }
+                    channelFuture.cancel(true);
                 }
-                channelFuture.cancel(true);
+                group.shutdownGracefully();
             }
-            group.shutdownGracefully();
-            if (listener != null)
+
+            if (listener != null) {
                 listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_CLOSED, mIndex);
-            if (isAutoReconnecting) reconnect();
+            }
         }
     }
 
@@ -239,7 +238,6 @@ public class NettyTcpClient {
                 return;
             }
             threadPool.submit(() -> {
-                reConnectTimes = 0;
                 connectServer();
             });
         }
@@ -249,11 +247,11 @@ public class NettyTcpClient {
     public void disconnect() {
         XLog.w(TAG, "disconnect() called!");
         isConnected = false;
-        reConnectTimes = Integer.MAX_VALUE;
-
+        reConnectTimes = 0;
         if (group != null) {
             group.shutdownGracefully();
         }
+        if (bootstrap != null) bootstrap.validate();
     }
 
     public void reconnect() {
@@ -305,16 +303,8 @@ public class NettyTcpClient {
         sendMsgToServer(new String(data), listener);
     }
 
-    /**
-     * 获取TCP连接状态
-     *
-     * @return 获取TCP连接状态
-     */
-    public boolean getConnectStatus() {
-        return isConnected;
-    }
 
-    public boolean isConnecting() {
+    public boolean isConnected() {
         return isConnected;
     }
 

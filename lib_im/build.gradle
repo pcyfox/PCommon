@@ -25,6 +25,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            // 当编译时出现报错，按情况添加
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/io.netty.versions.properties"
+        }
+    }
 }
 
 dependencies {
@@ -33,6 +41,6 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
    // implementation 'androidx.appcompat:appcompat:1.2.0'
     //implementation 'com.google.android.material:material:1.2.1'
-    api files('libs/netty-all-4.1.23.Final.jar')
     implementation rootDependencies.xlog
+    api'io.netty:netty-all:4.1.94.Final'
 }

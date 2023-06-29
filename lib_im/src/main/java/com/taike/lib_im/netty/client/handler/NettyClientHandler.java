@@ -7,9 +7,10 @@ import com.taike.lib_im.netty.NettyProtocolBean;
 import com.taike.lib_im.netty.client.listener.NettyClientListener;
 import com.taike.lib_im.netty.client.status.ConnectState;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
-
+@ChannelHandler.Sharable
 public class NettyClientHandler extends CustomHeartbeatHandler {
     private static final String TAG = "NettyClientHandler";
 

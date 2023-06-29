@@ -39,7 +39,7 @@ public class NettyTcpServer {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    private volatile boolean isServerStart;
+    private volatile boolean isServerStarted;
 
     private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
     private int idleTimeSeconds = NettyConfig.SERVER_IDLE_TIME_SECONDS;
@@ -79,7 +79,7 @@ public class NettyTcpServer {
     }
 
     private void startServer() {
-        if (bossGroup != null) return;
+        if (bossGroup != null || isServerStarted) return;
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup(4);
         ServerBootstrap bootstrap = new ServerBootstrap();
@@ -101,7 +101,7 @@ public class NettyTcpServer {
             // Bind and start to accept incoming connections.
             ChannelFuture future = bootstrap.bind().sync(); // 8
             XLog.i(TAG + ",started and listen on localAddress:" + future.channel().localAddress());
-            isServerStart = true;
+            isServerStarted = true;
             if (listener != null) listener.onStartServer();
             // Wait until the server socket is closed.
             // In this example, this does not happen, but you can do that to gracefully
@@ -118,8 +118,7 @@ public class NettyTcpServer {
     public void disconnect() {
         if (workerGroup != null) workerGroup.shutdownGracefully();
         if (bossGroup != null) bossGroup.shutdownGracefully();
-
-        isServerStart = false;
+        isServerStarted = false;
         workerGroup = null;
         bossGroup = null;
         if (listener != null) listener.onStopServer();
@@ -133,8 +132,8 @@ public class NettyTcpServer {
         isNeedSendPong = needSendPong;
     }
 
-    public boolean isServerStart() {
-        return isServerStart;
+    public boolean isServerStarted() {
+        return isServerStarted;
     }
 
     public void setIdleTimeSeconds(int idleTimeSeconds) {
