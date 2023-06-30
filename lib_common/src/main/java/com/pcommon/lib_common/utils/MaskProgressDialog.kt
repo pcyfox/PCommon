@@ -26,15 +26,15 @@ class MaskProgressDialog constructor(
 
     override fun onStart() {
         super.onStart()
-        avi_loading.show()
-        avi_loading.visibility = View.VISIBLE
+        avi_loading?.show()
+        avi_loading?.visibility = View.VISIBLE
     }
 
 
     override fun onDismiss() {
         avi_loading?.hide()
+        avi_loading?.visibility = View.GONE
         listener?.onDismiss()
-        avi_loading.visibility = View.GONE
     }
 
 
@@ -55,7 +55,7 @@ class MaskProgressDialog constructor(
         }
     }
 
-    fun show(tips: String?,isCancelable: Boolean=false) {
+    fun show(tips: String?, isCancelable: Boolean = false) {
         if (!isShowing) {
             super.show()
         }
