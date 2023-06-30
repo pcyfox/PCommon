@@ -16,7 +16,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class NettyClientHandler extends CustomHeartbeatHandler {
     private static final String TAG = "NettyClientHandler";
-
+    private int maxReaderIdleCount = 5;
     private final NettyClientListener<String> listener;
     private final String index;
     private String heartBeatData;
@@ -24,13 +24,16 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
     private final boolean isNeedSendPing;
     private int readerIdleCount = 0;
 
-
     public NettyClientHandler(String index, String heartBeatData, boolean isNeedSendPing, NettyClientListener<String> listener) {
         super(index, false);
         this.isNeedSendPing = isNeedSendPing;
         this.listener = listener;
         this.index = index;
         this.heartBeatData = heartBeatData;
+    }
+
+    public void setMaxReaderIdleCount(int maxReaderIdleCount) {
+        this.maxReaderIdleCount = maxReaderIdleCount;
     }
 
     public void reset() {
@@ -62,7 +65,7 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
     protected void handleReaderIdle(ChannelHandlerContext ctx) {
         super.handleReaderIdle(ctx);
         readerIdleCount++;
-        if (readerIdleCount >= 3) {//you are out
+        if (readerIdleCount >= maxReaderIdleCount) {//you are out
             Channel channel = ctx.channel();
             if (channel.isOpen()) {
                 channel.close();

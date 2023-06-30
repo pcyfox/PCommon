@@ -52,6 +52,7 @@ public class NettyTcpClient {
 
     private final String mIndex;
     private int reConnectTimes = 0;
+    private int maxReaderIdleCount = 5;
 
     private boolean isNeedSendPing = true;
 
@@ -94,6 +95,9 @@ public class NettyTcpClient {
         threadPool = Executors.newSingleThreadExecutor();
     }
 
+    public void setMaxReaderIdleCount(int maxReaderIdleCount) {
+        this.maxReaderIdleCount = maxReaderIdleCount;
+    }
 
     public int getReConnectTimes() {
         return maxFrameLength;
@@ -168,6 +172,7 @@ public class NettyTcpClient {
                             listener.onClientStatusConnectChanged(statusCode, index);
                     }
                 });
+                nettyClientHandler.setMaxReaderIdleCount(maxReaderIdleCount);
                 pipeline.addLast("handler", nettyClientHandler);
             }
         });
@@ -323,6 +328,8 @@ public class NettyTcpClient {
      */
     public static class Builder {
 
+        private int maxReaderIdleCount = 5;
+
         private boolean isNeedSendPing = true;
         /**
          * 最大重连次数
@@ -430,6 +437,11 @@ public class NettyTcpClient {
             return this;
         }
 
+        public Builder setMaxReaderIdleCount(int maxReaderIdleCount) {
+            this.maxReaderIdleCount = maxReaderIdleCount;
+            return this;
+        }
+
         public NettyTcpClient build() {
             NettyTcpClient nettyTcpClient = new NettyTcpClient(host, tcp_port, mIndex);
             nettyTcpClient.reconnectIntervalTime = this.reconnectIntervalTime;
@@ -441,6 +453,7 @@ public class NettyTcpClient {
             nettyTcpClient.isAutoReconnecting = this.isAutoReconnecting;
             nettyTcpClient.listener = this.listener;
             nettyTcpClient.isNeedSendPing = this.isNeedSendPing;
+            nettyTcpClient.maxReaderIdleCount=this.maxReaderIdleCount;
             return nettyTcpClient;
         }
     }
