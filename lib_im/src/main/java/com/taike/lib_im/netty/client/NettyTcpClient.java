@@ -195,7 +195,7 @@ public class NettyTcpClient {
                     isConnected = false;
                     if (listener != null)
                         listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, mIndex);
-                    if (isAutoReconnecting) connect();
+                    if (isAutoReconnecting) reconnect();
                 }
             }).sync();
             // Wait until the connection is closed.
@@ -233,6 +233,7 @@ public class NettyTcpClient {
     }
 
     public void connect() {
+        Log.d(TAG, "connect() called");
         synchronized (lock) {
             if (isConnected || isConnecting) {
                 return;

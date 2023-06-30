@@ -10,6 +10,7 @@ import com.taike.lib_im.netty.NettyProtocolBean;
 import com.taike.lib_im.netty.client.listener.NettyClientListener;
 import com.taike.lib_im.netty.client.status.ConnectState;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -62,10 +63,13 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
         super.handleReaderIdle(ctx);
         readerIdleCount++;
         if (readerIdleCount >= 3) {//you are out
-            if (NettyConfig.isPrintLog) {
-                Log.e(TAG, "handleReaderIdle() called and close channel with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
+            Channel channel = ctx.channel();
+            if (channel.isOpen()) {
+                channel.close();
+                if (NettyConfig.isPrintLog) {
+                    Log.e(TAG, "handleReaderIdle() called and close channel with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
+                }
             }
-            ctx.channel().close();
         }
     }
 
