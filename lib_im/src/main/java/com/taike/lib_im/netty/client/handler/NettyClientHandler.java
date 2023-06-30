@@ -1,8 +1,11 @@
 package com.taike.lib_im.netty.client.handler;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taike.lib_im.netty.CustomHeartbeatHandler;
+import com.taike.lib_im.netty.MessageType;
+import com.taike.lib_im.netty.NettyConfig;
 import com.taike.lib_im.netty.NettyProtocolBean;
 import com.taike.lib_im.netty.client.listener.NettyClientListener;
 import com.taike.lib_im.netty.client.status.ConnectState;
@@ -10,7 +13,6 @@ import com.taike.lib_im.netty.client.status.ConnectState;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
-@ChannelHandler.Sharable
 public class NettyClientHandler extends CustomHeartbeatHandler {
     private static final String TAG = "NettyClientHandler";
 
@@ -50,10 +52,19 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
     }
 
     @Override
+    public void onChannelRead(NettyProtocolBean bean) {
+        super.onChannelRead(bean);
+        if (bean.getType() == MessageType.PONG_MSG) readerIdleCount = 0;
+    }
+
+    @Override
     protected void handleReaderIdle(ChannelHandlerContext ctx) {
         super.handleReaderIdle(ctx);
         readerIdleCount++;
         if (readerIdleCount >= 3) {//you are out
+            if (NettyConfig.isPrintLog) {
+                Log.e(TAG, "handleReaderIdle() called and close channel with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
+            }
             ctx.channel().close();
         }
     }
@@ -65,6 +76,7 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+        if (NettyConfig.isPrintLog) Log.w(TAG, "channelActive() called with: ctx = [" + ctx + "]");
         if (listener != null)
             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_SUCCESS, index);
     }
@@ -76,6 +88,8 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        if (NettyConfig.isPrintLog)
+            Log.w(TAG, "channelInactive() called with: ctx = [" + ctx + "]");
         if (listener != null)
             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_CLOSED, index);
     }
@@ -87,6 +101,8 @@ public class NettyClientHandler extends CustomHeartbeatHandler {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (NettyConfig.isPrintLog)
+            Log.e(TAG, "exceptionCaught() called with: ctx = [" + ctx + "], cause = [" + cause + "]");
         if (listener != null)
             listener.onClientStatusConnectChanged(ConnectState.STATUS_CONNECT_ERROR, index);
         cause.printStackTrace();

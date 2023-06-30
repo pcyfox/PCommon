@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 
-@ChannelHandler.Sharable
 public class MyIdleStateHandler extends IdleStateHandler {
     public MyIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);

@@ -19,13 +19,11 @@ class NettyServerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_netty_server)
         startServer()
-
-
     }
 
-
-    fun startServer() {
+    private fun startServer() {
         NettyTcpServer.getInstance().run {
+            setIdleTimeSeconds(22)
             setListener(object : NettyServerListener<String> {
                 override fun onMessageResponseServer(msg: String?, channel: Channel?) {
                     Log.d(
@@ -66,7 +64,6 @@ class NettyServerActivity : AppCompatActivity() {
                     }
                 }
             })
-
             start(9527)
         }
         tvHost.text = IPUtils.getIpAddress(this) + ":9527"

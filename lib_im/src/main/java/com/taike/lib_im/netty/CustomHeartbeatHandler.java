@@ -19,7 +19,7 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
     private static final String TAG = "CustomHeartbeatHandler";
     protected String name;
     private int heartbeatCount = 0;
-    private boolean isNeedSendPong = false;
+    private final boolean isNeedSendPong;
 
     public CustomHeartbeatHandler(String name, boolean isNeedSendPong) {
         this.name = name;
@@ -27,7 +27,7 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyProtocolBean nettyProtocolBean) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyProtocolBean nettyProtocolBean) {
     }
 
     @Override
@@ -35,17 +35,17 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
         super.channelRead(ctx, msg);
         if (msg instanceof NettyProtocolBean) {
             NettyProtocolBean bean = (NettyProtocolBean) msg;
+            onChannelRead(bean);
             MessageType type = bean.getType();
-            if (BuildConfig.DEBUG)
+            if (NettyConfig.isPrintLog)
                 Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
             switch (type) {
                 case PING_MSG:
                     if (isNeedSendPong) sendPongMsg(ctx);
-                    ctx.flush();
                     break;
                 case PONG_MSG:
                     ctx.flush();
-                    if (BuildConfig.DEBUG)
+                    if (NettyConfig.isPrintLog)
                         Log.d(TAG, "channelRead():" + name + "-------------------> get pong msg from " + ctx.channel().remoteAddress());
                     break;
                 case CUSTOM_MSG:
@@ -55,6 +55,11 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
                     Log.w(TAG, "channelRead() called with:  unknown type = [" + type + "]");
             }
         }
+    }
+
+
+    protected void onChannelRead(NettyProtocolBean bean) {
+
     }
 
 
@@ -69,14 +74,14 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
         }
         NettyUtils.writeAndFlush(heartBeatData, ctx.channel(), PING_MSG);
         heartbeatCount++;
-        if (BuildConfig.DEBUG)
+        if (NettyConfig.isPrintLog)
             Log.d(TAG, "sendPingMsg() called with: ctx = [" + ctx + "], heartBeatData = [" + heartBeatData + "],heartbeatCount=" + heartbeatCount);
     }
 
     private void sendPongMsg(ChannelHandlerContext context) {
         NettyUtils.writeAndFlush(name, context.channel(), PONG_MSG);
         heartbeatCount++;
-        if (BuildConfig.DEBUG)
+        if (NettyConfig.isPrintLog)
             Log.d(TAG, "sendPongMsg() called with: context = [" + context + "],heartbeatCount=" + heartbeatCount);
     }
 
@@ -105,7 +110,7 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
                     break;
             }
 
-            if (BuildConfig.DEBUG)
+            if (NettyConfig.isPrintLog)
                 Log.d(TAG, "userEventTriggered() called with: ctx = [" + ctx + "], idleEvent= [" + idleEvent + "]");
         }
     }
@@ -118,5 +123,4 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
 
     protected void handleAllIdle(ChannelHandlerContext ctx) {
     }
-
 }

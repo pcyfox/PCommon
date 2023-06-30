@@ -18,23 +18,27 @@ class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_c
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         client =
-            NettyTcpClient.Builder().setMaxReconnectTimes(3).setListener(object :
-                NettyClientListener<String> {
-                override fun onMessageResponseClient(msg: String?, index: String?) {
-                    Log.d(TAG, "onMessageResponseClient() called with: msg = $msg, index = $index")
-                }
+            NettyTcpClient.Builder().setMaxReconnectTimes(3).setHeartBeatInterval(10)
+                .setListener(object :
+                    NettyClientListener<String> {
+                    override fun onMessageResponseClient(msg: String?, index: String?) {
+                        Log.d(
+                            TAG,
+                            "onMessageResponseClient() called with: msg = $msg, index = $index"
+                        )
+                    }
 
-                override fun onClientStatusConnectChanged(
-                    state: ConnectState,
-                    index: String?
-                ) {
-                    Log.d(
-                        TAG,
-                        "onClientStatusConnectChanged() called with: state = $state, index = $index"
-                    )
-                   // if (state != ConnectState.STATUS_CONNECT_SUCCESS) client.connect()
-                }
-            }).setHeartBeatData("test").setIndex("A1").build()
+                    override fun onClientStatusConnectChanged(
+                        state: ConnectState,
+                        index: String?
+                    ) {
+                        Log.d(
+                            TAG,
+                            "onClientStatusConnectChanged() called with: state = $state, index = $index"
+                        )
+                        // if (state != ConnectState.STATUS_CONNECT_SUCCESS) client.connect()
+                    }
+                }).setHeartBeatData("test").setIndex("A1").build()
     }
 
     fun onStart(view: View) {

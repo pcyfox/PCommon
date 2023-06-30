@@ -40,7 +40,6 @@ public interface NettyServerListener<T> {
      */
     void onChannelDisConnect(Channel channel);
 
-
     void onIdleEventTriggered(Channel channel, IdleStateEvent event);
 
 }

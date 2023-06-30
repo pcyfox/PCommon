@@ -88,12 +88,13 @@ public class NettyTcpServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true).childOption(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.TCP_NODELAY, true).childHandler(new ChannelInitializer<SocketChannel>() { // 7
                     @Override
                     public void initChannel(SocketChannel ch) {
-                        if (BuildConfig.DEBUG)
-                            Log.d(TAG, "initChannel() called with: ch = [" + ch + "]");
+                        if (NettyConfig.isPrintLog) {
+                            Log.d(TAG, "initChannel() called with: ch = [" + ch + "],idleTimeSeconds=" + idleTimeSeconds);
+                        }
                         ChannelPipeline pipeline = ch.pipeline();
                         //解析报文
                         pipeline.addLast(new ProtocolDecoder(maxFrameLength));
-                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds , idleTimeSeconds, idleTimeSeconds * 2L, TimeUnit.SECONDS));
+                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 2L, TimeUnit.SECONDS));
                         pipeline.addLast(new NettyServerHandler(listener, isNeedSendPong));
                     }
                 });

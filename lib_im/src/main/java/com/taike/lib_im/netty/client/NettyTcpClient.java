@@ -137,7 +137,6 @@ public class NettyTcpClient {
         if (bootstrap != null) {
             return;
         }
-
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group).option(ChannelOption.TCP_NODELAY, true);//屏蔽Nagle算法
@@ -151,7 +150,7 @@ public class NettyTcpClient {
                 //解析报文
                 pipeline.addLast(new ProtocolDecoder(maxFrameLength));
                 if (isSendHeartBeat) {
-                    IdleStateHandler idleStateHandler = new MyIdleStateHandler(heartBeatInterval, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS);
+                    IdleStateHandler idleStateHandler = new IdleStateHandler(heartBeatInterval, heartBeatInterval, heartBeatInterval * 2, TimeUnit.SECONDS);
                     pipeline.addLast("idle", idleStateHandler);//3s未发送数据，回调userEventTriggered
                 }
                 NettyClientHandler nettyClientHandler = new NettyClientHandler(mIndex, heartBeatData, isNeedSendPing, new NettyClientListener<>() {
