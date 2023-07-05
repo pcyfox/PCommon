@@ -47,11 +47,10 @@ public class RequestManager extends AbsRequest {
         return requestManager;
     }
 
-
     public void iniRetrofit(String clientId, String baseUrl, String appVersionCode, String appVersionName, String pkgName, int retryTime, int[] timeOuts) {
         Log.d(TAG, "iniRetrofit() called with: clientId = [" + clientId + "], baseUrl = [" + baseUrl + "], appVersionCode = [" + appVersionCode + "], appVersionName = [" + appVersionName + "], pkgName = [" + pkgName + "], retryTime = [" + retryTime + "], timeOuts = [" + Arrays.toString(timeOuts) + "]");
-        iniRetrofit(clientId, baseUrl, appVersionCode, appVersionName, pkgName, retryTime);
         this.timeOuts = timeOuts;
+        iniRetrofit(clientId, baseUrl, appVersionCode, appVersionName, pkgName, retryTime);
     }
 
 

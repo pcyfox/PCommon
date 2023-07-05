@@ -37,6 +37,8 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         }
         btnNettyClient.setOnClickListener { startActivityExt(NettyClientActivity::class.java) }
         btnNettyServer.setOnClickListener { startActivityExt(NettyServerActivity::class.java) }
+        btnTestLoadFile.setOnClickListener { startActivityExt(TestLoadFileActivity::class.java) }
+
         btnSHowProgress.setOnClickListener { showProgress("x系统正在启动中！",true) }
     }
 

@@ -66,6 +66,12 @@ public abstract class AbsRequest {
         return builder.build();
     }
 
+    public <T> T create(String baseUrl, final Class<T> service) {
+        if (retrofit == null || !this.baseUrl.equals(baseUrl)) {
+            retrofit = buildRetrofit();
+        }
+        return retrofit.create(service);
+    }
 
     public <T> T create(final Class<T> service) {
         if (retrofit == null) {

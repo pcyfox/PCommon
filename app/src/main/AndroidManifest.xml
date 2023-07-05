@@ -26,7 +26,13 @@
         android:theme="@style/CommonAppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
-
+        <activity
+            android:name=".TestLoadFileActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".TestWhiteBoardActivity"
             android:exported="false" />

@@ -76,6 +76,14 @@
                     android:layout_marginTop="4dp"
                     android:text="Netty-Server" />
 
+                <Button
+                    android:id="@+id/btnTestLoadFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Load File" />
+
+
             </androidx.appcompat.widget.LinearLayoutCompat>
 
 
