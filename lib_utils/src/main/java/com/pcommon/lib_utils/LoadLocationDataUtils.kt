@@ -16,11 +16,11 @@ object LoadLocationDataUtils {
         var reader: BufferedReader? = null
         try {
             var inputFile = File(path)
-            if (!inputFile.isFile || !inputFile.exists()) {
+            if (!inputFile.isFile || !inputFile.exists() || !inputFile.isFile || !inputFile.canRead()) {
                 Log.d(TAG, "loadData() called fail,can not read fail,with: path = $path")
                 return null
             }
-            val isZip = isUnZip || inputFile.name.endsWith("zip") || inputFile.name.endsWith("zip");
+            val isZip = isUnZip || inputFile.name.endsWith("zip", true)
             val tempFile = File(inputFile.parentFile.absolutePath + "/temp")
             if (isZip) {
                 if (!tempFile.exists()) tempFile.mkdirs()
@@ -50,14 +50,10 @@ object LoadLocationDataUtils {
     }
 
     fun saveObjectToSD(
-        data: Any?,
-        path: String,
-        isZipFile: Boolean = false,
-        isDeleteOld: Boolean = true
+        data: Any?, path: String, isZipFile: Boolean = false, isDeleteOld: Boolean = true
     ): Boolean {
         if (BuildConfig.DEBUG) Log.d(
-            TAG,
-            "saveObjectToSD() called with: data = $data, path = $path, isZipFile = $isZipFile"
+            TAG, "saveObjectToSD() called with: data = $data, path = $path, isZipFile = $isZipFile"
         )
         val file = File(path)
         var fWriter: FileWriter? = null
