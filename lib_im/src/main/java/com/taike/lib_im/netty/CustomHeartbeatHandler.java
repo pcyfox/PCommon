@@ -142,7 +142,7 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
             if (channel.isOpen()) {
                 channel.close();
                 if (NettyConfig.isPrintLog) {
-                    Log.e(TAG, "handleReaderIdle() close channel when read time put, with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
+                    Log.e(TAG, "handleReaderIdle() close channel when read timeout, with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
                 }
             }
         }
