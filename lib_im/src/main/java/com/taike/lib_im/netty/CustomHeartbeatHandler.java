@@ -6,8 +6,7 @@ import static com.taike.lib_im.netty.MessageType.PONG_MSG;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.taike.lib_im.BuildConfig;
-
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -20,10 +19,33 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
     protected String name;
     private int heartbeatCount = 0;
     private final boolean isNeedSendPong;
+    private final boolean isNeedSendPing;
+    private String heartBeatData;
 
-    public CustomHeartbeatHandler(String name, boolean isNeedSendPong) {
+    private long count;
+    private long readerIdleCount = 0;
+    private int maxReaderIdleCount = 3;
+
+    public CustomHeartbeatHandler(String name, String heartBeatData, boolean isNeedSendPing, boolean isNeedSendPong) {
+        if (NettyConfig.isPrintLog)
+            Log.d(TAG, "CustomHeartbeatHandler() called with: name = [" + name + "], heartBeatData = [" + heartBeatData + "], isNeedSendPing = [" + isNeedSendPing + "], isNeedSendPong = [" + isNeedSendPong + "]");
         this.name = name;
+        this.heartBeatData = heartBeatData;
         this.isNeedSendPong = isNeedSendPong;
+        this.isNeedSendPing = isNeedSendPing;
+    }
+
+    public void reset() {
+        count = 0;
+        readerIdleCount = 0;
+    }
+
+    public void setMaxReaderIdleCount(int maxReaderIdleCount) {
+        this.maxReaderIdleCount = maxReaderIdleCount;
+    }
+
+    public void setHeartBeatData(String heartBeatData) {
+        this.heartBeatData = heartBeatData;
     }
 
     @Override
@@ -35,18 +57,20 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
         super.channelRead(ctx, msg);
         if (msg instanceof NettyProtocolBean) {
             NettyProtocolBean bean = (NettyProtocolBean) msg;
-            onChannelRead(bean);
+            onChannelRead(ctx, bean);
             MessageType type = bean.getType();
             if (NettyConfig.isPrintLog)
                 Log.d(TAG, "channelRead() called with: context = [" + ctx.channel().remoteAddress() + "],bean= [" + bean + "]");
             switch (type) {
                 case PING_MSG:
+                    if (NettyConfig.isPrintLog)
+                        Log.d(TAG, "channelRead():" + name + " <******************* get ping msg from " + ctx.channel().remoteAddress());
                     if (isNeedSendPong) sendPongMsg(ctx);
                     break;
                 case PONG_MSG:
                     ctx.flush();
                     if (NettyConfig.isPrintLog)
-                        Log.d(TAG, "channelRead():" + name + "-------------------> get pong msg from " + ctx.channel().remoteAddress());
+                        Log.d(TAG, "channelRead():" + name + " <------------------- get pong msg from " + ctx.channel().remoteAddress());
                     break;
                 case CUSTOM_MSG:
                     handleData(ctx, bean);
@@ -56,36 +80,6 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
             }
         }
     }
-
-
-    protected void onChannelRead(NettyProtocolBean bean) {
-
-    }
-
-
-    protected void sendPingMsg(ChannelHandlerContext context) {
-        sendPingMsg(context, name + heartbeatCount);
-    }
-
-    public void sendPingMsg(ChannelHandlerContext ctx, String heartBeatData) {
-        if (TextUtils.isEmpty(heartBeatData)) {
-            sendPingMsg(ctx);
-            return;
-        }
-        NettyUtils.writeAndFlush(heartBeatData, ctx.channel(), PING_MSG);
-        heartbeatCount++;
-        if (NettyConfig.isPrintLog)
-            Log.d(TAG, "sendPingMsg() called with: ctx = [" + ctx + "], heartBeatData = [" + heartBeatData + "],heartbeatCount=" + heartbeatCount);
-    }
-
-    private void sendPongMsg(ChannelHandlerContext context) {
-        NettyUtils.writeAndFlush(name, context.channel(), PONG_MSG);
-        heartbeatCount++;
-        if (NettyConfig.isPrintLog)
-            Log.d(TAG, "sendPongMsg() called with: context = [" + context + "],heartbeatCount=" + heartbeatCount);
-    }
-
-    protected abstract void handleData(ChannelHandlerContext channelHandlerContext, NettyProtocolBean data);
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
@@ -115,12 +109,60 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
         }
     }
 
+    protected abstract void handleData(ChannelHandlerContext channelHandlerContext, NettyProtocolBean data);
+
+
+    protected void sendPingMsg(ChannelHandlerContext context) {
+        sendPingMsg(context, name + heartbeatCount);
+    }
+
+    public void sendPingMsg(ChannelHandlerContext ctx, String heartBeatData) {
+        if (TextUtils.isEmpty(heartBeatData)) {
+            sendPingMsg(ctx);
+            return;
+        }
+        NettyUtils.writeAndFlush(heartBeatData, ctx.channel(), PING_MSG);
+        heartbeatCount++;
+        if (NettyConfig.isPrintLog)
+            Log.d(TAG, "sendPingMsg() called with: ctx = [" + ctx + "], heartBeatData = [" + heartBeatData + "],heartbeatCount=" + heartbeatCount);
+    }
+
+    protected void sendPongMsg(ChannelHandlerContext context) {
+        NettyUtils.writeAndFlush(name, context.channel(), PONG_MSG);
+        heartbeatCount++;
+        if (NettyConfig.isPrintLog)
+            Log.d(TAG, "sendPongMsg() called with: context = [" + context + "],heartbeatCount=" + heartbeatCount);
+    }
+
+
     protected void handleReaderIdle(ChannelHandlerContext ctx) {
+        readerIdleCount++;
+        if (readerIdleCount >= maxReaderIdleCount) {//you are out
+            Channel channel = ctx.channel();
+            if (channel.isOpen()) {
+                channel.close();
+                if (NettyConfig.isPrintLog) {
+                    Log.e(TAG, "handleReaderIdle() close channel when read time put, with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
+                }
+            }
+        }
+    }
+
+    protected void onChannelRead(ChannelHandlerContext ctx, NettyProtocolBean bean) {
+        readerIdleCount = 0;
+        MessageType type = bean.getType();
+        if (type == MessageType.PING_MSG && isNeedSendPong) {
+            sendPongMsg(ctx);
+        }
     }
 
     protected void handleWriterIdle(ChannelHandlerContext ctx) {
+        if (!isNeedSendPing) return;
+        if (TextUtils.isEmpty(heartBeatData)) heartBeatData = "" + count++;
+        sendPingMsg(ctx, heartBeatData);
     }
 
     protected void handleAllIdle(ChannelHandlerContext ctx) {
+
     }
 }

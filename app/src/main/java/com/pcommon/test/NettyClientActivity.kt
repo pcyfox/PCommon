@@ -18,7 +18,8 @@ class NettyClientActivity(override val layoutId: Int = R.layout.activity_netty_c
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         client =
-            NettyTcpClient.Builder().setMaxReconnectTimes(3).setHeartBeatInterval(10)
+            NettyTcpClient.Builder().setMaxReconnectTimes(3000).setHeartBeatInterval(10)
+                .setNeedSendPong(true)
                 .setListener(object :
                     NettyClientListener<String> {
                     override fun onMessageResponseClient(msg: String?, index: String?) {

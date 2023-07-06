@@ -6,7 +6,6 @@ import android.util.Log;
 import com.elvishew.xlog.XLog;
 import com.taike.lib_im.BuildConfig;
 import com.taike.lib_im.netty.MessageType;
-import com.taike.lib_im.netty.MyIdleStateHandler;
 import com.taike.lib_im.netty.NettyConfig;
 import com.taike.lib_im.netty.NettyUtils;
 import com.taike.lib_im.netty.ProtocolDecoder;
@@ -54,7 +53,8 @@ public class NettyTcpClient {
     private int reConnectTimes = 0;
     private int maxReaderIdleCount = 5;
 
-    private boolean isNeedSendPing = true;
+    private boolean isNeedSendPing = false;
+    private boolean isNeedSendPong = false;
 
     private Bootstrap bootstrap;
     private final ExecutorService threadPool;
@@ -64,7 +64,6 @@ public class NettyTcpClient {
      * 最大重连次数
      */
     private int maxConnectTimes = NettyConfig.MAX_RECONNECT_TIMES;
-
     private long reconnectIntervalTime = NettyConfig.RECONNECT_INTERVAL_TIME;
     private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
 
@@ -72,11 +71,6 @@ public class NettyTcpClient {
      * 心跳间隔时间
      */
     private long heartBeatInterval = NettyConfig.CLIENT_HEART_BEAT_TIME_SECONDS;//单位秒
-
-    /**
-     * 是否发送心跳
-     */
-    private boolean isSendHeartBeat = true;
 
     /**
      * 心跳数据，可以是String类型，也可以是byte[].
@@ -123,16 +117,16 @@ public class NettyTcpClient {
         return heartBeatInterval;
     }
 
-    public boolean isSendHeartBeat() {
-        return isSendHeartBeat;
-    }
-
     public void setAutoReconnecting(boolean autoReconnecting) {
         isAutoReconnecting = autoReconnecting;
     }
 
     public void setNeedSendPing(boolean needSendPing) {
         isNeedSendPing = needSendPing;
+    }
+
+    public void setNeedSendPong(boolean needSendPong) {
+        isNeedSendPong = needSendPong;
     }
 
     private NettyClientListener<String> listener;
@@ -148,20 +142,19 @@ public class NettyTcpClient {
             @Override
             public void initChannel(SocketChannel ch) {
                 isConnecting = false;
-                if (BuildConfig.DEBUG)
-                    Log.d(TAG, "initChannel() called with: ch = [" + ch + "]");
+                if (BuildConfig.DEBUG) Log.d(TAG, "initChannel() called with: ch = [" + ch + "]");
                 ChannelPipeline pipeline = ch.pipeline();
                 //解析报文
                 pipeline.addLast(new ProtocolDecoder(maxFrameLength));
-                if (isSendHeartBeat) {
-                    IdleStateHandler idleStateHandler = new IdleStateHandler(heartBeatInterval, heartBeatInterval, heartBeatInterval * 2, TimeUnit.SECONDS);
-                    pipeline.addLast("idle", idleStateHandler);//3s未发送数据，回调userEventTriggered
+
+                if (isNeedSendPong || isNeedSendPing) {
+                    pipeline.addLast("idle", new IdleStateHandler(heartBeatInterval, heartBeatInterval, heartBeatInterval * 3, TimeUnit.SECONDS));//3s未发送数据，回调userEventTriggered
                 }
-                NettyClientHandler nettyClientHandler = new NettyClientHandler(mIndex, heartBeatData, isNeedSendPing, new NettyClientListener<>() {
+
+                NettyClientHandler nettyClientHandler = new NettyClientHandler(mIndex, heartBeatData, isNeedSendPing, isNeedSendPong, new NettyClientListener<>() {
                     @Override
                     public void onMessageResponseClient(String msg, String index) {
-                        if (listener != null)
-                            listener.onMessageResponseClient(msg, index);
+                        if (listener != null) listener.onMessageResponseClient(msg, index);
                     }
 
                     @Override
@@ -328,9 +321,9 @@ public class NettyTcpClient {
      */
     public static class Builder {
 
-        private int maxReaderIdleCount = 5;
-
-        private boolean isNeedSendPing = true;
+        private int maxReaderIdleCount = 3;
+        private boolean isNeedSendPing = false;
+        private boolean isNeedSendPong = false;
         /**
          * 最大重连次数
          */
@@ -354,10 +347,6 @@ public class NettyTcpClient {
         private String mIndex;
 
         /**
-         * 是否发送心跳
-         */
-        private boolean isSendHeartBeat = true;
-        /**
          * 心跳时间间隔
          */
         private long heartBeatInterval = NettyConfig.CLIENT_HEART_BEAT_TIME_SECONDS;
@@ -378,6 +367,11 @@ public class NettyTcpClient {
 
         public Builder setNeedSendPing(boolean needSendPing) {
             isNeedSendPing = needSendPing;
+            return this;
+        }
+
+        public Builder setNeedSendPong(boolean needSendPong) {
+            isNeedSendPong = needSendPong;
             return this;
         }
 
@@ -422,11 +416,6 @@ public class NettyTcpClient {
             return this;
         }
 
-        public Builder setSendHeartBeat(boolean isSendHeartBeat) {
-            this.isSendHeartBeat = isSendHeartBeat;
-            return this;
-        }
-
         public Builder setHeartBeatData(String heartBeatData) {
             this.heartBeatData = heartBeatData;
             return this;
@@ -446,14 +435,14 @@ public class NettyTcpClient {
             NettyTcpClient nettyTcpClient = new NettyTcpClient(host, tcp_port, mIndex);
             nettyTcpClient.reconnectIntervalTime = this.reconnectIntervalTime;
             nettyTcpClient.heartBeatInterval = this.heartBeatInterval;
-            nettyTcpClient.isSendHeartBeat = this.isSendHeartBeat;
             nettyTcpClient.heartBeatData = this.heartBeatData;
             nettyTcpClient.maxFrameLength = this.maxFrameLength;
             nettyTcpClient.maxConnectTimes = this.maxReConnectTimes;
             nettyTcpClient.isAutoReconnecting = this.isAutoReconnecting;
             nettyTcpClient.listener = this.listener;
             nettyTcpClient.isNeedSendPing = this.isNeedSendPing;
-            nettyTcpClient.maxReaderIdleCount=this.maxReaderIdleCount;
+            nettyTcpClient.isNeedSendPong = this.isNeedSendPong;
+            nettyTcpClient.maxReaderIdleCount = this.maxReaderIdleCount;
             return nettyTcpClient;
         }
     }

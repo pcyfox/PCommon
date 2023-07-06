@@ -24,6 +24,8 @@ class NettyServerActivity : AppCompatActivity() {
     private fun startServer() {
         NettyTcpServer.getInstance().run {
             setIdleTimeSeconds(22)
+            setNeedSendPing(false)
+            setNeedSendPong(true)
             setListener(object : NettyServerListener<String> {
                 override fun onMessageResponseServer(msg: String?, channel: Channel?) {
                     Log.d(

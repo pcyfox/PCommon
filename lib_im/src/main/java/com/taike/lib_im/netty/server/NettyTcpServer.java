@@ -43,6 +43,8 @@ public class NettyTcpServer {
 
     private int maxFrameLength = NettyConfig.MAX_FRAME_LENGTH;
     private int idleTimeSeconds = NettyConfig.SERVER_IDLE_TIME_SECONDS;
+
+    private boolean isNeedSendPing = false;
     private boolean isNeedSendPong = true;
 
     private static final class InstanceHolder {
@@ -94,8 +96,10 @@ public class NettyTcpServer {
                         ChannelPipeline pipeline = ch.pipeline();
                         //解析报文
                         pipeline.addLast(new ProtocolDecoder(maxFrameLength));
-                        pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 2L, TimeUnit.SECONDS));
-                        pipeline.addLast(new NettyServerHandler(listener, isNeedSendPong));
+                        if(isNeedSendPing||isNeedSendPong){
+                            pipeline.addLast(new IdleStateHandler(idleTimeSeconds, idleTimeSeconds, idleTimeSeconds * 3L, TimeUnit.SECONDS));
+                        }
+                        pipeline.addLast(new NettyServerHandler(listener, "server", isNeedSendPing, isNeedSendPong));
                     }
                 });
         try {
@@ -135,6 +139,10 @@ public class NettyTcpServer {
 
     public boolean isServerStarted() {
         return isServerStarted;
+    }
+
+    public void setNeedSendPing(boolean needSendPing) {
+        isNeedSendPing = needSendPing;
     }
 
     public void setIdleTimeSeconds(int idleTimeSeconds) {

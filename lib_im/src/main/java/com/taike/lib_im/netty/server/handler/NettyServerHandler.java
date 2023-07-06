@@ -17,8 +17,8 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
     private final NettyServerListener<String> listener;
     private int allIdleTimes = 0;
 
-    public NettyServerHandler(NettyServerListener<String> listener, boolean isNeedSendPong) {
-        super("server", isNeedSendPong);
+    public NettyServerHandler(NettyServerListener<String> listener, String heartBeat, boolean isNeedSendPing, boolean isNeedSendPong) {
+        super("server", heartBeat, isNeedSendPing, isNeedSendPong);
         this.listener = listener;
     }
 
@@ -70,4 +70,6 @@ public class NettyServerHandler extends CustomHeartbeatHandler {
             listener.onIdleEventTriggered(ctx.channel(), (IdleStateEvent) evt);
         }
     }
+
+
 }

@@ -1,79 +1,29 @@
 package com.taike.lib_im.netty.client.handler;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.taike.lib_im.netty.CustomHeartbeatHandler;
-import com.taike.lib_im.netty.MessageType;
 import com.taike.lib_im.netty.NettyConfig;
 import com.taike.lib_im.netty.NettyProtocolBean;
 import com.taike.lib_im.netty.client.listener.NettyClientListener;
 import com.taike.lib_im.netty.client.status.ConnectState;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
 public class NettyClientHandler extends CustomHeartbeatHandler {
     private static final String TAG = "NettyClientHandler";
-    private int maxReaderIdleCount = 5;
     private final NettyClientListener<String> listener;
     private final String index;
-    private String heartBeatData;
-    private int count = 0;
-    private final boolean isNeedSendPing;
-    private int readerIdleCount = 0;
 
-    public NettyClientHandler(String index, String heartBeatData, boolean isNeedSendPing, NettyClientListener<String> listener) {
-        super(index, false);
-        this.isNeedSendPing = isNeedSendPing;
+    public NettyClientHandler(String index, String heartBeatData, boolean isNeedSendPing, boolean isNeedSendPong, NettyClientListener<String> listener) {
+        super(index, heartBeatData, isNeedSendPing, isNeedSendPong);
         this.listener = listener;
         this.index = index;
-        this.heartBeatData = heartBeatData;
     }
-
-    public void setMaxReaderIdleCount(int maxReaderIdleCount) {
-        this.maxReaderIdleCount = maxReaderIdleCount;
-    }
-
-    public void reset() {
-        count = 0;
-        readerIdleCount = 0;
-    }
-
 
     @Override
     protected void handleData(ChannelHandlerContext channelHandlerContext, NettyProtocolBean data) {
         if (listener != null) listener.onMessageResponseClient(data.getContent(), index);
-    }
-
-    @Override
-    protected void handleWriterIdle(ChannelHandlerContext ctx) {
-        super.handleWriterIdle(ctx);
-        if (!isNeedSendPing) return;
-        if (TextUtils.isEmpty(heartBeatData)) heartBeatData = "" + count++;
-        sendPingMsg(ctx, heartBeatData);
-    }
-
-    @Override
-    public void onChannelRead(NettyProtocolBean bean) {
-        super.onChannelRead(bean);
-        if (bean.getType() == MessageType.PONG_MSG) readerIdleCount = 0;
-    }
-
-    @Override
-    protected void handleReaderIdle(ChannelHandlerContext ctx) {
-        super.handleReaderIdle(ctx);
-        readerIdleCount++;
-        if (readerIdleCount >= maxReaderIdleCount) {//you are out
-            Channel channel = ctx.channel();
-            if (channel.isOpen()) {
-                channel.close();
-                if (NettyConfig.isPrintLog) {
-                    Log.e(TAG, "handleReaderIdle() called and close channel with: ctx = [" + ctx + "],readerIdleCount=" + readerIdleCount);
-                }
-            }
-        }
     }
 
     /**
