@@ -42,7 +42,7 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
 
     {
         if (TextUtils.isEmpty(defDir)) {
-            defDir = getContext().getExternalCacheDir().getAbsolutePath() + File.separator + "CompanyLogo";
+            defDir = getContext().getExternalCacheDir().getParentFile().getAbsolutePath() + File.separator + "CompanyLogo";
         }
     }
 

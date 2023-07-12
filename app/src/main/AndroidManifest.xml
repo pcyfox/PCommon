@@ -48,6 +48,11 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <activity
+            android:name=".TestCustomSourceImageActivity"
+            android:exported="false" />
+
         <activity
             android:name=".NettyClientActivity"
             android:exported="false">
@@ -55,6 +60,7 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity> <!-- 屏幕适配配置参数 -->
+
         <activity android:name=".TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

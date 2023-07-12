@@ -7,6 +7,7 @@ import com.pcommon.lib_common.base.BaseActivity
 import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.startActivityExt
 import com.pcommon.lib_network.udp.UDPSocketClient
+import com.pcommon.lib_vidget.widget.CustomSourceImageView
 import com.pcommon.test.databinding.ActivityTestBinding
 import kotlinx.android.synthetic.main.activity_test.*
 
@@ -28,6 +29,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
             //btnNum.text = DeskConfig.getInstance().deskNumber
 //            testCrash()
         }
+        CustomSourceImageView.setDefLoadLogoDir("https://lmg.jj20.com/up/allimg/1112/112GPR626/1Q12FR626-9-1200.jpg")
     }
 
     override fun initListener() {
@@ -38,8 +40,8 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         btnNettyClient.setOnClickListener { startActivityExt(NettyClientActivity::class.java) }
         btnNettyServer.setOnClickListener { startActivityExt(NettyServerActivity::class.java) }
         btnTestLoadFile.setOnClickListener { startActivityExt(TestLoadFileActivity::class.java) }
-
-        btnSHowProgress.setOnClickListener { showProgress("x系统正在启动中！",true) }
+        btnCustomSourceImageView.setOnClickListener { startActivityExt(TestCustomSourceImageActivity::class.java) }
+        btnSHowProgress.setOnClickListener { showProgress("x系统正在启动中！", true) }
     }
 
     private fun testCrash() {
