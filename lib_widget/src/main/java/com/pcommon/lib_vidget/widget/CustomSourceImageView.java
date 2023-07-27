@@ -40,12 +40,6 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
     }
 
 
-    {
-        if (TextUtils.isEmpty(defDir)) {
-            defDir = getContext().getExternalCacheDir().getParentFile().getAbsolutePath() + File.separator + "CompanyLogo";
-        }
-    }
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -62,7 +56,11 @@ public class CustomSourceImageView extends androidx.appcompat.widget.AppCompatIm
     public void loadImg(String path) {
         Log.d(TAG, "loadImg() called with: path = [" + path + "]");
         defDir = path;
-        if (path.isEmpty()) return;
+
+        if (TextUtils.isEmpty(defDir)) {
+            defDir = getContext().getExternalCacheDir().getParentFile().getAbsolutePath() + File.separator + "CompanyLogo";
+        }
+
         if (path.startsWith("http")) {
             Glide.with(this).load(path).into(this);
             return;
