@@ -65,6 +65,7 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.setAppVersionName(appVersionName);
         headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
+
         loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token", "authorization");
         iniRetrofit(baseUrl, retryTime, timeOuts, headerInterceptor, loggingInterceptor);
     }
@@ -74,7 +75,8 @@ public class RequestManager extends AbsRequest {
     }
 
     public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts) {
-        iniRetrofit(baseUrl, retryTime, timeOuts, null, null);
+        loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
+        iniRetrofit(baseUrl, retryTime, timeOuts, null, loggingInterceptor);
     }
 
     public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts, HeaderInterceptor headerInterceptor, MyHttpLoggingInterceptor loggingInterceptor) {
