@@ -68,7 +68,7 @@ public class RequestManager extends AbsRequest {
     }
 
     public void iniRetrofit(String baseUrl, int retryTime) {
-        iniRetrofit(baseUrl, retryTime, null);
+        iniRetrofit(baseUrl, retryTime, timeOuts);
     }
 
     public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts) {
