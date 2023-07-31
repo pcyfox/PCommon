@@ -73,7 +73,7 @@ public class RequestManager extends AbsRequest {
 
     public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts) {
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
-        iniRetrofit(baseUrl, retryTime, timeOuts, null, loggingInterceptor);
+        iniRetrofit(baseUrl, retryTime, timeOuts, new HeaderInterceptor(), loggingInterceptor);
     }
 
     public void iniRetrofit(String baseUrl, int retryTime, int[] timeOuts, HeaderInterceptor headerInterceptor, MyHttpLoggingInterceptor loggingInterceptor) {
