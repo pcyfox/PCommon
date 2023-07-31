@@ -66,7 +66,7 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
 
-        loggingInterceptor.setCareHeaders("uid", "token", "device-id", "token", "authorization");
+        loggingInterceptor.addPrintHeaderKey("uid", "token", "device-id", "token", "Authorization", "authorization");
         iniRetrofit(baseUrl, retryTime, timeOuts, headerInterceptor, loggingInterceptor);
     }
 
@@ -186,4 +186,9 @@ public class RequestManager extends AbsRequest {
         }
         return true;
     }
+
+    public void printHeadKey(String... key) {
+        loggingInterceptor.addPrintHeaderKey(key);
+    }
+
 }

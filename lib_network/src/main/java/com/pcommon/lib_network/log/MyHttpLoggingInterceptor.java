@@ -8,17 +8,14 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -134,7 +131,8 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
      *
      * @param names 请求头信息的Key
      */
-    public void setCareHeaders(String... names) {
+
+    public void addPrintHeaderKey(String... names) {
         careHeaders.addAll(Arrays.asList(names));
     }
 
