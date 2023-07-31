@@ -316,7 +316,7 @@ public final class MyHttpLoggingInterceptor implements Interceptor {
 
 
     private String getLogHeader(Headers headers, int i) {
-        if (!careHeaders.contains(headers.name(i))) {
+        if (!careHeaders.isEmpty() && !careHeaders.contains(headers.name(i))) {
             return "";
         }
         return "{" + headers.name(i) + ":" + headers.value(i) + "}";

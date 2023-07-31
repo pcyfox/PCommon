@@ -63,10 +63,7 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.setAppVersionCode(appVersionCode);
         headerInterceptor.setPkgName(pkgName);
         headerInterceptor.setAppVersionName(appVersionName);
-        headerInterceptor.addHeader("Connection", "close");
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
-
-        loggingInterceptor.addPrintHeaderKey("uid", "token", "device-id", "token", "Authorization", "authorization");
         iniRetrofit(baseUrl, retryTime, timeOuts, headerInterceptor, loggingInterceptor);
     }
 
