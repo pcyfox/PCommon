@@ -63,6 +63,7 @@ public class RequestManager extends AbsRequest {
         headerInterceptor.setAppVersionCode(appVersionCode);
         headerInterceptor.setPkgName(pkgName);
         headerInterceptor.setAppVersionName(appVersionName);
+
         loggingInterceptor.setLevel(MyHttpLoggingInterceptor.Level.BODY);
         iniRetrofit(baseUrl, retryTime, timeOuts, headerInterceptor, loggingInterceptor);
     }
@@ -94,6 +95,7 @@ public class RequestManager extends AbsRequest {
             this.headerInterceptor = headerInterceptor;
             addInterceptor(headerInterceptor);
         }
+
         if (null != loggingInterceptor) addInterceptor(loggingInterceptor);
 
         cleaConverterFactories();
