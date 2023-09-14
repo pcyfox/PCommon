@@ -37,8 +37,6 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         btnSend.setOnClickListener {
             udpSocketClient?.sendBroadcast("{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}")
         }
-        btnNettyClient.setOnClickListener { startActivityExt(NettyClientActivity::class.java) }
-        btnNettyServer.setOnClickListener { startActivityExt(NettyServerActivity::class.java) }
         btnTestLoadFile.setOnClickListener { startActivityExt(TestLoadFileActivity::class.java) }
         btnCustomSourceImageView.setOnClickListener { startActivityExt(TestCustomSourceImageActivity::class.java) }
         btnSHowProgress.setOnClickListener { showProgress("x系统正在启动中！", true) }
