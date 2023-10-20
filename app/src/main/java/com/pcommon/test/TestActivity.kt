@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.activity_test.*
 class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     BaseActivity<ActivityTestBinding, TestViewModel>(TestViewModel::class.java) {
     private val TAG = "TestActivity"
-    private var udpSocketClient: UDPSocketClient? = null
     override var isShowNetWorkChangNotice: Boolean = true
 
     override fun initData() {
@@ -35,7 +34,12 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     override fun initListener() {
         super.initListener()
         btnSend.setOnClickListener {
-            udpSocketClient?.sendBroadcast("{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}")
+            UDPSocketClient.getInstance()?.run {
+                sendBroadcast(
+                    "{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}",
+                    clientPort
+                )
+            }
         }
         btnTestLoadFile.setOnClickListener { startActivityExt(TestLoadFileActivity::class.java) }
         btnCustomSourceImageView.setOnClickListener { startActivityExt(TestCustomSourceImageActivity::class.java) }
@@ -46,8 +50,12 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     }
 
     private fun testUDP() {
-        UDPSocketClient.newInstance(9993).start { m, ip, port ->
+        Log.d(TAG, "testUDP() called")
+        UDPSocketClient.getInstance(9978).start { m, ip, port ->
             Log.d(TAG, "testUDP() called with: m = $m, ip = $ip, port = $port")
+        }
+        UDPSocketClient.getInstance().startHeartbeatTimer(200, 10_000) {
+            Log.e(TAG, "testUDP() ,on hb timeout! $it")
         }
     }
 

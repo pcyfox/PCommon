@@ -17,13 +17,13 @@ public class UDPBroadcaster {
     public static void sendBroadcast(final DatagramSocket datagramSocket, final String message, final String ip, final int port) {
         //XLog.i(TAG + ":sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
         ThreadTool.getTreadPool().execute(() -> {
-            DatagramSocket socket=datagramSocket;
+            DatagramSocket socket = datagramSocket;
             try {
                 //说明通过指定端口创建的socket失败
                 if (datagramSocket == null) {
                     try {
                         //使用系统分配端口创建socket，保证消息能正常发送
-                        socket= new DatagramSocket();
+                        socket = new DatagramSocket();
                     } catch (SocketException e) {
                         XLog.e(TAG + ";sendBroadcast() called with: message = [" + message + "], port = [" + port + "] create socket error:" + e.getMessage());
                         e.printStackTrace();

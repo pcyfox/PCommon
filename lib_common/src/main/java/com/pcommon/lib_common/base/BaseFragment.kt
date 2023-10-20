@@ -21,8 +21,10 @@ import com.pcommon.lib_common.application.BaseAbstractApplication.Companion.appl
 @Keep
 abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmClass: Class<VM>? = null) :
     Fragment(), OnKeyDownListener {
-    var tag: Any? = null
 
+    constructor() : this(null)
+
+    var tag: Any? = null
     protected var viewModel: VM? = null
     protected var contentView: View? = null
 

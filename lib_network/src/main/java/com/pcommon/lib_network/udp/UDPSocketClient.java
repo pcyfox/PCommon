@@ -29,7 +29,7 @@ public class UDPSocketClient {
     private final byte[] receiveByte = new byte[BUFFER_LENGTH];
     private static final String BROADCAST_IP = "255.255.255.255";
 
-    private int CLIENT_PORT = 1999;
+    private int clientPort = 1999;
     private volatile boolean isThreadRunning = false;
 
     private DatagramSocket datagramSocket;
@@ -38,12 +38,13 @@ public class UDPSocketClient {
     private long lastReceiveTime = 0;
     private static final long TIME_OUT = 12 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
+    private static final String HEARTBEAT_MSG = "HB-Hi";
+
     private HeartbeatTimer timer;
     private static final Object lock = new Object();
 
-
     public boolean isStarted() {
-        if (datagramSocket == null || datagramSocket.isClosed()) {
+        if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed()) {
             return false;
         }
         return isThreadRunning;
@@ -56,7 +57,14 @@ public class UDPSocketClient {
 
     private UDPSocketClient(int port) {
         this();
-        CLIENT_PORT = port;
+        Log.d(TAG, "UDPSocketClient() called with: port = [" + port + "]");
+        setClientPort(port);
+    }
+
+    public static UDPSocketClient getInstance(int port) {
+        UDPSocketClient client = getInstance();
+        client.setClientPort(port);
+        return client;
     }
 
     public static UDPSocketClient getInstance() {
@@ -74,7 +82,12 @@ public class UDPSocketClient {
     }
 
     public void setClientPort(int clientPort) {
-        CLIENT_PORT = clientPort;
+        Log.d(TAG, "setClientPort() called with: clientPort = [" + clientPort + "]");
+        this.clientPort = clientPort;
+    }
+
+    public int getClientPort() {
+        return clientPort;
     }
 
     public void startUDPSocket(int port) {
@@ -87,9 +100,7 @@ public class UDPSocketClient {
         XLog.i(TAG + ":stopUDPSocket() called");
         isThreadRunning = false;
         if (datagramSocket != null) {
-            //datagramSocket.disconnect();
-            if (!datagramSocket.isClosed())
-                datagramSocket.close();
+            if (!datagramSocket.isClosed()) datagramSocket.close();
             XLog.d(TAG + ";stopUDPSocket() called socket closed");
             datagramSocket = null;
         }
@@ -98,7 +109,6 @@ public class UDPSocketClient {
         if (timer != null) {
             timer.exit();
         }
-
         if (onStateChangeLister != null) {
             onStateChangeLister.onStop();
         }
@@ -110,7 +120,7 @@ public class UDPSocketClient {
     }
 
     public void startUDPSocket() {
-        XLog.d(TAG + ":startUDPSocket() called  isThreadRunning=" + isThreadRunning);
+        XLog.d(TAG + ",startUDPSocket() called  isThreadRunning=" + isThreadRunning);
         if (isThreadRunning) {
             stopUDPSocket();
         }
@@ -118,10 +128,9 @@ public class UDPSocketClient {
             // 创建接受数据的 packet
             receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
             datagramSocket = new DatagramSocket(null);
-            XLog.i(TAG + ":startUDPSocket()  create a new  DatagramSocket ");
             datagramSocket.setReuseAddress(true);
-            datagramSocket.bind(new InetSocketAddress(CLIENT_PORT));
-            XLog.i(TAG + ":startUDPSocket()   DatagramSocket  bind :" + CLIENT_PORT);
+            datagramSocket.bind(new InetSocketAddress(clientPort));
+            XLog.i(TAG + ":startUDPSocket() ,create a new DatagramSocket bind:" + clientPort);
             startSocketThread();
         } catch (Exception e) {
             XLog.e(TAG + ":startUDPSocket() error =" + e.getMessage());
@@ -129,7 +138,6 @@ public class UDPSocketClient {
                 datagramSocket.disconnect();
                 datagramSocket.close();
             }
-
             if (onStateChangeLister != null) {
                 onStateChangeLister.onStop();
             }
@@ -150,13 +158,13 @@ public class UDPSocketClient {
     }
 
     /**
-     * 开启发送数据的线程
+     * 开启接收数据的线程
      */
     private void startSocketThread() {
-        XLog.i(TAG + ":startSocketThread() called");
+        XLog.i(TAG + ",startSocketThread() called");
         isThreadRunning = true;
         Thread clientThread = new Thread(() -> {
-            XLog.i(TAG + ":clientThread start to working,port:" + CLIENT_PORT);
+            XLog.i(TAG + ":clientThread start to working,port:" + clientPort);
             receiveMessage();
             isThreadRunning = false;
             XLog.e(TAG + ":clientThread work broken!");
@@ -175,13 +183,8 @@ public class UDPSocketClient {
      * 处理接受到的消息
      */
     private void receiveMessage() {
-        Log.d(TAG, "receiveMessage() called,isThreadRunning=" + isThreadRunning);
-        while (isThreadRunning && !Thread.interrupted()) {
+        while (isStarted() && !Thread.interrupted()) {
             try {
-                if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed()) {
-                    XLog.e(TAG + ":receiveMessage  return,because receivePacket == null || datagramSocket == null || datagramSocket.isClosed()");
-                    return;
-                }
                 datagramSocket.receive(receivePacket);
                 lastReceiveTime = System.currentTimeMillis();
             } catch (IOException e) {
@@ -195,8 +198,9 @@ public class UDPSocketClient {
                 continue;
             }
             try {
-                String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
+                if (HEARTBEAT_MSG.equals(strReceive)) return;
+                String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive, host, receivePacket.getPort());
                 } else {
@@ -224,27 +228,29 @@ public class UDPSocketClient {
 
 
     /**
-     * 启动心跳，timer 间隔十秒
+     * 启动心跳
      */
-    private void startHeartbeatTimer() {
+    public void startHeartbeatTimer(long delay, long period, HeartbeatListener listener) {
+        XLog.d(TAG + ",startHeartbeatTimer() called with: delay = [" + delay + "], period = [" + period + "]");
         if (timer != null) {
             timer.exit();
         }
+        sendBroadcast(HEARTBEAT_MSG, clientPort);
         timer = new HeartbeatTimer();
         timer.setOnScheduleListener(() -> {
-            XLog.d("timer is onSchedule...");
-            long duration = System.currentTimeMillis() - lastReceiveTime;
-            XLog.d("duration:" + duration);
-            if (duration > TIME_OUT) {//若超过两分钟都没收到我的心跳包，则认为对方不在线。
-                XLog.d("超时，对方已经下线");
-                // 刷新时间，重新进入下一个心跳周期
-                lastReceiveTime = System.currentTimeMillis();
-            } else if (duration > HEARTBEAT_MESSAGE_DURATION) {//若超过十秒他没收到我的心跳包，则重新发一个。
-                String string = "hello,this is a heartbeat message";
-                sendBroadcast(string);
+            if (isStarted()) {
+                long duration = System.currentTimeMillis() - lastReceiveTime;
+                if (duration > period * 2) {//若超过两分钟都没收到我的心跳包，则认为对方不在线。
+                    XLog.d(TAG + ",心跳超时");
+                    // 刷新时间，重新进入下一个心跳周期
+                    lastReceiveTime = System.currentTimeMillis();
+                    if (listener != null) listener.onTimeout(duration);
+                } else {
+                    sendBroadcast(HEARTBEAT_MSG, clientPort);
+                }
             }
         });
-        timer.startTimer(0, 1000 * 10);
+        timer.startTimer(delay, period);
     }
 
 
@@ -253,7 +259,7 @@ public class UDPSocketClient {
     }
 
     public void sendBroadcast(final String message) {
-        sendBroadcast(message, CLIENT_PORT);
+        sendBroadcast(message, clientPort);
     }
 
     public void sendBroadcast(final String message, final int port) {
@@ -276,7 +282,6 @@ public class UDPSocketClient {
         void onSocketMsgArrived(String msg, String ip, int pot);
     }
 
-
     public interface OnStateChangeLister {
         void onStart();
 
@@ -287,7 +292,7 @@ public class UDPSocketClient {
     @Override
     public String toString() {
         return "UDPSocketClient{" +
-                "CLIENT_PORT=" + CLIENT_PORT +
+                "CLIENT_PORT=" + clientPort +
                 ", lastReceiveTime=" + lastReceiveTime +
                 ", timer=" + timer +
                 '}';
