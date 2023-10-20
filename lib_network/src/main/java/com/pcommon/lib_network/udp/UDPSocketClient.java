@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.Keep;
 
 import com.elvishew.xlog.XLog;
+import com.pcommon.lib_network.BuildConfig;
 import com.pcommon.lib_network.Utils;
 
 import java.io.IOException;
@@ -199,7 +200,7 @@ public class UDPSocketClient {
             }
             try {
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
-                if (HEARTBEAT_MSG.equals(strReceive)) return;
+                if (!BuildConfig.DEBUG && HEARTBEAT_MSG.equals(strReceive)) return;
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive, host, receivePacket.getPort());
