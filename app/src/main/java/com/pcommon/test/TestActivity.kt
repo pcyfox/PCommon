@@ -7,6 +7,7 @@ import com.pcommon.lib_common.base.BaseActivity
 import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.startActivityExt
 import com.pcommon.lib_network.udp.UDPSocketClient
+import com.pcommon.lib_utils.IPUtils
 import com.pcommon.lib_vidget.widget.CustomSourceImageView
 import com.pcommon.test.databinding.ActivityTestBinding
 import kotlinx.android.synthetic.main.activity_test.*
@@ -31,6 +32,11 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
         CustomSourceImageView.setDefLoadLogoDir("https://lmg.jj20.com/up/allimg/1112/112GPR626/1Q12FR626-9-1200.jpg")
     }
 
+    override fun onResumeOver() {
+        super.onResumeOver()
+        tvIp.text = IPUtils.getIpAddress(this)
+    }
+
     override fun initListener() {
         super.initListener()
         btnSend.setOnClickListener {
@@ -52,7 +58,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     private fun testUDP() {
         Log.d(TAG, "testUDP() called")
         UDPSocketClient.getInstance(9978).start { m, ip, port ->
-            Log.d(TAG, "testUDP() called with: m = $m, ip = $ip, port = $port")
+            Log.d(TAG, "testUDP() called with rev: m = $m, ip = $ip, port = $port")
         }
         UDPSocketClient.getInstance().startHeartbeatTimer(200, 10_000) {
             Log.e(TAG, "testUDP() ,on hb timeout! $it")

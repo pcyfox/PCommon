@@ -9,6 +9,7 @@
         tools:context="com.pcommon.test.TestActivity">
 
         <TextView
+            android:id="@+id/tvIp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

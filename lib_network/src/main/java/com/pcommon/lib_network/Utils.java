@@ -15,6 +15,7 @@ import java.nio.channels.FileChannel;
 
 final public class Utils {
     public static final Inet4Address LOCALHOST4;
+
     static {
         byte[] LOCALHOST4_BYTES = new byte[]{127, 0, 0, 1};
         Inet4Address localhost4 = null;
@@ -23,7 +24,6 @@ final public class Utils {
         } catch (Exception var20) {
             var20.printStackTrace();
         }
-
         LOCALHOST4 = localhost4;
     }
 

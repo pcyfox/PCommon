@@ -1,6 +1,9 @@
 package com.pcommon.lib_network.udp;
 
+import android.util.Log;
+
 import com.elvishew.xlog.XLog;
+import com.pcommon.lib_network.BuildConfig;
 import com.pcommon.lib_network.ThreadTool;
 
 import java.io.IOException;
@@ -15,7 +18,9 @@ public class UDPBroadcaster {
 
 
     public static void sendBroadcast(final DatagramSocket datagramSocket, final String message, final String ip, final int port) {
-        //XLog.i(TAG + ":sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, ":sendBroadcast() called with: message = [" + message + "], ip = [" + ip + "], port = [" + port + "]");
+
         ThreadTool.getTreadPool().execute(() -> {
             DatagramSocket socket = datagramSocket;
             try {

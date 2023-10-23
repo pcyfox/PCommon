@@ -236,7 +236,7 @@ public class UDPSocketClient {
         if (timer != null) {
             timer.exit();
         }
-        sendBroadcast(HEARTBEAT_MSG, clientPort);
+        sendHBtoSelf();
         timer = new HeartbeatTimer();
         timer.setOnScheduleListener(() -> {
             if (isStarted()) {
@@ -247,11 +247,19 @@ public class UDPSocketClient {
                     lastReceiveTime = System.currentTimeMillis();
                     if (listener != null) listener.onTimeout(duration);
                 } else {
-                    sendBroadcast(HEARTBEAT_MSG, clientPort);
+                    sendHBtoSelf();
                 }
             }
         });
         timer.startTimer(delay, period);
+    }
+
+
+    private void sendHBtoSelf() {
+        if (datagramSocket != null) {
+            String ip = getHostAddress();
+            sendMessage(HEARTBEAT_MSG, ip, clientPort);
+        }
     }
 
 
