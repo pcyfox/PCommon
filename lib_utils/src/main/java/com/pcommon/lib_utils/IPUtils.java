@@ -31,12 +31,11 @@ final public class IPUtils {
         if (conMann == null) return null;
 
         NetworkInfo mobileNetworkInfo = conMann.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
-        NetworkInfo wifiNetworkInfo = conMann.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
         if (mobileNetworkInfo != null && mobileNetworkInfo.isConnected()) {
             return getIp();
         }
 
+        NetworkInfo wifiNetworkInfo = conMann.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (wifiNetworkInfo != null && wifiNetworkInfo.isConnected()) {
             WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
