@@ -45,7 +45,7 @@ public class UDPSocketClient {
     private static final Object lock = new Object();
 
     public boolean isStarted() {
-        if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed()) {
+        if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed() || !datagramSocket.isBound()) {
             return false;
         }
         return isThreadRunning;

@@ -43,7 +43,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
             UDPSocketClient.getInstance()?.run {
                 sendBroadcast(
                     "{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}",
-                    clientPort
+                    9978
                 )
             }
         }
