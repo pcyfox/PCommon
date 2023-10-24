@@ -1,8 +1,6 @@
 package com.pcommon.test
 
 import android.util.Log
-import com.df.lib_config.DeskConfig
-import com.df.lib_config.DeskConfigManager
 import com.pcommon.lib_common.base.BaseActivity
 import com.pcommon.lib_common.ext.postDelayed
 import com.pcommon.lib_common.ext.startActivityExt
@@ -21,7 +19,6 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     override fun initData() {
         super.initData()
         //DeskConfigManager.getInstance().updateData()
-        testUDP()
     }
 
     override fun initView() {
@@ -40,12 +37,7 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     override fun initListener() {
         super.initListener()
         btnSend.setOnClickListener {
-            UDPSocketClient.getInstance()?.run {
-                sendBroadcast(
-                    "{\"action\":\"SET_DESK_NUMBER\",\"data\":\"\",\"delay\":0,\"deskNumber\":[],\"isShowTip\":true}",
-                    9978
-                )
-            }
+            startActivityExt(TestUDPSocketActivity::class.java)
         }
         btnTestLoadFile.setOnClickListener { startActivityExt(TestLoadFileActivity::class.java) }
         btnCustomSourceImageView.setOnClickListener { startActivityExt(TestCustomSourceImageActivity::class.java) }
@@ -55,14 +47,5 @@ class TestActivity(override val layoutId: Int = R.layout.activity_test) :
     private fun testCrash() {
     }
 
-    private fun testUDP() {
-        Log.d(TAG, "testUDP() called")
-        UDPSocketClient.getInstance(9978).start { m, ip, port ->
-            Log.d(TAG, "testUDP() called with rev: m = $m, ip = $ip, port = $port")
-        }
-        UDPSocketClient.getInstance().startHeartbeatTimer(200, 10_000) {
-            Log.e(TAG, "testUDP() ,on hb timeout! $it")
-        }
-    }
 
 }

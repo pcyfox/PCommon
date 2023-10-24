@@ -13,11 +13,15 @@ public class HeartbeatTimer {
     private TimerTask task;
     private OnScheduleListener mListener;
 
+    private boolean isStart = false;
+
+
     public HeartbeatTimer() {
         timer = new Timer();
     }
 
     public void startTimer(long delay, long period) {
+        isStart = true;
         task = new TimerTask() {
             @Override
             public void run() {
@@ -26,20 +30,25 @@ public class HeartbeatTimer {
                 }
             }
         };
+
         timer.schedule(task, delay, period);
+
     }
 
     public void exit() {
-        if (timer != null) {
-            timer.cancel();
-        }
+        timer.cancel();
         if (task != null) {
             task.cancel();
         }
+        isStart = false;
     }
 
+    public boolean isStart() {
+        return isStart;
+    }
 
     public void setOnScheduleListener(OnScheduleListener listener) {
         this.mListener = listener;
     }
+
 }

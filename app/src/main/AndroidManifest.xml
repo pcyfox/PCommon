@@ -27,6 +27,9 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
         <activity
+            android:name=".TestUDPSocketActivity"
+            android:exported="false" />
+        <activity
             android:name=".TestLoadFileActivity"
             android:exported="false">
             <meta-data
@@ -41,13 +44,9 @@
             android:name="design_width_in_dp"
             android:value="540" />
 
-
         <activity
             android:name=".TestCustomSourceImageActivity"
             android:exported="false" />
-
-
-
         <activity android:name=".TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

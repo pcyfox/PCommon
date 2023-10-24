@@ -34,9 +34,9 @@ public class UDPSocketClient {
     private volatile boolean isThreadRunning = false;
 
     private DatagramSocket datagramSocket;
-    private DatagramPacket receivePacket;
 
-    private long lastReceiveTime = 0;
+
+    private volatile long lastReceiveTime = 0;
     private static final long TIME_OUT = 12 * 1000;
     private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
     private static final String HEARTBEAT_MSG = "HB-Hi";
@@ -45,7 +45,7 @@ public class UDPSocketClient {
     private static final Object lock = new Object();
 
     public boolean isStarted() {
-        if (receivePacket == null || datagramSocket == null || datagramSocket.isClosed() || !datagramSocket.isBound()) {
+        if (datagramSocket == null || datagramSocket.isClosed() || !datagramSocket.isBound()) {
             return false;
         }
         return isThreadRunning;
@@ -101,12 +101,11 @@ public class UDPSocketClient {
         XLog.i(TAG + ":stopUDPSocket() called");
         isThreadRunning = false;
         if (datagramSocket != null) {
-            if (!datagramSocket.isClosed()) datagramSocket.close();
+            if (!isStarted()) return;
+            datagramSocket.close();
             XLog.d(TAG + ";stopUDPSocket() called socket closed");
-            datagramSocket = null;
         }
-        isThreadRunning = false;
-        receivePacket = null;
+
         if (timer != null) {
             timer.exit();
         }
@@ -126,8 +125,6 @@ public class UDPSocketClient {
             stopUDPSocket();
         }
         try {
-            // 创建接受数据的 packet
-            receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
             datagramSocket = new DatagramSocket(null);
             datagramSocket.setReuseAddress(true);
             datagramSocket.bind(new InetSocketAddress(clientPort));
@@ -186,19 +183,10 @@ public class UDPSocketClient {
     private void receiveMessage() {
         while (isStarted() && !Thread.interrupted()) {
             try {
+                DatagramPacket receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
                 datagramSocket.receive(receivePacket);
                 lastReceiveTime = System.currentTimeMillis();
-            } catch (IOException e) {
-                XLog.d("UDP数据包接收失败！线程停止 e:" + e.getMessage());
-                stopUDPSocket();
-                e.printStackTrace();
-                return;
-            }
-            if (receivePacket == null || receivePacket.getLength() == 0 || receivePacket.getAddress() == null) {
-                XLog.d("无法接收UDP数据或者接收到的UDP数据为空");
-                continue;
-            }
-            try {
+                if (receivePacket.getAddress() == null) continue;
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
                 if (!BuildConfig.DEBUG && HEARTBEAT_MSG.equals(strReceive)) return;
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
@@ -207,14 +195,9 @@ public class UDPSocketClient {
                 } else {
                     XLog.e(TAG + ":receiveMessage,but msgArrivedListener is null ! ");
                 }
-                // 每次接收完UDP数据后，重置长度。否则可能会导致下次收到数据包被截断。
-                if (receivePacket != null) {
-                    receivePacket.setLength(BUFFER_LENGTH);
-                    //XLog.d(TAG + ",接收到广播数据:\n form:" + host + ":" + receivePacket.getPort() + "\n content:\n" + strReceive);
-                }
             } catch (Exception e) {
-                XLog.e(TAG + ",receiveMessage() error:" + e.getMessage());
-                e.printStackTrace();
+                XLog.d("UDP数据包接收失败！线程停止 e:" + e.getMessage());
+                stopUDPSocket();
             }
         }
     }
@@ -228,25 +211,33 @@ public class UDPSocketClient {
     }
 
 
+    public boolean isStaredHeartbeatTimer() {
+        return timer != null && timer.isStart();
+    }
+
+    public void stopHeartbeatTimer() {
+        if (timer != null) timer.exit();
+        timer = null;
+    }
+
+
     /**
      * 启动心跳
      */
     public void startHeartbeatTimer(long delay, long period, HeartbeatListener listener) {
         XLog.d(TAG + ",startHeartbeatTimer() called with: delay = [" + delay + "], period = [" + period + "]");
-        if (timer != null) {
-            timer.exit();
-        }
+        stopHeartbeatTimer();
         sendHBtoSelf();
         timer = new HeartbeatTimer();
         timer.setOnScheduleListener(() -> {
             if (isStarted()) {
                 long duration = System.currentTimeMillis() - lastReceiveTime;
-                if (duration > period * 2) {//若超过两分钟都没收到我的心跳包，则认为对方不在线。
-                    XLog.d(TAG + ",心跳超时");
+                if (duration > period * 3) {//若超过两分钟都没收到我的心跳包，则认为对方不在线。
+                    XLog.w(TAG + "startHeartbeatTimer(),-------心跳超时---------");
                     // 刷新时间，重新进入下一个心跳周期
                     lastReceiveTime = System.currentTimeMillis();
                     if (listener != null) listener.onTimeout(duration);
-                } else {
+                } else if (duration >= period) {
                     sendHBtoSelf();
                 }
             }
