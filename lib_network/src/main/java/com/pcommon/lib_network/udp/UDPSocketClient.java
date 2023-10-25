@@ -9,7 +9,6 @@ import com.elvishew.xlog.XLog;
 import com.pcommon.lib_network.BuildConfig;
 import com.pcommon.lib_network.Utils;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -21,35 +20,20 @@ import java.nio.charset.StandardCharsets;
  */
 @Keep
 public class UDPSocketClient {
+    private static final String TAG = "UDPSocketClient";
     private OnSocketMsgArrivedListener msgArrivedListener;
     private OnStateChangeLister onStateChangeLister;
     private static UDPSocketClient instance;
-    private static final String TAG = "UDPSocketClient";
-    // 单个CPU线程池大小
     private static final int BUFFER_LENGTH = 8 * 1024;
     private final byte[] receiveByte = new byte[BUFFER_LENGTH];
     private static final String BROADCAST_IP = "255.255.255.255";
-
     private int clientPort = 1999;
     private volatile boolean isThreadRunning = false;
-
-    private DatagramSocket datagramSocket;
-
-
     private volatile long lastReceiveTime = 0;
-    private static final long TIME_OUT = 12 * 1000;
-    private static final long HEARTBEAT_MESSAGE_DURATION = 10 * 1000;
     private static final String HEARTBEAT_MSG = "HB-Hi";
-
+    private DatagramSocket datagramSocket;
     private HeartbeatTimer timer;
     private static final Object lock = new Object();
-
-    public boolean isStarted() {
-        if (datagramSocket == null || datagramSocket.isClosed() || !datagramSocket.isBound()) {
-            return false;
-        }
-        return isThreadRunning;
-    }
 
     private UDPSocketClient() {
         // 记录创建对象时的时间
@@ -77,6 +61,13 @@ public class UDPSocketClient {
         return instance;
     }
 
+
+    public boolean isStarted() {
+        if (datagramSocket == null || datagramSocket.isClosed() || !datagramSocket.isBound()) {
+            return false;
+        }
+        return isThreadRunning;
+    }
 
     public static UDPSocketClient newInstance(int port) {
         return new UDPSocketClient(port);
@@ -188,7 +179,7 @@ public class UDPSocketClient {
                 lastReceiveTime = System.currentTimeMillis();
                 if (receivePacket.getAddress() == null) continue;
                 String strReceive = new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
-                if (!BuildConfig.DEBUG && HEARTBEAT_MSG.equals(strReceive)) return;
+                if (!BuildConfig.DEBUG && HEARTBEAT_MSG.equals(strReceive)) continue;
                 String host = (receivePacket.getAddress() == null) ? "null" : receivePacket.getAddress().getHostAddress();
                 if (msgArrivedListener != null) {
                     msgArrivedListener.onSocketMsgArrived(strReceive, host, receivePacket.getPort());
@@ -288,13 +279,4 @@ public class UDPSocketClient {
         void onStop();
     }
 
-
-    @Override
-    public String toString() {
-        return "UDPSocketClient{" +
-                "CLIENT_PORT=" + clientPort +
-                ", lastReceiveTime=" + lastReceiveTime +
-                ", timer=" + timer +
-                '}';
-    }
 }
