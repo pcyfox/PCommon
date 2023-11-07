@@ -12,23 +12,31 @@ import java.util.*
 object UploadUtils {
     private val TAG = "UploadUtils"
 
+    private var myHttpClient: OkHttpClient? = null
+        get() {
+            if (field == null) field = OkHttpClient();
+            return field
+        }
+
+
     fun upload(
         url: String,
         headers: Headers? = null,
         formDataParts: Map<String, String>? = null,
         filePath: String,
         fileName: String,
+        filePartName: String = "file",
         okHttpClient: OkHttpClient? = null
     ): Observable<String?> {
         Log.d(
             TAG,
             "upload() called with: url = $url, headers = $headers, filePath = $filePath, fileName = $fileName"
         )
-        val client = okHttpClient ?: OkHttpClient()
+        val client = okHttpClient ?: myHttpClient!!
         val requestBody: RequestBody = MultipartBody.Builder()
             .setType(FORM)
             .addFormDataPart(
-                "file", fileName,
+                filePartName, fileName,
                 File(filePath).asRequestBody("multipart/form-data".toMediaTypeOrNull())
             ).apply {
                 formDataParts?.forEach {

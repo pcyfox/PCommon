@@ -25,6 +25,7 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     constructor() : this(null)
 
     var tag: Any? = null
+
     protected var viewModel: VM? = null
     protected var contentView: View? = null
 
@@ -32,18 +33,12 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
     protected abstract val fragmentLayoutId: Int
     open var mainViewModelId = -1
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = if (vmClass != null) {
-            createViewModel(vmClass!!)
-        } else {
-            createViewModel()
-        }
-
-        if (viewModel != null) {
-            lifecycle.addObserver(viewModel!!)
-        }
+        initViewModel()
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,6 +86,17 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel>(var vmCla
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return false;
+    }
+
+    protected fun initViewModel() {
+        viewModel = if (vmClass != null) {
+            createViewModel(vmClass!!)
+        } else {
+            createViewModel()
+        }
+        if (viewModel != null) {
+            lifecycle.addObserver(viewModel!!)
+        }
     }
 
 
