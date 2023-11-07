@@ -6,6 +6,7 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody.Companion.FORM
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.*
 
@@ -23,6 +24,7 @@ object UploadUtils {
         url: String,
         headers: Headers? = null,
         formDataParts: Map<String, String>? = null,
+        body: String? = null,
         filePath: String,
         fileName: String,
         filePartName: String = "file",
@@ -41,6 +43,9 @@ object UploadUtils {
             ).apply {
                 formDataParts?.forEach {
                     addFormDataPart(it.key, it.value)
+                }
+                if (!body.isNullOrEmpty()) {
+                    addPart(body.toRequestBody())
                 }
             }
             .build()
@@ -84,9 +89,30 @@ object UploadUtils {
             url,
             headers = header,
             formDataParts = null,
+            body = null,
             filePath,
             fileName,
             okHttpClient = null
         )
     }
+
+    fun upload(
+        url: String,
+        reqBody: String?,
+        filePath: String,
+        fileName: String,
+        filePartName: String,
+    ): Observable<String?> {
+        return upload(
+            url,
+            headers = null,
+            formDataParts = null,
+            body = reqBody,
+            filePath,
+            fileName,
+            filePartName = filePartName,
+            okHttpClient = null
+        )
+    }
+
 }
