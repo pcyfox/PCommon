@@ -26,6 +26,10 @@
         android:theme="@style/CommonAppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:label">
+
+        <activity
+            android:name=".TestUploadActivity"
+            android:exported="false" />
         <activity
             android:name=".TestUDPSocketActivity"
             android:exported="false" />

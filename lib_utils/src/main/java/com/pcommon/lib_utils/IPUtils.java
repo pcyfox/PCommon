@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import java.util.List;
 
 final public class IPUtils {
+    public static boolean isPrintLog = BuildConfig.DEBUG;
+
     private IPUtils() {
     }
 
@@ -41,7 +43,8 @@ final public class IPUtils {
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             int ipAddress = wifiInfo.getIpAddress();
             String ip = intToIp(ipAddress);
-            System.out.println("----------- net element:" + wifiInfo.getSSID() + ",Ip:" + ip + "-----------");
+            if (isPrintLog)
+                System.out.println("----------- net element:" + wifiInfo.getSSID() + ",Ip:" + ip + "-----------");
             return ip;
         }
         return "";
@@ -63,7 +66,8 @@ final public class IPUtils {
                     // 排除IPv6地址和回环地址
                     if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress instanceof Inet4Address) {
                         ip = inetAddress.getHostAddress();
-                        System.out.println("----------- net element:" + into.getName() + ",Ip:" + ip + "-----------");
+                        if (isPrintLog)
+                            System.out.println("----------- net element:" + into.getName() + ",Ip:" + ip + "-----------");
                         ips.add(ip);
                     }
                 }
