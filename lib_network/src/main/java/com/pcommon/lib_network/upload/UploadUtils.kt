@@ -39,7 +39,6 @@ object UploadUtils {
     var progressListener: ProgressListener? = null
 
 
-    @WorkerThread
     fun upload(
         url: String,
         reqHeaders: Headers? = null,
@@ -120,7 +119,6 @@ object UploadUtils {
         }
     }
 
-    @WorkerThread
     fun upload(
         url: String,
         authorization: Pair<String, String>,
@@ -144,7 +142,6 @@ object UploadUtils {
     }
 
 
-    @WorkerThread
     fun upload(
         url: String,
         params: Map<String, String>,
@@ -163,7 +160,6 @@ object UploadUtils {
         )
     }
 
-    @WorkerThread
     fun upload(
         url: String,
         reqBody: String?,
