@@ -34,7 +34,11 @@ final public class IPUtils {
 
         NetworkInfo mobileNetworkInfo = conMann.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
         if (mobileNetworkInfo != null && mobileNetworkInfo.isConnected()) {
-            return getIp();
+            String name = mobileNetworkInfo.getTypeName();
+            String ip = getIp();
+            if (isPrintLog)
+                System.out.println("-----------getIpAddress,form " + name + ",Ip:" + ip + "-----------");
+            return ip;
         }
 
         NetworkInfo wifiNetworkInfo = conMann.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -44,9 +48,12 @@ final public class IPUtils {
             int ipAddress = wifiInfo.getIpAddress();
             String ip = intToIp(ipAddress);
             if (isPrintLog)
-                System.out.println("----------- net element:" + wifiInfo.getSSID() + ",Ip:" + ip + "-----------");
+                System.out.println("-----------getIpAddress,form wifi ssid:" + wifiInfo.getSSID() + ",Ip:" + ip + "-----------");
             return ip;
         }
+
+        if (isPrintLog)
+            System.out.println("-----------getIpAddress Ip is empty-----------");
         return "";
     }
 

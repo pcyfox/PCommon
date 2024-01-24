@@ -46,14 +46,13 @@ public class OKHttpUtils {
             if (cache != null) {
                 cache.delete();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         Request request = new Request.Builder()
                 .url(url)
                 .build();
         client.newCall(request).enqueue(callback);
-
     }
 
 
@@ -101,18 +100,11 @@ public class OKHttpUtils {
         if (sync) {
             try {
                 Call call = client.newCall(request);
-                Response temp = call.execute();
-                if (temp != null) {
-
-                    if (temp.isSuccessful()) {
-                        ResponseBody body = temp.body();
-                        //call string auto close body
-                        callback.onResponse(call, temp);
-                    } else {
-                        callback.onFailure(call, new IOException("fail"));
-                    }
+                Response response = call.execute();
+                if (response.isSuccessful()) {
+                    callback.onResponse(call, response);
                 } else {
-                    callback.onFailure(call, new IOException("fail"));
+                    callback.onFailure(call, new IOException("call  onFinish fail"));
                 }
 
             } catch (IOException e) {
@@ -181,6 +173,18 @@ public class OKHttpUtils {
         client.newCall(builder.build()).enqueue(callback);
     }
 
+    public static Response post(String url, Map<String, String> params) throws Exception {
+        FormBody.Builder builder = new FormBody.Builder();
+        if (params != null && params.size() > 0) {
+            for (Map.Entry<String, String> p : params.entrySet()) {
+                builder.add(p.getKey(), p.getValue());
+            }
+        }
+        RequestBody body = builder.build();
+        Request request = new Request.Builder().url(url).post(body).build();
+        return getOkHttpClient().newCall(request).execute();
+    }
+
 
     public static void post(@NonNull String url, @NonNull String jsonData, Map<String, String> header, @NonNull Callback callback) {
         post(getOkHttpClient(), url, jsonData, header, callback);
@@ -190,20 +194,13 @@ public class OKHttpUtils {
     public static String getSys(String url) {
         Request request = new Request.Builder().url(url).build();
         Call call = getOkHttpClient().newCall(request);
-        Response response = null;
         try {
-            response = call.execute();
+            Response response = call.execute();
+            if (response.isSuccessful()) {
+                return response.body().string();
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        if (response != null) {
-            if (response.isSuccessful()) {
-                try {
-                    return response.body().string();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return null;
     }
@@ -217,7 +214,7 @@ public class OKHttpUtils {
                     .readTimeout(20, TimeUnit.SECONDS)
                     .writeTimeout(20, TimeUnit.SECONDS);
 
-            if (interceptors != null && interceptors.length > 0) {
+            if (interceptors != null) {
                 for (Interceptor interceptor : interceptors) {
                     builder.addInterceptor(interceptor);
                 }
@@ -225,34 +222,6 @@ public class OKHttpUtils {
             okHttpClient = builder.build();
         }
         return okHttpClient;
-    }
-
-
-    /**
-     * 使用okHttp进行同步post网络请求, Form表单格式请求
-     *
-     * @param url    请求地址
-     * @param params 请求参数
-     * @return
-     * @throws IOException
-     */
-    public static Response post(String url, Map<String, String> params) throws Exception {
-        FormBody.Builder builder = new FormBody.Builder();
-        StringBuilder temp = new StringBuilder();
-        if (params != null && params.size() > 0) {
-            for (String key : params.keySet()) {
-                String value = params.get(key);
-                if (!TextUtils.isEmpty(value)) {
-                    builder.add(key, params.get(key));
-                    temp.append("\n   ").append(key).append(" --> ").append(params.get(key));
-                }
-            }
-        }
-        RequestBody body = builder.build();
-        //RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
-        Request request = new Request.Builder().url(url).post(body).build();
-        //AppLog.d(TAG, "Http Req --> " + url + temp);
-        return getOkHttpClient().newCall(request).execute();
     }
 
 
