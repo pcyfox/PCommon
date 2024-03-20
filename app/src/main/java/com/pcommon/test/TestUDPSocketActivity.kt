@@ -35,6 +35,7 @@ class TestUDPSocketActivity : AppCompatActivity() {
         Log.d(TAG, "testUDP() called")
         UDPSocketClient.getInstance(9978).start { m, ip, port ->
             Log.d(TAG, "testUDP() called with rev: m = $m, ip = $ip, port = $port")
+            false
         }
 
     }

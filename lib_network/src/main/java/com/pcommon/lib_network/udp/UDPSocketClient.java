@@ -270,7 +270,7 @@ public class UDPSocketClient {
     }
 
     public interface OnSocketMsgArrivedListener {
-        void onSocketMsgArrived(String msg, String ip, int pot);
+        boolean onSocketMsgArrived(String msg, String ip, int pot);
     }
 
     public interface OnStateChangeLister {
